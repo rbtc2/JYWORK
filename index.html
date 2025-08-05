@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>세계 여행 앱</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .nav-tab {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tab:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .nav-tab.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        @media (max-width: 640px) {
+            .nav-container {
+                padding: 0.5rem;
+            }
+            
+            .nav-tab {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 네비게이션 바 -->
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="nav-container max-w-4xl mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <div class="text-xl font-bold text-gray-800 py-4">
+                    🌍 여행 앱
+                </div>
+            </div>
+            
+            <!-- 탭 네비게이션 -->
+            <div class="flex space-x-1 pb-2">
+                <button class="nav-tab active flex-1 py-3 px-4 rounded-lg text-sm font-medium text-center transition-colors" data-section="world-map">
+                    🗺️ 세계지도
+                </button>
+                <button class="nav-tab flex-1 py-3 px-4 rounded-lg text-sm font-medium text-center transition-colors text-gray-600" data-section="dashboard">
+                    📊 대시보드
+                </button>
+                <button class="nav-tab flex-1 py-3 px-4 rounded-lg text-sm font-medium text-center transition-colors text-gray-600" data-section="timeline">
+                    ⏰ 타임라인
+                </button>
+                <button class="nav-tab flex-1 py-3 px-4 rounded-lg text-sm font-medium text-center transition-colors text-gray-600" data-section="calendar">
+                    📅 캘린더
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 메인 콘텐츠 -->
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <!-- 세계지도 섹션 -->
+        <section id="world-map" class="content-section block">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                <div class="text-center">
+                    <div class="text-6xl mb-6">🗺️</div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4">세계지도</h1>
+                    <p class="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
+                        전 세계 여행지를 인터랙티브 지도에서 탐색하세요. 
+                        각 국가와 도시를 클릭하여 상세 정보를 확인할 수 있으며, 
+                        방문한 곳과 가고 싶은 곳을 마커로 표시할 수 있습니다.
+                    </p>
+                    <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+                        <p class="text-blue-800 text-sm">
+                            💡 지도를 확대/축소하고 드래그하여 원하는 지역을 탐색해보세요.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 대시보드 섹션 -->
+        <section id="dashboard" class="content-section hidden">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                <div class="text-center">
+                    <div class="text-6xl mb-6">📊</div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4">대시보드</h1>
+                    <p class="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
+                        여행 통계와 분석 데이터를 한눈에 확인하세요. 
+                        방문한 국가 수, 총 여행 거리, 소요된 시간 등 
+                        다양한 여행 데이터를 시각적으로 확인할 수 있습니다.
+                    </p>
+                    <div class="mt-8 p-4 bg-green-50 rounded-lg">
+                        <p class="text-green-800 text-sm">
+                            📈 여행 패턴과 통계를 분석하여 더 나은 여행 계획을 세워보세요.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 타임라인 섹션 -->
+        <section id="timeline" class="content-section hidden">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                <div class="text-center">
+                    <div class="text-6xl mb-6">⏰</div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4">타임라인</h1>
+                    <p class="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
+                        여행 일정을 시간순으로 정리하고 관리하세요. 
+                        각 여행의 시작과 끝, 주요 일정들을 타임라인 형태로 
+                        시각화하여 전체 여행 흐름을 한눈에 파악할 수 있습니다.
+                    </p>
+                    <div class="mt-8 p-4 bg-purple-50 rounded-lg">
+                        <p class="text-purple-800 text-sm">
+                            🕒 시간순으로 정렬된 여행 기록으로 추억을 되새겨보세요.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 캘린더 섹션 -->
+        <section id="calendar" class="content-section hidden">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                <div class="text-center">
+                    <div class="text-6xl mb-6">📅</div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4">캘린더</h1>
+                    <p class="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
+                        월별 캘린더로 여행 일정을 시각적으로 확인하세요. 
+                        각 날짜에 방문한 곳과 예정된 여행을 표시하여 
+                        전체적인 여행 일정을 체계적으로 관리할 수 있습니다.
+                    </p>
+                    <div class="mt-8 p-4 bg-orange-50 rounded-lg">
+                        <p class="text-orange-800 text-sm">
+                            📆 월별/연도별 여행 일정을 한눈에 확인하고 계획해보세요.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 탭 클릭 이벤트 처리
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const targetSection = this.getAttribute('data-section');
+                
+                // 모든 탭에서 active 클래스 제거
+                document.querySelectorAll('.nav-tab').forEach(t => {
+                    t.classList.remove('active');
+                    t.classList.add('text-gray-600');
+                });
+                
+                // 클릭된 탭에 active 클래스 추가
+                this.classList.add('active');
+                this.classList.remove('text-gray-600');
+                
+                // 모든 섹션 숨기기
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.add('hidden');
+                });
+                
+                // 해당 섹션 보이기
+                const targetElement = document.getElementById(targetSection);
+                if (targetElement) {
+                    targetElement.classList.remove('hidden');
+                    targetElement.classList.add('block');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
