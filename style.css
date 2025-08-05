@@ -1,0 +1,138 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.nav-tab {
+    transition: all 0.3s ease;
+}
+
+.nav-tab:hover {
+    background-color: #f3f4f6;
+}
+
+.nav-tab.active {
+    background-color: #3b82f6;
+    color: white;
+}
+
+@media (max-width: 640px) {
+    .nav-container {
+        padding: 0.5rem;
+    }
+    
+    .nav-tab {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* 캘린더 이벤트 스타일 (구글 캘린더 스타일) */
+.calendar-event {
+    display: block;
+    width: 100%;
+    padding: 2px 6px;
+    margin: 1px 0;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-left: 3px solid;
+}
+
+.calendar-event:hover {
+    transform: scale(1.02);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 이벤트 색상 변형 */
+.calendar-event.event-1 { background-color: #4285f4; border-left-color: #1a73e8; }
+.calendar-event.event-2 { background-color: #ea4335; border-left-color: #d93025; }
+.calendar-event.event-3 { background-color: #fbbc04; border-left-color: #f9ab00; }
+.calendar-event.event-4 { background-color: #34a853; border-left-color: #137333; }
+.calendar-event.event-5 { background-color: #9c27b0; border-left-color: #7b1fa2; }
+.calendar-event.event-6 { background-color: #ff9800; border-left-color: #f57c00; }
+.calendar-event.event-7 { background-color: #795548; border-left-color: #5d4037; }
+.calendar-event.event-8 { background-color: #607d8b; border-left-color: #455a64; }
+
+/* 툴팁 스타일 */
+.calendar-tooltip {
+    animation: tooltipFadeIn 0.2s ease-out;
+}
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 모바일에서 터치 영역 확대 */
+@media (max-width: 768px) {
+    .calendar-event {
+        padding: 3px 8px;
+        font-size: 0.8rem;
+        margin: 2px 0;
+    }
+    
+    /* 모바일에서 캘린더 네비게이션 최적화 */
+    #year-select, #month-select {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+/* 지도 마커 스타일 */
+.custom-marker {
+    background: none;
+    border: none;
+}
+
+.marker-pin {
+    font-size: 24px;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.marker-pin:hover {
+    transform: scale(1.2);
+}
+
+/* 거주지 마커 스타일 */
+.marker-pin.text-red-500 {
+    color: #ef4444;
+    filter: drop-shadow(2px 2px 2px rgba(239, 68, 68, 0.3));
+}
+
+/* 팝업 스타일 */
+.custom-popup .leaflet-popup-content-wrapper {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custom-popup .leaflet-popup-content {
+    margin: 0;
+    padding: 0;
+}
+
+.popup-content {
+    padding: 12px;
+}
+
+/* 지도 컨테이너 반응형 */
+@media (max-width: 768px) {
+    #map-container {
+        height: 60vh !important;
+        max-height: 400px !important;
+    }
+} 
