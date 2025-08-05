@@ -88,7 +88,7 @@
         <!-- 대시보드 섹션 -->
         <section id="dashboard" class="content-section hidden">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                <div class="text-center">
+                <div class="text-center mb-8">
                     <div class="text-6xl mb-6">📊</div>
                     <h1 class="text-3xl font-bold text-gray-800 mb-4">대시보드</h1>
                     <p class="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
@@ -96,10 +96,29 @@
                         방문한 국가 수, 총 여행 거리, 소요된 시간 등 
                         다양한 여행 데이터를 시각적으로 확인할 수 있습니다.
                     </p>
-                    <div class="mt-8 p-4 bg-green-50 rounded-lg">
-                        <p class="text-green-800 text-sm">
-                            📈 여행 패턴과 통계를 분석하여 더 나은 여행 계획을 세워보세요.
-                        </p>
+                </div>
+                
+                <!-- 통계 카드들 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-blue-50 rounded-xl p-6 text-center">
+                        <div class="text-3xl font-bold text-blue-600 mb-2" id="total-countries">0</div>
+                        <div class="text-blue-800 font-medium">방문 국가</div>
+                    </div>
+                    <div class="bg-green-50 rounded-xl p-6 text-center">
+                        <div class="text-3xl font-bold text-green-600 mb-2" id="total-cities">0</div>
+                        <div class="text-green-800 font-medium">방문 도시</div>
+                    </div>
+                    <div class="bg-purple-50 rounded-xl p-6 text-center">
+                        <div class="text-3xl font-bold text-purple-600 mb-2" id="total-days">0</div>
+                        <div class="text-purple-800 font-medium">총 체류일</div>
+                    </div>
+                </div>
+                
+                <!-- 추가 통계 -->
+                <div class="bg-gray-50 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">여행 요약</h3>
+                    <div id="travel-summary" class="text-gray-600">
+                        <!-- 여기에 동적으로 요약 정보가 추가됩니다 -->
                     </div>
                 </div>
             </div>
@@ -108,7 +127,7 @@
         <!-- 타임라인 섹션 -->
         <section id="timeline" class="content-section hidden">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                <div class="text-center">
+                <div class="text-center mb-8">
                     <div class="text-6xl mb-6">⏰</div>
                     <h1 class="text-3xl font-bold text-gray-800 mb-4">타임라인</h1>
                     <p class="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
@@ -116,11 +135,18 @@
                         각 여행의 시작과 끝, 주요 일정들을 타임라인 형태로 
                         시각화하여 전체 여행 흐름을 한눈에 파악할 수 있습니다.
                     </p>
-                    <div class="mt-8 p-4 bg-purple-50 rounded-lg">
-                        <p class="text-purple-800 text-sm">
-                            🕒 시간순으로 정렬된 여행 기록으로 추억을 되새겨보세요.
-                        </p>
-                    </div>
+                </div>
+                
+                <!-- 타임라인 목록 -->
+                <div id="timeline-list" class="space-y-4">
+                    <!-- 여기에 동적으로 타임라인 카드들이 추가됩니다 -->
+                </div>
+                
+                <!-- 빈 상태 메시지 -->
+                <div id="timeline-empty" class="text-center py-12">
+                    <div class="text-4xl mb-4">📝</div>
+                    <p class="text-gray-500 text-lg">아직 등록된 여행 일정이 없습니다.</p>
+                    <p class="text-gray-400 text-sm mt-2">우측 하단의 + 버튼을 눌러 첫 여행을 추가해보세요!</p>
                 </div>
             </div>
         </section>
@@ -128,7 +154,7 @@
         <!-- 캘린더 섹션 -->
         <section id="calendar" class="content-section hidden">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                <div class="text-center">
+                <div class="text-center mb-8">
                     <div class="text-6xl mb-6">📅</div>
                     <h1 class="text-3xl font-bold text-gray-800 mb-4">캘린더</h1>
                     <p class="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
@@ -136,17 +162,434 @@
                         각 날짜에 방문한 곳과 예정된 여행을 표시하여 
                         전체적인 여행 일정을 체계적으로 관리할 수 있습니다.
                     </p>
-                    <div class="mt-8 p-4 bg-orange-50 rounded-lg">
-                        <p class="text-orange-800 text-sm">
-                            📆 월별/연도별 여행 일정을 한눈에 확인하고 계획해보세요.
-                        </p>
-                    </div>
+                </div>
+                
+                <!-- 캘린더 네비게이션 -->
+                <div class="flex justify-between items-center mb-6">
+                    <button id="prev-month" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
+                        ← 이전
+                    </button>
+                    <h2 id="current-month" class="text-xl font-semibold text-gray-800">2024년 1월</h2>
+                    <button id="next-month" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
+                        다음 →
+                    </button>
+                </div>
+                
+                <!-- 캘린더 테이블 -->
+                <div class="overflow-x-auto">
+                    <table id="calendar-table" class="w-full border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="p-3 text-center text-sm font-medium text-gray-600">일</th>
+                                <th class="p-3 text-center text-sm font-medium text-gray-600">월</th>
+                                <th class="p-3 text-center text-sm font-medium text-gray-600">화</th>
+                                <th class="p-3 text-center text-sm font-medium text-gray-600">수</th>
+                                <th class="p-3 text-center text-sm font-medium text-gray-600">목</th>
+                                <th class="p-3 text-center text-sm font-medium text-gray-600">금</th>
+                                <th class="p-3 text-center text-sm font-medium text-gray-600">토</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calendar-body">
+                            <!-- 여기에 동적으로 캘린더가 생성됩니다 -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 빈 상태 메시지 -->
+                <div id="calendar-empty" class="text-center py-12">
+                    <div class="text-4xl mb-4">📝</div>
+                    <p class="text-gray-500 text-lg">아직 등록된 여행 일정이 없습니다.</p>
+                    <p class="text-gray-400 text-sm mt-2">우측 하단의 + 버튼을 눌러 첫 여행을 추가해보세요!</p>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- 플로팅 + 버튼 -->
+    <button id="floating-btn" class="fixed bottom-6 right-6 w-14 h-14 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 z-50">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+    </button>
+
+    <!-- 모달 오버레이 -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <!-- 모달 창 -->
+        <div class="bg-white rounded-xl shadow-xl w-11/12 max-w-md max-h-[90vh] overflow-y-auto">
+            <!-- 모달 헤더 -->
+            <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-800">새 여행 추가</h2>
+                <button id="close-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- 모달 내용 -->
+            <form id="travel-form" class="p-6 space-y-4">
+                <!-- 국가 선택 -->
+                <div>
+                    <label for="country" class="block text-sm font-medium text-gray-700 mb-2">국가 *</label>
+                    <select id="country" name="country" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">국가를 선택하세요</option>
+                        <option value="korea">대한민국</option>
+                        <option value="japan">일본</option>
+                        <option value="china">중국</option>
+                        <option value="usa">미국</option>
+                        <option value="uk">영국</option>
+                        <option value="france">프랑스</option>
+                        <option value="germany">독일</option>
+                        <option value="italy">이탈리아</option>
+                        <option value="spain">스페인</option>
+                        <option value="australia">호주</option>
+                        <option value="canada">캐나다</option>
+                        <option value="singapore">싱가포르</option>
+                        <option value="thailand">태국</option>
+                        <option value="vietnam">베트남</option>
+                        <option value="other">기타</option>
+                    </select>
+                </div>
+
+                <!-- 도시 입력 -->
+                <div>
+                    <label for="city" class="block text-sm font-medium text-gray-700 mb-2">도시 *</label>
+                    <input type="text" id="city" name="city" required placeholder="도시명을 입력하세요" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- 체류 시작일 -->
+                <div>
+                    <label for="start-date" class="block text-sm font-medium text-gray-700 mb-2">체류 시작일 *</label>
+                    <input type="date" id="start-date" name="startDate" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- 체류 종료일 -->
+                <div>
+                    <label for="end-date" class="block text-sm font-medium text-gray-700 mb-2">체류 종료일 *</label>
+                    <input type="date" id="end-date" name="endDate" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- 체류 목적 -->
+                <div>
+                    <label for="purpose" class="block text-sm font-medium text-gray-700 mb-2">체류 목적 *</label>
+                    <select id="purpose" name="purpose" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">목적을 선택하세요</option>
+                        <option value="travel">여행</option>
+                        <option value="business">출장</option>
+                        <option value="study">유학</option>
+                        <option value="working-holiday">워킹 홀리데이</option>
+                        <option value="family-visit">가족 방문</option>
+                        <option value="dispatch">파견</option>
+                        <option value="exchange">교환학생</option>
+                        <option value="volunteer">봉사활동</option>
+                        <option value="medical">의료</option>
+                        <option value="language">어학 연수</option>
+                        <option value="transit">비행 경유</option>
+                    </select>
+                </div>
+
+                <!-- 메모 -->
+                <div>
+                    <label for="memo" class="block text-sm font-medium text-gray-700 mb-2">메모</label>
+                    <textarea id="memo" name="memo" rows="3" placeholder="추가 메모를 입력하세요 (선택사항)" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"></textarea>
+                </div>
+
+                <!-- 제출 버튼 -->
+                <div class="flex space-x-3 pt-4">
+                    <button type="button" id="cancel-btn" class="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                        취소
+                    </button>
+                    <button type="submit" class="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+                        추가
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
+        // 전역 변수
+        let entries = [];
+        let currentDate = new Date();
+
+        // 모달 관련 요소들
+        const floatingBtn = document.getElementById('floating-btn');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const closeModal = document.getElementById('close-modal');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const travelForm = document.getElementById('travel-form');
+
+        // localStorage에서 데이터 불러오기
+        function loadEntries() {
+            const savedEntries = localStorage.getItem('travelEntries');
+            entries = savedEntries ? JSON.parse(savedEntries) : [];
+        }
+
+        // localStorage에 데이터 저장
+        function saveEntries() {
+            localStorage.setItem('travelEntries', JSON.stringify(entries));
+        }
+
+        // 날짜 차이 계산 (체류일 수)
+        function calculateDays(startDate, endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays + 1; // 시작일 포함
+        }
+
+        // 통계 계산
+        function calculateStats() {
+            if (entries.length === 0) {
+                document.getElementById('total-countries').textContent = '0';
+                document.getElementById('total-cities').textContent = '0';
+                document.getElementById('total-days').textContent = '0';
+                document.getElementById('travel-summary').innerHTML = '<p class="text-gray-500">아직 등록된 여행이 없습니다.</p>';
+                return;
+            }
+
+            // 중복 제거된 국가와 도시
+            const countries = [...new Set(entries.map(entry => entry.country))];
+            const cities = [...new Set(entries.map(entry => entry.city))];
+            
+            // 총 체류일 계산
+            const totalDays = entries.reduce((sum, entry) => {
+                return sum + calculateDays(entry.startDate, entry.endDate);
+            }, 0);
+
+            // 통계 업데이트
+            document.getElementById('total-countries').textContent = countries.length;
+            document.getElementById('total-cities').textContent = cities.length;
+            document.getElementById('total-days').textContent = totalDays;
+
+            // 요약 정보 생성
+            const summaryHTML = `
+                <div class="space-y-2">
+                    <p><strong>총 여행 횟수:</strong> ${entries.length}회</p>
+                    <p><strong>방문 국가:</strong> ${countries.join(', ')}</p>
+                    <p><strong>방문 도시:</strong> ${cities.join(', ')}</p>
+                    <p><strong>평균 체류일:</strong> ${Math.round(totalDays / entries.length)}일</p>
+                </div>
+            `;
+            document.getElementById('travel-summary').innerHTML = summaryHTML;
+        }
+
+        // 타임라인 렌더링
+        function renderTimeline() {
+            const timelineList = document.getElementById('timeline-list');
+            const timelineEmpty = document.getElementById('timeline-empty');
+
+            if (entries.length === 0) {
+                timelineList.style.display = 'none';
+                timelineEmpty.style.display = 'block';
+                return;
+            }
+
+            timelineList.style.display = 'block';
+            timelineEmpty.style.display = 'none';
+
+            // 날짜순으로 정렬 (최신순)
+            const sortedEntries = [...entries].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+
+            timelineList.innerHTML = sortedEntries.map(entry => {
+                const days = calculateDays(entry.startDate, entry.endDate);
+                const purposeText = {
+                    'travel': '여행',
+                    'business': '출장',
+                    'study': '유학',
+                    'working-holiday': '워킹 홀리데이',
+                    'family-visit': '가족 방문',
+                    'dispatch': '파견',
+                    'exchange': '교환학생',
+                    'volunteer': '봉사활동',
+                    'medical': '의료',
+                    'language': '어학 연수',
+                    'transit': '비행 경유'
+                }[entry.purpose] || entry.purpose;
+
+                return `
+                    <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">${entry.country} / ${entry.city}</h3>
+                                <p class="text-sm text-gray-600">${purposeText}</p>
+                            </div>
+                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                                ${days}일
+                            </span>
+                        </div>
+                        <div class="text-sm text-gray-500 mb-3">
+                            📅 ${entry.startDate} ~ ${entry.endDate}
+                        </div>
+                        ${entry.memo ? `<p class="text-sm text-gray-600 bg-gray-50 p-3 rounded">📝 ${entry.memo}</p>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 캘린더 렌더링
+        function renderCalendar() {
+            const calendarBody = document.getElementById('calendar-body');
+            const calendarEmpty = document.getElementById('calendar-empty');
+            const currentMonthElement = document.getElementById('current-month');
+
+            if (entries.length === 0) {
+                calendarBody.style.display = 'none';
+                calendarEmpty.style.display = 'block';
+                return;
+            }
+
+            calendarBody.style.display = 'table-row-group';
+            calendarEmpty.style.display = 'none';
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            currentMonthElement.textContent = `${year}년 ${month + 1}월`;
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+            let calendarHTML = '';
+            let currentRow = '';
+
+            for (let i = 0; i < 42; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+
+                if (i % 7 === 0 && i > 0) {
+                    calendarHTML += `<tr>${currentRow}</tr>`;
+                    currentRow = '';
+                }
+
+                const isCurrentMonth = currentDate.getMonth() === month;
+                const isToday = currentDate.toDateString() === new Date().toDateString();
+                
+                // 해당 날짜의 일정 찾기
+                const dayEvents = entries.filter(entry => {
+                    const eventStart = new Date(entry.startDate);
+                    const eventEnd = new Date(entry.endDate);
+                    return currentDate >= eventStart && currentDate <= eventEnd;
+                });
+
+                let dayContent = `<div class="text-sm">${currentDate.getDate()}</div>`;
+                
+                if (dayEvents.length > 0) {
+                    dayContent += `<div class="mt-1 space-y-1">`;
+                    dayEvents.forEach(event => {
+                        const purposeText = {
+                            'travel': '여행',
+                            'business': '출장',
+                            'study': '유학',
+                            'working-holiday': '워킹홀',
+                            'family-visit': '가족방문',
+                            'dispatch': '파견',
+                            'exchange': '교환학생',
+                            'volunteer': '봉사',
+                            'medical': '의료',
+                            'language': '어학',
+                            'transit': '경유'
+                        }[event.purpose] || event.purpose;
+
+                        dayContent += `
+                            <div class="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded truncate" title="${event.country} ${event.city} - ${purposeText}">
+                                ${event.city} - ${purposeText}
+                            </div>
+                        `;
+                    });
+                    dayContent += `</div>`;
+                }
+
+                const cellClass = `
+                    border border-gray-200 p-2 h-24 align-top
+                    ${isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'}
+                    ${isToday ? 'bg-blue-50 border-blue-200' : ''}
+                `;
+
+                currentRow += `<td class="${cellClass}">${dayContent}</td>`;
+            }
+
+            if (currentRow) {
+                calendarHTML += `<tr>${currentRow}</tr>`;
+            }
+
+            calendarBody.innerHTML = calendarHTML;
+        }
+
+        // 모든 섹션 업데이트
+        function updateAllSections() {
+            calculateStats();
+            renderTimeline();
+            renderCalendar();
+        }
+
+        // 모달 열기
+        floatingBtn.addEventListener('click', function() {
+            modalOverlay.classList.remove('hidden');
+            modalOverlay.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        });
+
+        // 모달 닫기 함수
+        function closeModalFunction() {
+            modalOverlay.classList.add('hidden');
+            modalOverlay.classList.remove('flex');
+            document.body.style.overflow = '';
+            travelForm.reset();
+        }
+
+        // X 버튼으로 모달 닫기
+        closeModal.addEventListener('click', closeModalFunction);
+
+        // 취소 버튼으로 모달 닫기
+        cancelBtn.addEventListener('click', closeModalFunction);
+
+        // 오버레이 클릭으로 모달 닫기
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                closeModalFunction();
+            }
+        });
+
+        // 폼 제출 처리
+        travelForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                country: document.getElementById('country').value,
+                city: document.getElementById('city').value,
+                startDate: document.getElementById('start-date').value,
+                endDate: document.getElementById('end-date').value,
+                purpose: document.getElementById('purpose').value,
+                memo: document.getElementById('memo').value
+            };
+
+            // entries 배열에 추가
+            entries.push(formData);
+            saveEntries();
+            
+            // 모든 섹션 업데이트
+            updateAllSections();
+            
+            console.log('여행 데이터:', JSON.stringify(formData, null, 2));
+            closeModalFunction();
+            alert('여행이 성공적으로 추가되었습니다!');
+        });
+
+        // 캘린더 네비게이션
+        document.getElementById('prev-month').addEventListener('click', function() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        document.getElementById('next-month').addEventListener('click', function() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
         // 탭 클릭 이벤트 처리
         document.querySelectorAll('.nav-tab').forEach(tab => {
             tab.addEventListener('click', function() {
@@ -173,7 +616,18 @@
                     targetElement.classList.remove('hidden');
                     targetElement.classList.add('block');
                 }
+
+                // 캘린더 섹션으로 이동할 때 캘린더 다시 렌더링
+                if (targetSection === 'calendar') {
+                    renderCalendar();
+                }
             });
+        });
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            loadEntries();
+            updateAllSections();
         });
     </script>
 </body>
