@@ -3,6 +3,68 @@
  * 월별 캘린더 렌더링, 이벤트 표시, 네비게이션 등을 담당
  */
 
+// 국가 코드를 국기 이모지로 변환하는 함수
+function getCountryFlag(countryCode) {
+    if (!countryCode) return null;
+    
+    // 국가 코드를 대문자로 변환
+    const code = countryCode.toUpperCase();
+    
+    // 주요 국가들의 국기 이모지 매핑
+    const flagMap = {
+        'KR': '🇰🇷', 'US': '🇺🇸', 'JP': '🇯🇵', 'CN': '🇨🇳', 'GB': '🇬🇧', 'DE': '🇩🇪', 'FR': '🇫🇷',
+        'IT': '🇮🇹', 'ES': '🇪🇸', 'CA': '🇨🇦', 'AU': '🇦🇺', 'BR': '🇧🇷', 'IN': '🇮🇳', 'RU': '🇷🇺',
+        'NL': '🇳🇱', 'SE': '🇸🇪', 'NO': '🇳🇴', 'DK': '🇩🇰', 'FI': '🇫🇮', 'CH': '🇨🇭', 'AT': '🇦🇹',
+        'BE': '🇧🇪', 'IE': '🇮🇪', 'PT': '🇵🇹', 'GR': '🇬🇷', 'PL': '🇵🇱', 'CZ': '🇨🇿', 'HU': '🇭🇺',
+        'RO': '🇷🇴', 'BG': '🇧🇬', 'HR': '🇭🇷', 'SI': '🇸🇮', 'SK': '🇸🇰', 'LT': '🇱🇹', 'LV': '🇱🇻',
+        'EE': '🇪🇪', 'MT': '🇲🇹', 'CY': '🇨🇾', 'LU': '🇱🇺', 'IS': '🇮🇸', 'LI': '🇱🇮', 'MC': '🇲🇨',
+        'SM': '🇸🇲', 'VA': '🇻🇦', 'AD': '🇦🇩', 'MX': '🇲🇽', 'AR': '🇦🇷', 'CL': '🇨🇱', 'CO': '🇨🇴',
+        'PE': '🇵🇪', 'VE': '🇻🇪', 'EC': '🇪🇨', 'BO': '🇧🇴', 'PY': '🇵🇾', 'UY': '🇺🇾', 'GY': '🇬🇾',
+        'SR': '🇸🇷', 'GF': '🇬🇫', 'FK': '🇫🇰', 'ZA': '🇿🇦', 'EG': '🇪🇬', 'NG': '🇳🇬', 'KE': '🇰🇪',
+        'GH': '🇬🇭', 'UG': '🇺🇬', 'TZ': '🇹🇿', 'ET': '🇪🇹', 'SD': '🇸🇩', 'DZ': '🇩🇿', 'MA': '🇲🇦',
+        'TN': '🇹🇳', 'LY': '🇱🇾', 'TD': '🇹🇩', 'NE': '🇳🇪', 'ML': '🇲🇱', 'BF': '🇧🇫', 'CI': '🇨🇮',
+        'SN': '🇸🇳', 'GN': '🇬🇳', 'SL': '🇸🇱', 'LR': '🇱🇷', 'TG': '🇹🇬', 'BJ': '🇧🇯', 'GW': '🇬🇼',
+        'CV': '🇨🇻', 'GM': '🇬🇲', 'MR': '🇲🇷', 'ML': '🇲🇱', 'TH': '🇹🇭', 'VN': '🇻🇳', 'MY': '🇲🇾',
+        'SG': '🇸🇬', 'ID': '🇮🇩', 'PH': '🇵🇭', 'MM': '🇲🇲', 'LA': '🇱🇦', 'KH': '🇰🇭', 'BD': '🇧🇩',
+        'LK': '🇱🇰', 'NP': '🇳🇵', 'BT': '🇧🇹', 'MV': '🇲🇻', 'PK': '🇵🇰', 'AF': '🇦🇫', 'IR': '🇮🇷',
+        'IQ': '🇮🇶', 'SA': '🇸🇦', 'AE': '🇦🇪', 'OM': '🇴🇲', 'YE': '🇾🇪', 'JO': '🇯🇴', 'LB': '🇱🇧',
+        'SY': '🇸🇾', 'IL': '🇮🇱', 'PS': '🇵🇸', 'TR': '🇹🇷', 'GE': '🇬🇪', 'AM': '🇦🇲', 'AZ': '🇦🇿',
+        'KZ': '🇰🇿', 'UZ': '🇺🇿', 'TM': '🇹🇲', 'KG': '🇰🇬', 'TJ': '🇹🇯', 'MN': '🇲🇳', 'KP': '🇰🇵',
+        'TW': '🇹🇼', 'HK': '🇭🇰', 'MO': '🇲🇴', 'NZ': '🇳🇿', 'FJ': '🇫🇯', 'PG': '🇵🇬', 'SB': '🇸🇧',
+        'VU': '🇻🇺', 'NC': '🇳🇨', 'PF': '🇵🇫', 'TO': '🇹🇴', 'WS': '🇼🇸', 'KI': '🇰🇮', 'TV': '🇹🇻',
+        'NR': '🇳🇷', 'PW': '🇵🇼', 'MH': '🇲🇭', 'FM': '🇫🇲', 'CK': '🇨🇰', 'NU': '🇳🇺', 'TK': '🇹🇰',
+        'WF': '🇼🇫', 'AS': '🇦🇸', 'GU': '🇬🇺', 'MP': '🇲🇵', 'PR': '🇵🇷', 'VI': '🇻🇮', 'BL': '🇧🇱',
+        'MF': '🇲🇫', 'GP': '🇬🇵', 'MQ': '🇲🇶', 'RE': '🇷🇪', 'YT': '🇾🇹', 'PM': '🇵🇲', 'ST': '🇸🇹',
+        'AO': '🇦🇴', 'MZ': '🇲🇿', 'ZW': '🇿🇼', 'BW': '🇧🇼', 'NA': '🇳🇦', 'SZ': '🇸🇿', 'LS': '🇱🇸',
+        'MW': '🇲🇼', 'ZM': '🇿🇲', 'MG': '🇲🇬', 'MU': '🇲🇺', 'SC': '🇸🇨', 'KM': '🇰🇲', 'DJ': '🇩🇯',
+        'SO': '🇸🇴', 'ER': '🇪🇷', 'CF': '🇨🇫', 'CM': '🇨🇲', 'GQ': '🇬🇶', 'GA': '🇬🇦', 'CG': '🇨🇬',
+        'CD': '🇨🇩', 'RW': '🇷🇼', 'BI': '🇧🇮', 'SS': '🇸🇸', 'CF': '🇨🇫', 'TD': '🇹🇩', 'NE': '🇳🇪',
+        'ML': '🇲🇱', 'BF': '🇧🇫', 'CI': '🇨🇮', 'SN': '🇸🇳', 'GN': '🇬🇳', 'SL': '🇸🇱', 'LR': '🇱🇷',
+        'TG': '🇹🇬', 'BJ': '🇧🇯', 'GW': '🇬🇼', 'CV': '🇨🇻', 'GM': '🇬🇲', 'MR': '🇲🇷', 'ML': '🇲🇱'
+    };
+    
+    return flagMap[code] || null;
+}
+
+// 텍스트를 축약하는 함수
+function truncateText(text, maxLength = 6) {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '..';
+}
+
+// 일정 표시 텍스트 생성 함수
+function getEventDisplayText(entry) {
+    // 국기 이모지가 있는 경우 우선 사용
+    const flag = getCountryFlag(entry.countryCode);
+    if (flag) {
+        return flag;
+    }
+    
+    // 국기 이모지가 없는 경우 텍스트 축약
+    return truncateText(entry.country, 6);
+}
+
 // 캘린더 렌더링
 function renderCalendar() {
     const calendarBody = document.getElementById('calendar-body');
@@ -47,7 +109,13 @@ function renderCalendar() {
         const dayEvents = entries.filter(entry => {
             const eventStart = new Date(entry.startDate);
             const eventEnd = new Date(entry.endDate);
-            return currentDate >= eventStart && currentDate <= eventEnd;
+            
+            // 날짜 비교를 위해 시간을 제거하고 날짜만 비교
+            const currentDateOnly = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+            const eventStartOnly = new Date(eventStart.getFullYear(), eventStart.getMonth(), eventStart.getDate());
+            const eventEndOnly = new Date(eventEnd.getFullYear(), eventEnd.getMonth(), eventEnd.getDate());
+            
+            return currentDateOnly >= eventStartOnly && currentDateOnly <= eventEndOnly;
         });
 
         let dayContent = `<div class="text-xs sm:text-sm font-medium">${currentDate.getDate()}</div>`;
@@ -63,8 +131,11 @@ function renderCalendar() {
                 // 이벤트 색상 클래스 결정 (순환)
                 const colorClass = `event-${(index % 8) + 1}`;
                 
+                // 일정 표시 텍스트 생성
+                const displayText = getEventDisplayText(event);
+                
                 dayContent += `
-                    <div class="calendar-event ${colorClass}"
+                    <div class="calendar-event ${colorClass} text-xs overflow-hidden whitespace-nowrap"
                          data-event-index="${index}"
                          data-tooltip="${tooltipText.replace(/"/g, '&quot;')}"
                          data-entry-id="${event.id}"
@@ -74,9 +145,8 @@ function renderCalendar() {
                          ontouchend="handleTouchEnd(event)"
                          onclick="showEntryDetail('${event.id}')"
                          title="${event.country}"
-                         style="cursor: pointer;">
-                        <span class="hidden sm:inline">${event.country}</span>
-                        <span class="sm:hidden">${event.country.substring(0, 2)}</span>
+                         style="cursor: pointer; max-height: 1.2em; line-height: 1.2em; max-width: 100%;">
+                        <span class="truncate block w-full">${displayText}</span>
                     </div>
                 `;
             });
@@ -84,7 +154,7 @@ function renderCalendar() {
         }
 
         const cellClass = `
-            border border-gray-200 p-1 sm:p-2 h-20 sm:h-28 align-top
+            border border-gray-200 p-1 sm:p-2 h-20 sm:h-28 align-top overflow-hidden
             ${isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'}
             ${isToday ? 'bg-blue-50 border-blue-200' : ''}
         `;

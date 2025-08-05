@@ -39,6 +39,7 @@ body {
 .calendar-event {
     display: block;
     width: 100%;
+    max-width: 100%;
     padding: 3px 6px;
     margin: 1px 0;
     border-radius: 3px;
@@ -51,7 +52,11 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     border-left: 3px solid;
-    min-height: 24px; /* 모바일 터치 영역 확대 */
+    min-height: 20px;
+    max-height: 20px;
+    line-height: 1.2;
+    text-align: center;
+    box-sizing: border-box;
 }
 
 .calendar-event:hover {
@@ -91,7 +96,9 @@ body {
         padding: 4px 8px;
         font-size: 0.8rem;
         margin: 2px 0;
-        min-height: 28px;
+        min-height: 22px;
+        max-height: 22px;
+        line-height: 1.2;
     }
     
     /* 모바일에서 캘린더 네비게이션 최적화 */
@@ -101,12 +108,33 @@ body {
         min-height: 40px;
     }
     
-    /* 모바일에서 캘린더 셀 크기 조정 */
-    #calendar-table th,
-    #calendar-table td {
-        padding: 0.5rem 0.25rem;
-        min-height: 40px;
-    }
+    /* 캘린더 테이블 레이아웃 고정 */
+#calendar-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+#calendar-table th,
+#calendar-table td {
+    width: 14.285%; /* 100% / 7 = 14.285% */
+    padding: 0.5rem 0.25rem;
+    min-height: 40px;
+    word-wrap: break-word;
+    overflow: hidden;
+    max-width: 14.285%;
+    box-sizing: border-box;
+}
+
+/* 캘린더 셀 내부 콘텐츠 제한 */
+#calendar-table td > div {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+#calendar-table td .calendar-event {
+    max-width: 100%;
+    width: 100%;
+}
     
     /* 모바일에서 캘린더 셀 텍스트 크기 조정 */
     #calendar-table th {
