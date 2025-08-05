@@ -36,23 +36,34 @@ function renderTimeline() {
         const flag = countryFlags[entry.countryCode] || '🏳️';
 
         return `
-            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer" 
+            <div class="timeline-card bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer active:scale-[0.98] sm:active:scale-100" 
                  onclick="showEntryDetail('${entry.id}')">
-                <div class="flex justify-between items-start mb-3">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-800">${flag} ${entry.country} / ${entry.city}</h3>
-                        <p class="text-sm text-gray-600">${purposeText}</p>
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-3">
+                    <div class="flex-1">
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 break-words">${flag} ${entry.country} / ${entry.city}</h3>
+                        <p class="text-xs sm:text-sm text-gray-600 mt-1">${purposeText}</p>
                     </div>
-                    <div class="flex items-center">
-                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                    <div class="flex items-center justify-end sm:justify-start">
+                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap">
                             ${days}일
                         </span>
                     </div>
                 </div>
-                <div class="text-sm text-gray-500 mb-3">
+                <div class="text-xs sm:text-sm text-gray-500 mb-3">
                     📅 ${entry.startDate} ~ ${entry.endDate}
                 </div>
-                ${entry.memo ? `<p class="text-sm text-gray-600 bg-gray-50 p-3 rounded">📝 ${entry.memo}</p>` : ''}
+                ${entry.memo ? `<p class="text-xs sm:text-sm text-gray-600 bg-gray-50 p-2 sm:p-3 rounded break-words">📝 ${entry.memo}</p>` : ''}
+                <!-- 데스크톱에서만 수정/삭제 버튼 표시 -->
+                <div class="hidden sm:flex gap-2 mt-3">
+                    <button onclick="event.stopPropagation(); modifyEntry('${entry.id}')" 
+                            class="flex-1 px-3 py-2 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors min-h-[36px]">
+                        수정
+                    </button>
+                    <button onclick="event.stopPropagation(); deleteEntry('${entry.id}')" 
+                            class="flex-1 px-3 py-2 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-colors min-h-[36px]">
+                        삭제
+                    </button>
+                </div>
             </div>
         `;
     }).join('');
@@ -217,18 +228,21 @@ function showEntryDetail(entryId) {
                 </div>
 
                 <!-- 하단 버튼 -->
-                <div class="flex justify-end space-x-3 p-6 border-t border-gray-200">
-                    <button onclick="modifyEntry('${entry.id}'); closeEntryDetail();" 
-                            class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
-                        수정
-                    </button>
-                    <button onclick="deleteEntry('${entry.id}'); closeEntryDetail();" 
-                            class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
-                        삭제
-                    </button>
+                <div class="flex flex-col sm:flex-row justify-end gap-3 p-4 sm:p-6 border-t border-gray-200">
+                    <!-- 모바일에서는 버튼을 세로로 배치하고 더 큰 터치 영역 제공 -->
+                    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                        <button onclick="modifyEntry('${entry.id}'); closeEntryDetail();" 
+                                class="flex-1 sm:flex-none px-4 py-3 sm:py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm sm:text-base font-medium min-h-[44px] sm:min-h-[36px]">
+                            ✏️ 수정
+                        </button>
+                        <button onclick="deleteEntry('${entry.id}'); closeEntryDetail();" 
+                                class="flex-1 sm:flex-none px-4 py-3 sm:py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm sm:text-base font-medium min-h-[44px] sm:min-h-[36px]">
+                            🗑️ 삭제
+                        </button>
+                    </div>
                     <button onclick="closeEntryDetail()" 
-                            class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
-                        닫기
+                            class="w-full sm:w-auto px-4 py-3 sm:py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm sm:text-base font-medium min-h-[44px] sm:min-h-[36px]">
+                        ✕ 닫기
                     </button>
                 </div>
             </div>

@@ -4,6 +4,7 @@ body {
 
 .nav-tab {
     transition: all 0.3s ease;
+    min-height: 44px; /* 모바일 터치 영역 최소 크기 */
 }
 
 .nav-tab:hover {
@@ -23,6 +24,14 @@ body {
     .nav-tab {
         padding: 0.75rem 0.5rem;
         font-size: 0.875rem;
+        min-height: 44px;
+    }
+    
+    /* 모바일에서 탭 텍스트 줄바꿈 방지 */
+    .nav-tab {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 
@@ -30,7 +39,7 @@ body {
 .calendar-event {
     display: block;
     width: 100%;
-    padding: 2px 6px;
+    padding: 3px 6px;
     margin: 1px 0;
     border-radius: 3px;
     font-size: 0.75rem;
@@ -42,6 +51,7 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     border-left: 3px solid;
+    min-height: 24px; /* 모바일 터치 영역 확대 */
 }
 
 .calendar-event:hover {
@@ -78,15 +88,33 @@ body {
 /* 모바일에서 터치 영역 확대 */
 @media (max-width: 768px) {
     .calendar-event {
-        padding: 3px 8px;
+        padding: 4px 8px;
         font-size: 0.8rem;
         margin: 2px 0;
+        min-height: 28px;
     }
     
     /* 모바일에서 캘린더 네비게이션 최적화 */
     #year-select, #month-select {
         font-size: 0.875rem;
         padding: 0.5rem 0.75rem;
+        min-height: 40px;
+    }
+    
+    /* 모바일에서 캘린더 셀 크기 조정 */
+    #calendar-table th,
+    #calendar-table td {
+        padding: 0.5rem 0.25rem;
+        min-height: 40px;
+    }
+    
+    /* 모바일에서 캘린더 셀 텍스트 크기 조정 */
+    #calendar-table th {
+        font-size: 0.75rem;
+    }
+    
+    #calendar-table td {
+        font-size: 0.875rem;
     }
 }
 
@@ -135,6 +163,14 @@ body {
         height: 60vh !important;
         max-height: 400px !important;
     }
+    
+    /* 모바일에서 지도 컨트롤 버튼 크기 조정 */
+    #fit-bounds-btn,
+    #clear-markers-btn,
+    #show-markers-btn {
+        min-height: 40px;
+        font-size: 0.875rem;
+    }
 }
 
 /* 국가 배지 컬렉션 스타일 */
@@ -142,6 +178,7 @@ body {
     position: relative;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 80px; /* 모바일에서 최소 높이 보장 */
 }
 
 .country-badge::before {
@@ -200,6 +237,7 @@ body {
     transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
+    min-height: 40px; /* 모바일 터치 영역 확대 */
 }
 
 .sort-btn::after {
@@ -240,24 +278,32 @@ body {
 @media (max-width: 640px) {
     #countries-collection {
         grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .country-badge {
+        min-height: 70px;
     }
 }
 
 @media (min-width: 641px) and (max-width: 1024px) {
     #countries-collection {
         grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
     }
 }
 
 @media (min-width: 1025px) {
     #countries-collection {
         grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
     }
 }
 
 @media (min-width: 1280px) {
     #countries-collection {
         grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
     }
 }
 
@@ -265,6 +311,7 @@ body {
 #countries-card {
     position: relative;
     overflow: hidden;
+    min-height: 100px; /* 모바일에서 최소 높이 보장 */
 }
 
 #countries-card::after {
@@ -295,5 +342,83 @@ body {
     }
     100% {
         background-position: 200% 0;
+    }
+}
+
+/* 모바일 최적화 추가 스타일 */
+@media (max-width: 768px) {
+    /* 모바일에서 입력 필드 터치 영역 확대 */
+    input[type="text"],
+    input[type="date"],
+    select,
+    textarea {
+        min-height: 40px;
+        font-size: 16px; /* iOS에서 줌 방지 */
+    }
+    
+    /* 모바일에서 버튼 터치 영역 확대 */
+    button {
+        min-height: 40px;
+    }
+    
+    /* 모바일에서 드롭다운 목록 최적화 */
+    #country-dropdown,
+    #city-dropdown,
+    #residence-country-dropdown,
+    #residence-city-dropdown {
+        max-height: 200px;
+        font-size: 14px;
+    }
+    
+    /* 모바일에서 드롭다운 항목 터치 영역 확대 */
+    #country-dropdown li,
+    #city-dropdown li,
+    #residence-country-dropdown li,
+    #residence-city-dropdown li {
+        padding: 0.75rem 1rem;
+        min-height: 44px;
+    }
+    
+    /* 모바일에서 타임라인 카드 최적화 */
+    .timeline-card {
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        /* 모바일에서 터치 피드백 개선 */
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+    }
+    
+    /* 모바일에서 타임라인 카드 터치 영역 최적화 */
+    .timeline-card:active {
+        background-color: #f8fafc;
+        transform: scale(0.98);
+    }
+    
+    /* 모바일에서 설정 섹션 버튼 최적화 */
+    .bg-gray-50 button {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+    
+    /* 모바일에서 플로팅 버튼 위치 조정 */
+    #floating-btn {
+        bottom: 1rem;
+        right: 1rem;
+        width: 3rem;
+        height: 3rem;
+    }
+}
+
+/* 스크롤바 스타일링 (모바일 최적화) */
+@media (max-width: 768px) {
+    /* 모바일에서 스크롤바 숨기기 */
+    ::-webkit-scrollbar {
+        width: 0;
+        background: transparent;
+    }
+    
+    /* 모바일에서 오버플로우 처리 */
+    .overflow-y-auto {
+        -webkit-overflow-scrolling: touch;
     }
 } 

@@ -50,10 +50,10 @@ function renderCalendar() {
             return currentDate >= eventStart && currentDate <= eventEnd;
         });
 
-        let dayContent = `<div class="text-sm">${currentDate.getDate()}</div>`;
+        let dayContent = `<div class="text-xs sm:text-sm font-medium">${currentDate.getDate()}</div>`;
         
         if (dayEvents.length > 0) {
-            dayContent += `<div class="mt-1 space-y-1">`;
+            dayContent += `<div class="mt-1 space-y-0.5 sm:space-y-1">`;
             dayEvents.forEach((event, index) => {
                 const purposeText = getPurposeText(event.purpose);
                 
@@ -75,7 +75,8 @@ function renderCalendar() {
                          onclick="showEntryDetail('${event.id}')"
                          title="${event.country}"
                          style="cursor: pointer;">
-                        ${event.country}
+                        <span class="hidden sm:inline">${event.country}</span>
+                        <span class="sm:hidden">${event.country.substring(0, 2)}</span>
                     </div>
                 `;
             });
@@ -83,7 +84,7 @@ function renderCalendar() {
         }
 
         const cellClass = `
-            border border-gray-200 p-2 h-28 align-top
+            border border-gray-200 p-1 sm:p-2 h-20 sm:h-28 align-top
             ${isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'}
             ${isToday ? 'bg-blue-50 border-blue-200' : ''}
         `;

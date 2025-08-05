@@ -14,28 +14,28 @@
 <body class="bg-gray-50 min-h-screen">
     <!-- 네비게이션 바 -->
     <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-        <div class="nav-container max-w-4xl mx-auto px-4">
+        <div class="nav-container max-w-4xl mx-auto px-2 sm:px-4">
             <div class="flex justify-between items-center">
-                <div class="text-xl font-bold text-gray-800 py-4">
+                <div class="text-lg sm:text-xl font-bold text-gray-800 py-3 sm:py-4">
                     🌍 여행 앱
                 </div>
                 
                 <!-- 사용자 정보 및 로그인 버튼 -->
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2 sm:space-x-4">
                     <!-- 로그인된 사용자 정보 (기본적으로 숨김) -->
                     <div id="user-info" class="hidden flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                            <span class="text-white text-sm font-medium" id="user-initial">U</span>
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                            <span class="text-white text-xs sm:text-sm font-medium" id="user-initial">U</span>
                         </div>
-                        <span class="text-sm font-medium text-gray-700" id="username">사용자</span>
+                        <span class="text-xs sm:text-sm font-medium text-gray-700" id="username">사용자</span>
                     </div>
                     
                     <!-- 로그인/로그아웃 버튼 -->
                     <div class="flex items-center space-x-2">
-                        <button id="login-btn" class="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                        <button id="login-btn" class="text-xs sm:text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors px-2 py-1">
                             로그인
                         </button>
-                        <button id="logout-btn" class="hidden text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors">
+                        <button id="logout-btn" class="hidden text-xs sm:text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors px-2 py-1">
                             로그아웃
                         </button>
                     </div>
@@ -44,19 +44,19 @@
             
             <!-- 탭 네비게이션 -->
             <div class="flex space-x-1 pb-2">
-                <button class="nav-tab active flex-1 py-3 px-4 rounded-lg text-sm font-medium text-center transition-colors" data-section="world-map">
+                <button class="nav-tab active flex-1 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg text-xs sm:text-sm font-medium text-center transition-colors min-h-[44px]" data-section="world-map">
                     🗺️ 세계지도
                 </button>
-                <button class="nav-tab flex-1 py-3 px-4 rounded-lg text-sm font-medium text-center transition-colors text-gray-600" data-section="dashboard">
+                <button class="nav-tab flex-1 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg text-xs sm:text-sm font-medium text-center transition-colors text-gray-600 min-h-[44px]" data-section="dashboard">
                     📊 대시보드
                 </button>
-                <button class="nav-tab flex-1 py-3 px-4 rounded-lg text-sm font-medium text-center transition-colors text-gray-600" data-section="timeline">
+                <button class="nav-tab flex-1 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg text-xs sm:text-sm font-medium text-center transition-colors text-gray-600 min-h-[44px]" data-section="timeline">
                     ⏰ 타임라인
                 </button>
-                <button class="nav-tab flex-1 py-3 px-4 rounded-lg text-sm font-medium text-center transition-colors text-gray-600" data-section="calendar">
+                <button class="nav-tab flex-1 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg text-xs sm:text-sm font-medium text-center transition-colors text-gray-600 min-h-[44px]" data-section="calendar">
                     📅 캘린더
                 </button>
-                <button class="nav-tab flex-1 py-3 px-4 rounded-lg text-sm font-medium text-center transition-colors text-gray-600" data-section="settings">
+                <button class="nav-tab flex-1 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg text-xs sm:text-sm font-medium text-center transition-colors text-gray-600 min-h-[44px]" data-section="settings">
                     ⚙️ 설정
                 </button>
             </div>
@@ -64,14 +64,14 @@
     </nav>
 
     <!-- 메인 콘텐츠 -->
-    <main class="max-w-4xl mx-auto px-4 py-8">
+    <main class="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
         <!-- 세계지도 섹션 -->
         <section id="world-map" class="content-section block">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                <div class="text-center mb-8">
-                    <div class="text-6xl mb-6">🗺️</div>
-                    <h1 class="text-3xl font-bold text-gray-800 mb-4">세계지도</h1>
-                    <p class="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-8">
+                <div class="text-center mb-6 sm:mb-8">
+                    <div class="text-4xl sm:text-6xl mb-4 sm:mb-6">🗺️</div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">세계지도</h1>
+                    <p class="text-gray-600 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
                         전 세계 여행지를 인터랙티브 지도에서 탐색하세요. 
                         방문한 도시들이 지도에 마커로 표시되며, 
                         마커를 클릭하면 상세 정보를 확인할 수 있습니다.
@@ -79,26 +79,26 @@
                 </div>
                 
                 <!-- 지도 컨테이너 -->
-                <div id="map-container" class="w-full h-[80vh] max-h-[600px] rounded-xl shadow-md mb-16 overflow-hidden">
+                <div id="map-container" class="w-full h-[60vh] sm:h-[80vh] max-h-[400px] sm:max-h-[600px] rounded-xl shadow-md mb-8 sm:mb-16 overflow-hidden">
                     <div id="world-map" class="w-full h-full"></div>
                 </div>
                 
                 <!-- 지도 컨트롤 -->
                 <div class="mt-4 flex flex-wrap gap-2 justify-center">
-                    <button id="fit-bounds-btn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">
+                    <button id="fit-bounds-btn" class="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-xs sm:text-sm min-h-[40px]">
                         전체 보기
                     </button>
-                    <button id="clear-markers-btn" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm">
+                    <button id="clear-markers-btn" class="px-3 sm:px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-xs sm:text-sm min-h-[40px]">
                         마커 숨기기
                     </button>
-                    <button id="show-markers-btn" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm">
+                    <button id="show-markers-btn" class="px-3 sm:px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-xs sm:text-sm min-h-[40px]">
                         마커 보기
                     </button>
                 </div>
                 
                 <!-- 마커 정보 패널 -->
-                <div id="marker-info-panel" class="mt-4 bg-gray-50 rounded-lg p-4 hidden">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">방문 도시 정보</h3>
+                <div id="marker-info-panel" class="mt-4 bg-gray-50 rounded-lg p-3 sm:p-4 hidden">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-2">방문 도시 정보</h3>
                     <div id="marker-info-content" class="text-sm text-gray-600">
                         <!-- 여기에 마커 정보가 동적으로 추가됩니다 -->
                     </div>
@@ -108,11 +108,11 @@
 
         <!-- 대시보드 섹션 -->
         <section id="dashboard" class="content-section hidden">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                <div class="text-center mb-8">
-                    <div class="text-6xl mb-6">📊</div>
-                    <h1 class="text-3xl font-bold text-gray-800 mb-4">대시보드</h1>
-                    <p class="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-8">
+                <div class="text-center mb-6 sm:mb-8">
+                    <div class="text-4xl sm:text-6xl mb-4 sm:mb-6">📊</div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">대시보드</h1>
+                    <p class="text-gray-600 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
                         여행 통계와 분석 데이터를 한눈에 확인하세요. 
                         방문한 국가 수, 총 여행 거리, 소요된 시간 등 
                         다양한 여행 데이터를 시각적으로 확인할 수 있습니다.
@@ -120,26 +120,26 @@
                 </div>
                 
                 <!-- 통계 카드들 -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div id="countries-card" class="bg-blue-50 rounded-xl p-6 text-center cursor-pointer hover:bg-blue-100 transition-colors transform hover:scale-105">
-                        <div class="text-3xl font-bold text-blue-600 mb-2" id="total-countries">0</div>
-                        <div class="text-blue-800 font-medium">방문 국가</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                    <div id="countries-card" class="bg-blue-50 rounded-xl p-4 sm:p-6 text-center cursor-pointer hover:bg-blue-100 transition-colors transform hover:scale-105 min-h-[100px] flex flex-col justify-center">
+                        <div class="text-2xl sm:text-3xl font-bold text-blue-600 mb-2" id="total-countries">0</div>
+                        <div class="text-blue-800 font-medium text-sm sm:text-base">방문 국가</div>
                         <div class="text-xs text-blue-600 mt-2">클릭하여 배지 보기</div>
                     </div>
-                    <div class="bg-green-50 rounded-xl p-6 text-center">
-                        <div class="text-3xl font-bold text-green-600 mb-2" id="total-cities">0</div>
-                        <div class="text-green-800 font-medium">방문 도시</div>
+                    <div class="bg-green-50 rounded-xl p-4 sm:p-6 text-center min-h-[100px] flex flex-col justify-center">
+                        <div class="text-2xl sm:text-3xl font-bold text-green-600 mb-2" id="total-cities">0</div>
+                        <div class="text-green-800 font-medium text-sm sm:text-base">방문 도시</div>
                     </div>
-                    <div class="bg-purple-50 rounded-xl p-6 text-center">
-                        <div class="text-3xl font-bold text-purple-600 mb-2" id="total-days">0</div>
-                        <div class="text-purple-800 font-medium">총 체류일</div>
+                    <div class="bg-purple-50 rounded-xl p-4 sm:p-6 text-center min-h-[100px] flex flex-col justify-center sm:col-span-2 lg:col-span-1">
+                        <div class="text-2xl sm:text-3xl font-bold text-purple-600 mb-2" id="total-days">0</div>
+                        <div class="text-purple-800 font-medium text-sm sm:text-base">총 체류일</div>
                     </div>
                 </div>
                 
                 <!-- 추가 통계 -->
-                <div class="bg-gray-50 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">여행 요약</h3>
-                    <div id="travel-summary" class="text-gray-600">
+                <div class="bg-gray-50 rounded-xl p-4 sm:p-6">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">여행 요약</h3>
+                    <div id="travel-summary" class="text-gray-600 text-sm sm:text-base">
                         <!-- 여기에 동적으로 요약 정보가 추가됩니다 -->
                     </div>
                 </div>
@@ -148,11 +148,11 @@
 
         <!-- 타임라인 섹션 -->
         <section id="timeline" class="content-section hidden">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                <div class="text-center mb-8">
-                    <div class="text-6xl mb-6">⏰</div>
-                    <h1 class="text-3xl font-bold text-gray-800 mb-4">타임라인</h1>
-                    <p class="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-8">
+                <div class="text-center mb-6 sm:mb-8">
+                    <div class="text-4xl sm:text-6xl mb-4 sm:mb-6">⏰</div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">타임라인</h1>
+                    <p class="text-gray-600 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
                         여행 일정을 시간순으로 정리하고 관리하세요. 
                         각 여행의 시작과 끝, 주요 일정들을 타임라인 형태로 
                         시각화하여 전체 여행 흐름을 한눈에 파악할 수 있습니다.
@@ -160,14 +160,14 @@
                 </div>
                 
                 <!-- 타임라인 목록 -->
-                <div id="timeline-list" class="space-y-4">
+                <div id="timeline-list" class="space-y-3 sm:space-y-4">
                     <!-- 여기에 동적으로 타임라인 카드들이 추가됩니다 -->
                 </div>
                 
                 <!-- 빈 상태 메시지 -->
-                <div id="timeline-empty" class="text-center py-12">
-                    <div class="text-4xl mb-4">📝</div>
-                    <p class="text-gray-500 text-lg">아직 등록된 여행 일정이 없습니다.</p>
+                <div id="timeline-empty" class="text-center py-8 sm:py-12">
+                    <div class="text-3xl sm:text-4xl mb-4">📝</div>
+                    <p class="text-gray-500 text-base sm:text-lg">아직 등록된 여행 일정이 없습니다.</p>
                     <p class="text-gray-400 text-sm mt-2">우측 하단의 + 버튼을 눌러 첫 여행을 추가해보세요!</p>
                 </div>
             </div>
@@ -175,11 +175,11 @@
 
         <!-- 캘린더 섹션 -->
         <section id="calendar" class="content-section hidden">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                <div class="text-center mb-8">
-                    <div class="text-6xl mb-6">📅</div>
-                    <h1 class="text-3xl font-bold text-gray-800 mb-4">캘린더</h1>
-                    <p class="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-8">
+                <div class="text-center mb-6 sm:mb-8">
+                    <div class="text-4xl sm:text-6xl mb-4 sm:mb-6">📅</div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">캘린더</h1>
+                    <p class="text-gray-600 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
                         월별 캘린더로 여행 일정을 시각적으로 확인하세요. 
                         각 날짜에 방문한 곳과 예정된 여행을 표시하여 
                         전체적인 여행 일정을 체계적으로 관리할 수 있습니다.
@@ -187,14 +187,14 @@
                 </div>
                 
                 <!-- 캘린더 네비게이션 -->
-                <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6 gap-3 sm:gap-4">
                     <!-- 연도/월 선택 드롭다운 -->
-                    <div class="flex items-center gap-3">
-                        <select id="year-select" class="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <select id="year-select" class="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm min-h-[40px]">
                             <!-- 연도 옵션들이 동적으로 생성됩니다 -->
                         </select>
-                        <span class="text-gray-600 font-medium">년</span>
-                        <select id="month-select" class="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors">
+                        <span class="text-gray-600 font-medium text-sm">년</span>
+                        <select id="month-select" class="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm min-h-[40px]">
                             <option value="0">1월</option>
                             <option value="1">2월</option>
                             <option value="2">3월</option>
@@ -211,14 +211,14 @@
                     </div>
                     
                     <!-- 현재 월 표시 -->
-                    <h2 id="current-month" class="text-xl font-semibold text-gray-800">2024년 1월</h2>
+                    <h2 id="current-month" class="text-lg sm:text-xl font-semibold text-gray-800">2024년 1월</h2>
                     
                     <!-- 이전/다음 버튼 -->
                     <div class="flex items-center gap-2">
-                        <button id="prev-month" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
+                        <button id="prev-month" class="px-3 sm:px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm min-h-[40px]">
                             ← 이전
                         </button>
-                        <button id="next-month" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
+                        <button id="next-month" class="px-3 sm:px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm min-h-[40px]">
                             다음 →
                         </button>
                     </div>
@@ -229,13 +229,13 @@
                     <table id="calendar-table" class="w-full border-collapse">
                         <thead>
                             <tr class="bg-gray-50">
-                                <th class="p-3 text-center text-sm font-medium text-gray-600">일</th>
-                                <th class="p-3 text-center text-sm font-medium text-gray-600">월</th>
-                                <th class="p-3 text-center text-sm font-medium text-gray-600">화</th>
-                                <th class="p-3 text-center text-sm font-medium text-gray-600">수</th>
-                                <th class="p-3 text-center text-sm font-medium text-gray-600">목</th>
-                                <th class="p-3 text-center text-sm font-medium text-gray-600">금</th>
-                                <th class="p-3 text-center text-sm font-medium text-gray-600">토</th>
+                                <th class="p-2 sm:p-3 text-center text-xs sm:text-sm font-medium text-gray-600">일</th>
+                                <th class="p-2 sm:p-3 text-center text-xs sm:text-sm font-medium text-gray-600">월</th>
+                                <th class="p-2 sm:p-3 text-center text-xs sm:text-sm font-medium text-gray-600">화</th>
+                                <th class="p-2 sm:p-3 text-center text-xs sm:text-sm font-medium text-gray-600">수</th>
+                                <th class="p-2 sm:p-3 text-center text-xs sm:text-sm font-medium text-gray-600">목</th>
+                                <th class="p-2 sm:p-3 text-center text-xs sm:text-sm font-medium text-gray-600">금</th>
+                                <th class="p-2 sm:p-3 text-center text-xs sm:text-sm font-medium text-gray-600">토</th>
                             </tr>
                         </thead>
                         <tbody id="calendar-body">
@@ -245,9 +245,9 @@
                 </div>
                 
                 <!-- 빈 상태 메시지 -->
-                <div id="calendar-empty" class="text-center py-12">
-                    <div class="text-4xl mb-4">📝</div>
-                    <p class="text-gray-500 text-lg">아직 등록된 여행 일정이 없습니다.</p>
+                <div id="calendar-empty" class="text-center py-8 sm:py-12">
+                    <div class="text-3xl sm:text-4xl mb-4">📝</div>
+                    <p class="text-gray-500 text-base sm:text-lg">아직 등록된 여행 일정이 없습니다.</p>
                     <p class="text-gray-400 text-sm mt-2">우측 하단의 + 버튼을 눌러 첫 여행을 추가해보세요!</p>
                 </div>
             </div>
@@ -255,11 +255,11 @@
 
         <!-- 설정 섹션 -->
         <section id="settings" class="content-section hidden">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                <div class="text-center mb-8">
-                    <div class="text-6xl mb-6">⚙️</div>
-                    <h1 class="text-3xl font-bold text-gray-800 mb-4">설정</h1>
-                    <p class="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-8">
+                <div class="text-center mb-6 sm:mb-8">
+                    <div class="text-4xl sm:text-6xl mb-4 sm:mb-6">⚙️</div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">설정</h1>
+                    <p class="text-gray-600 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
                         앱 설정과 사용자 정보를 관리하세요. 
                         테마 변경, 언어 설정, 계정 관리 등 
                         다양한 설정 옵션을 제공합니다.
@@ -267,26 +267,26 @@
                 </div>
                 
                 <!-- 설정 카테고리들 -->
-                <div class="space-y-6">
+                <div class="space-y-4 sm:space-y-6">
                     <!-- 계정 설정 -->
-                    <div class="bg-gray-50 rounded-lg p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">계정 설정</h3>
+                    <div class="bg-gray-50 rounded-lg p-4 sm:p-6">
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">계정 설정</h3>
                         <div class="space-y-4">
-                            <div class="flex items-center justify-between">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div>
-                                    <p class="font-medium text-gray-700">로그인 상태</p>
-                                    <p class="text-sm text-gray-500" id="login-status">로그인되지 않음</p>
+                                    <p class="font-medium text-gray-700 text-sm sm:text-base">로그인 상태</p>
+                                    <p class="text-xs sm:text-sm text-gray-500" id="login-status">로그인되지 않음</p>
                                 </div>
-                                <button id="demo-login-btn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                                <button id="demo-login-btn" class="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm min-h-[40px] w-full sm:w-auto">
                                     데모 로그인
                                 </button>
                             </div>
-                            <div class="flex items-center justify-between">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div>
-                                    <p class="font-medium text-gray-700">사용자 데이터</p>
-                                    <p class="text-sm text-gray-500">현재 저장된 여행 데이터</p>
+                                    <p class="font-medium text-gray-700 text-sm sm:text-base">사용자 데이터</p>
+                                    <p class="text-xs sm:text-sm text-gray-500">현재 저장된 여행 데이터</p>
                                 </div>
-                                <button id="export-data-btn" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                                <button id="export-data-btn" class="px-3 sm:px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm min-h-[40px] w-full sm:w-auto">
                                     데이터 내보내기
                                 </button>
                             </div>
@@ -294,8 +294,8 @@
                     </div>
 
                     <!-- 거주지 설정 -->
-                    <div class="bg-gray-50 rounded-lg p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">거주지 설정</h3>
+                    <div class="bg-gray-50 rounded-lg p-4 sm:p-6">
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">거주지 설정</h3>
                         <div class="space-y-4">
                             <div>
                                 <label for="residence-country" class="block text-sm font-medium text-gray-700 mb-2">거주 국가</label>
@@ -304,7 +304,7 @@
                                         type="text" 
                                         id="residence-country" 
                                         placeholder="거주 국가를 선택하세요" 
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px]"
                                         autocomplete="off"
                                     >
                                     <input type="hidden" id="residence-country-code">
@@ -324,7 +324,7 @@
                                         type="text" 
                                         id="residence-city" 
                                         placeholder="거주 국가를 먼저 선택한 후 도시를 선택하세요" 
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px]"
                                         autocomplete="off"
                                         disabled
                                     >
@@ -337,12 +337,12 @@
                                 </div>
                             </div>
                             
-                            <div class="flex items-center justify-between">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div>
-                                    <p class="font-medium text-gray-700">현재 거주지</p>
-                                    <p class="text-sm text-gray-500" id="current-residence">설정되지 않음</p>
+                                    <p class="font-medium text-gray-700 text-sm sm:text-base">현재 거주지</p>
+                                    <p class="text-xs sm:text-sm text-gray-500" id="current-residence">설정되지 않음</p>
                                 </div>
-                                <button id="save-residence-btn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                                <button id="save-residence-btn" class="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm min-h-[40px] w-full sm:w-auto">
                                     저장
                                 </button>
                             </div>
@@ -350,24 +350,24 @@
                     </div>
 
                     <!-- 앱 설정 -->
-                    <div class="bg-gray-50 rounded-lg p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">앱 설정</h3>
+                    <div class="bg-gray-50 rounded-lg p-4 sm:p-6">
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">앱 설정</h3>
                         <div class="space-y-4">
-                            <div class="flex items-center justify-between">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div>
-                                    <p class="font-medium text-gray-700">다크 모드</p>
-                                    <p class="text-sm text-gray-500">어두운 테마로 변경</p>
+                                    <p class="font-medium text-gray-700 text-sm sm:text-base">다크 모드</p>
+                                    <p class="text-xs sm:text-sm text-gray-500">어두운 테마로 변경</p>
                                 </div>
-                                <button id="dark-mode-toggle" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                                <button id="dark-mode-toggle" class="px-3 sm:px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm min-h-[40px] w-full sm:w-auto">
                                     준비 중
                                 </button>
                             </div>
-                            <div class="flex items-center justify-between">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div>
-                                    <p class="font-medium text-gray-700">언어 설정</p>
-                                    <p class="text-sm text-gray-500">한국어 / English</p>
+                                    <p class="font-medium text-gray-700 text-sm sm:text-base">언어 설정</p>
+                                    <p class="text-xs sm:text-sm text-gray-500">한국어 / English</p>
                                 </div>
-                                <button id="language-toggle" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                                <button id="language-toggle" class="px-3 sm:px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm min-h-[40px] w-full sm:w-auto">
                                     준비 중
                                 </button>
                             </div>
@@ -375,24 +375,24 @@
                     </div>
 
                     <!-- 데이터 관리 -->
-                    <div class="bg-gray-50 rounded-lg p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">데이터 관리</h3>
+                    <div class="bg-gray-50 rounded-lg p-4 sm:p-6">
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">데이터 관리</h3>
                         <div class="space-y-4">
-                            <div class="flex items-center justify-between">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div>
-                                    <p class="font-medium text-gray-700">데이터 백업</p>
-                                    <p class="text-sm text-gray-500">여행 데이터를 안전하게 백업</p>
+                                    <p class="font-medium text-gray-700 text-sm sm:text-base">데이터 백업</p>
+                                    <p class="text-xs sm:text-sm text-gray-500">여행 데이터를 안전하게 백업</p>
                                 </div>
-                                <button id="backup-data-btn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                                <button id="backup-data-btn" class="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm min-h-[40px] w-full sm:w-auto">
                                     백업
                                 </button>
                             </div>
-                            <div class="flex items-center justify-between">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div>
-                                    <p class="font-medium text-gray-700">데이터 초기화</p>
-                                    <p class="text-sm text-gray-500">모든 여행 데이터 삭제</p>
+                                    <p class="font-medium text-gray-700 text-sm sm:text-base">데이터 초기화</p>
+                                    <p class="text-xs sm:text-sm text-gray-500">모든 여행 데이터 삭제</p>
                                 </div>
-                                <button id="reset-data-btn" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                                <button id="reset-data-btn" class="px-3 sm:px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm min-h-[40px] w-full sm:w-auto">
                                     초기화
                                 </button>
                             </div>
@@ -400,9 +400,9 @@
                     </div>
 
                     <!-- 정보 -->
-                    <div class="bg-gray-50 rounded-lg p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">정보</h3>
-                        <div class="space-y-2 text-sm text-gray-600">
+                    <div class="bg-gray-50 rounded-lg p-4 sm:p-6">
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">정보</h3>
+                        <div class="space-y-2 text-xs sm:text-sm text-gray-600">
                             <p><strong>앱 버전:</strong> 1.0.0</p>
                             <p><strong>개발자:</strong> 여행 앱 팀</p>
                             <p><strong>지원:</strong> 향후 Firebase Auth 또는 Supabase Auth 연동 예정</p>
@@ -414,28 +414,28 @@
     </main>
 
     <!-- 플로팅 + 버튼 -->
-    <button id="floating-btn" class="fixed bottom-6 right-6 w-14 h-14 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 z-50">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <button id="floating-btn" class="fixed bottom-4 right-4 w-12 h-12 sm:w-14 sm:h-14 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 z-50">
+        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
     </button>
 
     <!-- 여행 추가 모달 오버레이 -->
-    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-3 sm:p-4">
         <!-- 모달 창 -->
-        <div class="bg-white rounded-xl shadow-xl w-11/12 max-w-md max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-xl shadow-xl w-[95%] max-w-md max-h-[90vh] overflow-y-auto">
             <!-- 모달 헤더 -->
-            <div class="flex justify-between items-center p-6 border-b border-gray-200">
-                <h2 class="text-xl font-bold text-gray-800">새 여행 추가</h2>
-                <button id="close-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex justify-between items-center p-4 sm:p-6 border-b border-gray-200">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-800">새 여행 추가</h2>
+                <button id="close-modal" class="text-gray-400 hover:text-gray-600 transition-colors p-1">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
             </div>
 
             <!-- 모달 내용 -->
-            <form id="travel-form" class="p-6 space-y-4">
+            <form id="travel-form" class="p-4 sm:p-6 space-y-4">
                 <!-- 국가 선택 -->
                 <div class="relative">
                     <label for="country-input" class="block text-sm font-medium text-gray-700 mb-2">국가 *</label>
@@ -445,7 +445,7 @@
                         name="country" 
                         required 
                         placeholder="국가명을 입력하거나 선택하세요" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px]"
                         autocomplete="off"
                     >
                     <input type="hidden" id="country-code" name="countryCode">
@@ -466,7 +466,7 @@
                         name="city" 
                         required 
                         placeholder="국가를 먼저 선택한 후 도시명을 입력하세요" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px]"
                         autocomplete="off"
                         disabled
                     >
@@ -481,19 +481,19 @@
                 <!-- 체류 시작일 -->
                 <div>
                     <label for="start-date" class="block text-sm font-medium text-gray-700 mb-2">체류 시작일 *</label>
-                    <input type="date" id="start-date" name="startDate" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <input type="date" id="start-date" name="startDate" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px]">
                 </div>
 
                 <!-- 체류 종료일 -->
                 <div>
                     <label for="end-date" class="block text-sm font-medium text-gray-700 mb-2">체류 종료일 *</label>
-                    <input type="date" id="end-date" name="endDate" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <input type="date" id="end-date" name="endDate" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px]">
                 </div>
 
                 <!-- 체류 목적 -->
                 <div>
                     <label for="purpose" class="block text-sm font-medium text-gray-700 mb-2">체류 목적 *</label>
-                    <select id="purpose" name="purpose" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <select id="purpose" name="purpose" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px]">
                         <option value="">목적을 선택하세요</option>
                         <option value="travel">여행</option>
                         <option value="business">출장</option>
@@ -517,22 +517,22 @@
                         id="companions" 
                         name="companions" 
                         placeholder="동행자 이름을 입력하세요 (예: 김철수, 이영희) (선택사항)" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px]"
                     >
                 </div>
 
                 <!-- 메모 -->
                 <div>
                     <label for="memo" class="block text-sm font-medium text-gray-700 mb-2">메모</label>
-                    <textarea id="memo" name="memo" rows="3" placeholder="추가 메모를 입력하세요 (선택사항)" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"></textarea>
+                    <textarea id="memo" name="memo" rows="3" placeholder="추가 메모를 입력하세요 (선택사항)" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm"></textarea>
                 </div>
 
                 <!-- 제출 버튼 -->
                 <div class="flex space-x-3 pt-4">
-                    <button type="button" id="cancel-btn" class="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                    <button type="button" id="cancel-btn" class="flex-1 px-3 sm:px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm min-h-[40px]">
                         취소
                     </button>
-                    <button type="submit" class="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+                    <button type="submit" class="flex-1 px-3 sm:px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm min-h-[40px]">
                         추가
                     </button>
                 </div>
@@ -541,71 +541,71 @@
     </div>
 
     <!-- 방문 국가 배지 컬렉션 모달 오버레이 -->
-    <div id="countries-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div id="countries-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-3 sm:p-4">
         <!-- 모달 창 -->
-        <div class="bg-white rounded-xl shadow-xl w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-xl shadow-xl w-[95%] max-w-4xl max-h-[90vh] overflow-y-auto">
             <!-- 모달 헤더 -->
-            <div class="flex justify-between items-center p-6 border-b border-gray-200">
-                <h2 class="text-xl font-bold text-gray-800">🌍 방문 국가 배지 컬렉션</h2>
-                <button id="close-countries-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex justify-between items-center p-4 sm:p-6 border-b border-gray-200">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-800">🌍 방문 국가 배지 컬렉션</h2>
+                <button id="close-countries-modal" class="text-gray-400 hover:text-gray-600 transition-colors p-1">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
             </div>
 
             <!-- 모달 내용 -->
-            <div class="p-6">
+            <div class="p-4 sm:p-6">
                 <!-- 정렬 옵션 -->
-                <div class="mb-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-3">정렬 옵션</h3>
+                <div class="mb-4 sm:mb-6">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3">정렬 옵션</h3>
                     <div class="flex flex-wrap gap-2">
-                        <button id="sort-name" class="sort-btn active px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium">
+                        <button id="sort-name" class="sort-btn active px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-xs sm:text-sm font-medium min-h-[40px]">
                             국가 이름순
                         </button>
-                        <button id="sort-visit-order" class="sort-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium">
+                        <button id="sort-visit-order" class="sort-btn px-3 sm:px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-xs sm:text-sm font-medium min-h-[40px]">
                             방문 순서순
                         </button>
-                        <button id="sort-stay-days" class="sort-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium">
+                        <button id="sort-stay-days" class="sort-btn px-3 sm:px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-xs sm:text-sm font-medium min-h-[40px]">
                             체류일 순
                         </button>
-                        <button id="sort-visit-count" class="sort-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium">
+                        <button id="sort-visit-count" class="sort-btn px-3 sm:px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-xs sm:text-sm font-medium min-h-[40px]">
                             방문 횟수순
                         </button>
                     </div>
                 </div>
 
                 <!-- 통계 요약 -->
-                <div class="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div class="mb-4 sm:mb-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-3 sm:p-4">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-center">
                         <div>
-                            <div class="text-2xl font-bold text-blue-600" id="total-visited-countries">0</div>
-                            <div class="text-sm text-blue-800">방문 국가</div>
+                            <div class="text-xl sm:text-2xl font-bold text-blue-600" id="total-visited-countries">0</div>
+                            <div class="text-xs sm:text-sm text-blue-800">방문 국가</div>
                         </div>
                         <div>
-                            <div class="text-2xl font-bold text-green-600" id="total-visit-count">0</div>
-                            <div class="text-sm text-green-800">총 방문 횟수</div>
+                            <div class="text-xl sm:text-2xl font-bold text-green-600" id="total-visit-count">0</div>
+                            <div class="text-xs sm:text-sm text-green-800">총 방문 횟수</div>
                         </div>
                         <div>
-                            <div class="text-2xl font-bold text-purple-600" id="total-stay-days">0</div>
-                            <div class="text-sm text-purple-800">총 체류일</div>
+                            <div class="text-xl sm:text-2xl font-bold text-purple-600" id="total-stay-days">0</div>
+                            <div class="text-xs sm:text-sm text-purple-800">총 체류일</div>
                         </div>
                         <div>
-                            <div class="text-2xl font-bold text-orange-600" id="avg-stay-days">0</div>
-                            <div class="text-sm text-orange-800">평균 체류일</div>
+                            <div class="text-xl sm:text-2xl font-bold text-orange-600" id="avg-stay-days">0</div>
+                            <div class="text-xs sm:text-sm text-orange-800">평균 체류일</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- 국가 배지 컬렉션 -->
-                <div id="countries-collection" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div id="countries-collection" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                     <!-- 여기에 국가 배지들이 동적으로 추가됩니다 -->
                 </div>
 
                 <!-- 빈 상태 메시지 -->
-                <div id="countries-empty" class="text-center py-12 hidden">
-                    <div class="text-6xl mb-4">🌍</div>
-                    <p class="text-gray-500 text-lg">아직 방문한 국가가 없습니다.</p>
+                <div id="countries-empty" class="text-center py-8 sm:py-12 hidden">
+                    <div class="text-4xl sm:text-6xl mb-4">🌍</div>
+                    <p class="text-gray-500 text-base sm:text-lg">아직 방문한 국가가 없습니다.</p>
                     <p class="text-gray-400 text-sm mt-2">우측 하단의 + 버튼을 눌러 첫 여행을 추가해보세요!</p>
                 </div>
             </div>
