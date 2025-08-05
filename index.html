@@ -615,6 +615,18 @@
         function loadEntries() {
             const savedEntries = localStorage.getItem('travelEntries');
             entries = savedEntries ? JSON.parse(savedEntries) : [];
+            
+            // 기존 entries에 ID가 없는 경우 ID 추가
+            entries.forEach(entry => {
+                if (!entry.id) {
+                    entry.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+                }
+            });
+            
+            // ID가 추가된 경우 localStorage 업데이트
+            if (savedEntries) {
+                saveEntries();
+            }
         }
 
         // localStorage에 데이터 저장
@@ -815,9 +827,19 @@
                                 <h3 class="text-lg font-semibold text-gray-800">${entry.country} / ${entry.city}</h3>
                                 <p class="text-sm text-gray-600">${purposeText}</p>
                             </div>
-                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
-                                ${days}일
-                            </span>
+                            <div class="flex items-center space-x-2">
+                                <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                                    ${days}일
+                                </span>
+                                <div class="flex space-x-1">
+                                    <button onclick="modifyEntry('${entry.id}')" class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200 transition-colors">
+                                        수정
+                                    </button>
+                                    <button onclick="deleteEntry('${entry.id}')" class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200 transition-colors">
+                                        삭제
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="text-sm text-gray-500 mb-3">
                             📅 ${entry.startDate} ~ ${entry.endDate}
@@ -924,6 +946,56 @@
             calculateStats();
             renderTimeline();
             renderCalendar();
+        }
+
+        // 수정 모드 변수
+        let isEditMode = false;
+        let editingEntryId = null;
+
+        // 수정 함수
+        function modifyEntry(entryId) {
+            const entry = entries.find(e => e.id === entryId);
+            if (!entry) return;
+
+            // 수정 모드 설정
+            isEditMode = true;
+            editingEntryId = entryId;
+
+            // 모달 제목 변경
+            document.querySelector('#modal-overlay h2').textContent = '여행 수정';
+
+            // 폼에 기존 데이터 채우기
+            document.getElementById('country-input').value = entry.country;
+            document.getElementById('country-code').value = entry.countryCode;
+            document.getElementById('country-label').value = entry.countryLabel;
+            document.getElementById('city-input').value = entry.city;
+            document.getElementById('city-name').value = entry.cityName;
+            document.getElementById('start-date').value = entry.startDate;
+            document.getElementById('end-date').value = entry.endDate;
+            document.getElementById('purpose').value = entry.purpose;
+            document.getElementById('memo').value = entry.memo || '';
+
+            // 도시 입력 필드 활성화
+            document.getElementById('city-input').disabled = false;
+
+            // 제출 버튼 텍스트 변경
+            const submitBtn = document.querySelector('#travel-form button[type="submit"]');
+            submitBtn.textContent = '수정';
+
+            // 모달 열기
+            modalOverlay.classList.remove('hidden');
+            modalOverlay.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 삭제 함수
+        function deleteEntry(entryId) {
+            if (confirm('이 일정을 삭제하시겠습니까?')) {
+                entries = entries.filter(entry => entry.id !== entryId);
+                saveEntries();
+                updateAllSections();
+                alert('일정이 삭제되었습니다.');
+            }
         }
 
         // 국가 자동완성 이벤트 리스너들
@@ -1044,6 +1116,19 @@
             modalOverlay.classList.remove('flex');
             document.body.style.overflow = '';
             travelForm.reset();
+            
+            // 수정 모드 리셋
+            isEditMode = false;
+            editingEntryId = null;
+            
+            // 모달 제목과 버튼 텍스트 원래대로 복원
+            document.querySelector('#modal-overlay h2').textContent = '새 여행 추가';
+            const submitBtn = document.querySelector('#travel-form button[type="submit"]');
+            submitBtn.textContent = '추가';
+            
+            // 도시 입력 필드 비활성화
+            document.getElementById('city-input').disabled = true;
+            document.getElementById('city-input').placeholder = '국가를 먼저 선택한 후 도시명을 입력하세요';
         }
 
         // X 버튼으로 모달 닫기
@@ -1059,9 +1144,62 @@
             }
         });
 
+        // 날짜 유효성 검사 함수
+        function validateDates() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                
+                if (end < start) {
+                    alert('체류 종료일은 체류 시작일보다 이전일 수 없습니다.');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // 시작일 변경 시 종료일 최소값 설정
+        document.getElementById('start-date').addEventListener('change', function() {
+            const startDate = this.value;
+            const endDateInput = document.getElementById('end-date');
+            
+            if (startDate) {
+                endDateInput.min = startDate;
+                
+                // 현재 종료일이 시작일보다 이전이면 종료일을 시작일로 설정
+                if (endDateInput.value && endDateInput.value < startDate) {
+                    endDateInput.value = startDate;
+                }
+            }
+        });
+
+        // 종료일 변경 시 유효성 검사
+        document.getElementById('end-date').addEventListener('change', function() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = this.value;
+            
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                
+                if (end < start) {
+                    alert('체류 종료일은 체류 시작일보다 이전일 수 없습니다.');
+                    this.value = startDate; // 종료일을 시작일로 설정
+                }
+            }
+        });
+
         // 폼 제출 처리
         travelForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            
+            // 날짜 유효성 검사
+            if (!validateDates()) {
+                return;
+            }
             
             const formData = {
                 country: document.getElementById('country-input').value,
@@ -1075,16 +1213,28 @@
                 memo: document.getElementById('memo').value
             };
 
-            // entries 배열에 추가
-            entries.push(formData);
-            saveEntries();
-            
-            // 모든 섹션 업데이트
-            updateAllSections();
-            
-            console.log('여행 데이터:', JSON.stringify(formData, null, 2));
-            closeModalFunction();
-            alert('여행이 성공적으로 추가되었습니다!');
+            if (isEditMode && editingEntryId) {
+                // 수정 모드: 기존 entry 업데이트
+                const index = entries.findIndex(e => e.id === editingEntryId);
+                if (index !== -1) {
+                    formData.id = editingEntryId; // 기존 ID 유지
+                    entries[index] = formData;
+                    saveEntries();
+                    updateAllSections();
+                    console.log('수정된 여행 데이터:', JSON.stringify(formData, null, 2));
+                    closeModalFunction();
+                    alert('여행이 성공적으로 수정되었습니다!');
+                }
+            } else {
+                // 추가 모드: 새 entry 추가
+                formData.id = Date.now().toString(); // 고유 ID 추가
+                entries.push(formData);
+                saveEntries();
+                updateAllSections();
+                console.log('여행 데이터:', JSON.stringify(formData, null, 2));
+                closeModalFunction();
+                alert('여행이 성공적으로 추가되었습니다!');
+            }
         });
 
         // 캘린더 네비게이션
