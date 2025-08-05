@@ -33,6 +33,70 @@
                 font-size: 0.875rem;
             }
         }
+
+        /* 캘린더 이벤트 스타일 (구글 캘린더 스타일) */
+        .calendar-event {
+            display: block;
+            width: 100%;
+            padding: 2px 6px;
+            margin: 1px 0;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border-left: 3px solid;
+        }
+
+        .calendar-event:hover {
+            transform: scale(1.02);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 이벤트 색상 변형 */
+        .calendar-event.event-1 { background-color: #4285f4; border-left-color: #1a73e8; }
+        .calendar-event.event-2 { background-color: #ea4335; border-left-color: #d93025; }
+        .calendar-event.event-3 { background-color: #fbbc04; border-left-color: #f9ab00; }
+        .calendar-event.event-4 { background-color: #34a853; border-left-color: #137333; }
+        .calendar-event.event-5 { background-color: #9c27b0; border-left-color: #7b1fa2; }
+        .calendar-event.event-6 { background-color: #ff9800; border-left-color: #f57c00; }
+        .calendar-event.event-7 { background-color: #795548; border-left-color: #5d4037; }
+        .calendar-event.event-8 { background-color: #607d8b; border-left-color: #455a64; }
+
+        /* 툴팁 스타일 */
+        .calendar-tooltip {
+            animation: tooltipFadeIn 0.2s ease-out;
+        }
+
+        @keyframes tooltipFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 모바일에서 터치 영역 확대 */
+        @media (max-width: 768px) {
+            .calendar-event {
+                padding: 3px 8px;
+                font-size: 0.8rem;
+                margin: 2px 0;
+            }
+            
+            /* 모바일에서 캘린더 네비게이션 최적화 */
+            #year-select, #month-select {
+                font-size: 0.875rem;
+                padding: 0.5rem 0.75rem;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -42,6 +106,27 @@
             <div class="flex justify-between items-center">
                 <div class="text-xl font-bold text-gray-800 py-4">
                     🌍 여행 앱
+                </div>
+                
+                <!-- 사용자 정보 및 로그인 버튼 -->
+                <div class="flex items-center space-x-4">
+                    <!-- 로그인된 사용자 정보 (기본적으로 숨김) -->
+                    <div id="user-info" class="hidden flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm font-medium" id="user-initial">U</span>
+                        </div>
+                        <span class="text-sm font-medium text-gray-700" id="username">사용자</span>
+                    </div>
+                    
+                    <!-- 로그인/로그아웃 버튼 -->
+                    <div class="flex items-center space-x-2">
+                        <button id="login-btn" class="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                            로그인
+                        </button>
+                        <button id="logout-btn" class="hidden text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors">
+                            로그아웃
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -58,6 +143,9 @@
                 </button>
                 <button class="nav-tab flex-1 py-3 px-4 rounded-lg text-sm font-medium text-center transition-colors text-gray-600" data-section="calendar">
                     📅 캘린더
+                </button>
+                <button class="nav-tab flex-1 py-3 px-4 rounded-lg text-sm font-medium text-center transition-colors text-gray-600" data-section="settings">
+                    ⚙️ 설정
                 </button>
             </div>
         </div>
@@ -165,14 +253,41 @@
                 </div>
                 
                 <!-- 캘린더 네비게이션 -->
-                <div class="flex justify-between items-center mb-6">
-                    <button id="prev-month" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
-                        ← 이전
-                    </button>
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                    <!-- 연도/월 선택 드롭다운 -->
+                    <div class="flex items-center gap-3">
+                        <select id="year-select" class="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors">
+                            <!-- 연도 옵션들이 동적으로 생성됩니다 -->
+                        </select>
+                        <span class="text-gray-600 font-medium">년</span>
+                        <select id="month-select" class="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors">
+                            <option value="0">1월</option>
+                            <option value="1">2월</option>
+                            <option value="2">3월</option>
+                            <option value="3">4월</option>
+                            <option value="4">5월</option>
+                            <option value="5">6월</option>
+                            <option value="6">7월</option>
+                            <option value="7">8월</option>
+                            <option value="8">9월</option>
+                            <option value="9">10월</option>
+                            <option value="10">11월</option>
+                            <option value="11">12월</option>
+                        </select>
+                    </div>
+                    
+                    <!-- 현재 월 표시 -->
                     <h2 id="current-month" class="text-xl font-semibold text-gray-800">2024년 1월</h2>
-                    <button id="next-month" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
-                        다음 →
-                    </button>
+                    
+                    <!-- 이전/다음 버튼 -->
+                    <div class="flex items-center gap-2">
+                        <button id="prev-month" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
+                            ← 이전
+                        </button>
+                        <button id="next-month" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
+                            다음 →
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- 캘린더 테이블 -->
@@ -200,6 +315,109 @@
                     <div class="text-4xl mb-4">📝</div>
                     <p class="text-gray-500 text-lg">아직 등록된 여행 일정이 없습니다.</p>
                     <p class="text-gray-400 text-sm mt-2">우측 하단의 + 버튼을 눌러 첫 여행을 추가해보세요!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 설정 섹션 -->
+        <section id="settings" class="content-section hidden">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                <div class="text-center mb-8">
+                    <div class="text-6xl mb-6">⚙️</div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4">설정</h1>
+                    <p class="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
+                        앱 설정과 사용자 정보를 관리하세요. 
+                        테마 변경, 언어 설정, 계정 관리 등 
+                        다양한 설정 옵션을 제공합니다.
+                    </p>
+                </div>
+                
+                <!-- 설정 카테고리들 -->
+                <div class="space-y-6">
+                    <!-- 계정 설정 -->
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">계정 설정</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-700">로그인 상태</p>
+                                    <p class="text-sm text-gray-500" id="login-status">로그인되지 않음</p>
+                                </div>
+                                <button id="demo-login-btn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                                    데모 로그인
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-700">사용자 데이터</p>
+                                    <p class="text-sm text-gray-500">현재 저장된 여행 데이터</p>
+                                </div>
+                                <button id="export-data-btn" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                                    데이터 내보내기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 앱 설정 -->
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">앱 설정</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-700">다크 모드</p>
+                                    <p class="text-sm text-gray-500">어두운 테마로 변경</p>
+                                </div>
+                                <button id="dark-mode-toggle" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                                    준비 중
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-700">언어 설정</p>
+                                    <p class="text-sm text-gray-500">한국어 / English</p>
+                                </div>
+                                <button id="language-toggle" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                                    준비 중
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 데이터 관리 -->
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">데이터 관리</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-700">데이터 백업</p>
+                                    <p class="text-sm text-gray-500">여행 데이터를 안전하게 백업</p>
+                                </div>
+                                <button id="backup-data-btn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                                    백업
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-700">데이터 초기화</p>
+                                    <p class="text-sm text-gray-500">모든 여행 데이터 삭제</p>
+                                </div>
+                                <button id="reset-data-btn" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                                    초기화
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 정보 -->
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">정보</h3>
+                        <div class="space-y-2 text-sm text-gray-600">
+                            <p><strong>앱 버전:</strong> 1.0.0</p>
+                            <p><strong>개발자:</strong> 여행 앱 팀</p>
+                            <p><strong>지원:</strong> 향후 Firebase Auth 또는 Supabase Auth 연동 예정</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -324,6 +542,17 @@
         // 전역 변수
         let entries = [];
         let currentDate = new Date();
+        
+        // 사용자 관련 변수들
+        let currentUser = {
+            id: null,
+            username: null,
+            isLoggedIn: false
+        };
+        
+        // 수정 모드 변수
+        let isEditMode = false;
+        let editingEntryId = null;
         
         // 국가 데이터 (code, label, aliases, enLabel 구조)
         const countries = [
@@ -634,6 +863,42 @@
             localStorage.setItem('travelEntries', JSON.stringify(entries));
         }
         
+        // 사용자별 데이터 불러오기 (향후 로그인 시스템 대비)
+        function loadUserData() {
+            if (currentUser.isLoggedIn && currentUser.id) {
+                const userDataKey = `user_${currentUser.id}_travelEntries`;
+                const savedEntries = localStorage.getItem(userDataKey);
+                entries = savedEntries ? JSON.parse(savedEntries) : [];
+            } else {
+                // 현재는 기존 방식 유지 (비로그인 사용자용)
+                const savedEntries = localStorage.getItem('travelEntries');
+                entries = savedEntries ? JSON.parse(savedEntries) : [];
+            }
+            
+            // 기존 entries에 ID가 없는 경우 ID 추가
+            entries.forEach(entry => {
+                if (!entry.id) {
+                    entry.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+                }
+            });
+            
+            // ID가 추가된 경우 localStorage 업데이트
+            if (entries.length > 0) {
+                saveUserData();
+            }
+        }
+
+        // 사용자별 데이터 저장 (향후 로그인 시스템 대비)
+        function saveUserData() {
+            if (currentUser.isLoggedIn && currentUser.id) {
+                const userDataKey = `user_${currentUser.id}_travelEntries`;
+                localStorage.setItem(userDataKey, JSON.stringify(entries));
+            } else {
+                // 현재는 기존 방식 유지 (비로그인 사용자용)
+                localStorage.setItem('travelEntries', JSON.stringify(entries));
+            }
+        }
+        
         // 국가 필터링 함수
         function filterCountries(query) {
             if (!query) return countries;
@@ -740,6 +1005,108 @@
                 return true;
             }
             return false;
+        }
+
+
+
+        // 목적 텍스트 변환 함수
+        function getPurposeText(purpose) {
+            const textMap = {
+                'travel': '여행',
+                'business': '출장',
+                'study': '유학',
+                'working-holiday': '워킹 홀리데이',
+                'family-visit': '가족 방문',
+                'dispatch': '파견',
+                'exchange': '교환학생',
+                'volunteer': '봉사활동',
+                'medical': '의료',
+                'language': '어학 연수',
+                'transit': '비행 경유'
+            };
+            return textMap[purpose] || purpose;
+        }
+
+        // 툴팁 생성 함수
+        function createTooltip(event, tooltipContent) {
+            // 기존 툴팁 제거
+            const existingTooltip = document.querySelector('.calendar-tooltip');
+            if (existingTooltip) {
+                existingTooltip.remove();
+            }
+
+            const tooltip = document.createElement('div');
+            tooltip.className = 'calendar-tooltip fixed z-50 bg-gray-900 text-white text-sm rounded-lg px-3 py-2 shadow-lg max-w-xs pointer-events-none space-y-1';
+            
+            // 텍스트를 줄바꿈으로 분리하여 HTML로 변환
+            const lines = tooltipContent.split('\\n');
+            const htmlContent = lines.map((line, index) => {
+                const escapedLine = line.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                if (index === 0) {
+                    return `<div class="font-semibold">${escapedLine}</div>`;
+                } else {
+                    return `<div class="text-gray-300">${escapedLine}</div>`;
+                }
+            }).join('');
+            tooltip.innerHTML = htmlContent;
+            
+            document.body.appendChild(tooltip);
+
+            // 툴팁 위치 계산
+            const rect = event.target.getBoundingClientRect();
+            const tooltipRect = tooltip.getBoundingClientRect();
+            
+            let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+            let top = rect.bottom + 8;
+
+            // 화면 경계 체크
+            if (left < 8) left = 8;
+            if (left + tooltipRect.width > window.innerWidth - 8) {
+                left = window.innerWidth - tooltipRect.width - 8;
+            }
+            if (top + tooltipRect.height > window.innerHeight - 8) {
+                top = rect.top - tooltipRect.height - 8;
+            }
+
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }
+
+        // 툴팁 제거 함수
+        function removeTooltip() {
+            const tooltip = document.querySelector('.calendar-tooltip');
+            if (tooltip) {
+                tooltip.remove();
+            }
+        }
+
+        // 모바일 터치 이벤트 처리
+        let touchTimeout = null;
+        let activeTooltip = null;
+
+        function handleTouchEvent(event, tooltipContent) {
+            event.preventDefault();
+            
+            if (activeTooltip) {
+                // 이미 열린 툴팁이 있으면 닫기
+                removeTooltip();
+                activeTooltip = null;
+            } else {
+                // 툴팁 열기
+                createTooltip(event, tooltipContent);
+                activeTooltip = event.target;
+                
+                // 다른 곳 터치 시 툴팁 닫기
+                setTimeout(() => {
+                    document.addEventListener('touchstart', function closeTooltip(e) {
+                        if (!event.target.contains(e.target)) {
+                            removeTooltip();
+                            activeTooltip = null;
+                            document.removeEventListener('touchstart', closeTooltip);
+                        }
+                    }, { once: true });
+                }, 100);
+            }
         }
 
         // 날짜 차이 계산 (체류일 수)
@@ -901,24 +1268,24 @@
                 
                 if (dayEvents.length > 0) {
                     dayContent += `<div class="mt-1 space-y-1">`;
-                    dayEvents.forEach(event => {
-                        const purposeText = {
-                            'travel': '여행',
-                            'business': '출장',
-                            'study': '유학',
-                            'working-holiday': '워킹홀',
-                            'family-visit': '가족방문',
-                            'dispatch': '파견',
-                            'exchange': '교환학생',
-                            'volunteer': '봉사',
-                            'medical': '의료',
-                            'language': '어학',
-                            'transit': '경유'
-                        }[event.purpose] || event.purpose;
-
+                    dayEvents.forEach((event, index) => {
+                        const purposeText = getPurposeText(event.purpose);
+                        
+                        // 툴팁 내용을 안전하게 생성
+                        const tooltipText = `${event.country} / ${event.city}\\n${purposeText}\\n📅 ${event.startDate} ~ ${event.endDate}${event.memo ? '\\n📝 ' + event.memo : ''}`;
+                        
+                        // 이벤트 색상 클래스 결정 (순환)
+                        const colorClass = `event-${(index % 8) + 1}`;
+                        
                         dayContent += `
-                            <div class="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded truncate" title="${event.country} ${event.city} - ${purposeText}">
-                                ${event.city} - ${purposeText}
+                            <div class="calendar-event ${colorClass}"
+                                 data-event-index="${index}"
+                                 data-tooltip="${tooltipText.replace(/"/g, '&quot;')}"
+                                 onmouseenter="createTooltip(event, this.dataset.tooltip)"
+                                 onmouseleave="removeTooltip()"
+                                 ontouchstart="handleTouchEvent(event, this.dataset.tooltip)"
+                                 title="${event.country}">
+                                ${event.country}
                             </div>
                         `;
                     });
@@ -926,7 +1293,7 @@
                 }
 
                 const cellClass = `
-                    border border-gray-200 p-2 h-24 align-top
+                    border border-gray-200 p-2 h-28 align-top
                     ${isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'}
                     ${isToday ? 'bg-blue-50 border-blue-200' : ''}
                 `;
@@ -947,10 +1314,6 @@
             renderTimeline();
             renderCalendar();
         }
-
-        // 수정 모드 변수
-        let isEditMode = false;
-        let editingEntryId = null;
 
         // 수정 함수
         function modifyEntry(entryId) {
@@ -992,7 +1355,7 @@
         function deleteEntry(entryId) {
             if (confirm('이 일정을 삭제하시겠습니까?')) {
                 entries = entries.filter(entry => entry.id !== entryId);
-                saveEntries();
+                saveUserData();
                 updateAllSections();
                 alert('일정이 삭제되었습니다.');
             }
@@ -1219,7 +1582,7 @@
                 if (index !== -1) {
                     formData.id = editingEntryId; // 기존 ID 유지
                     entries[index] = formData;
-                    saveEntries();
+                    saveUserData();
                     updateAllSections();
                     console.log('수정된 여행 데이터:', JSON.stringify(formData, null, 2));
                     closeModalFunction();
@@ -1229,7 +1592,7 @@
                 // 추가 모드: 새 entry 추가
                 formData.id = Date.now().toString(); // 고유 ID 추가
                 entries.push(formData);
-                saveEntries();
+                saveUserData();
                 updateAllSections();
                 console.log('여행 데이터:', JSON.stringify(formData, null, 2));
                 closeModalFunction();
@@ -1237,16 +1600,64 @@
             }
         });
 
+        // 연도/월 드롭다운 초기화
+        function initializeCalendarDropdowns() {
+            const yearSelect = document.getElementById('year-select');
+            const monthSelect = document.getElementById('month-select');
+            
+            // 연도 옵션 생성 (현재 연도 기준 전후 10년)
+            const currentYear = new Date().getFullYear();
+            yearSelect.innerHTML = '';
+            for (let year = currentYear - 10; year <= currentYear + 10; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year + '년';
+                yearSelect.appendChild(option);
+            }
+            
+            // 현재 연도/월로 설정
+            yearSelect.value = currentDate.getFullYear();
+            monthSelect.value = currentDate.getMonth();
+        }
+
+        // 연도/월 선택 시 캘린더 업데이트
+        function updateCalendarFromDropdowns() {
+            const yearSelect = document.getElementById('year-select');
+            const monthSelect = document.getElementById('month-select');
+            
+            const selectedYear = parseInt(yearSelect.value);
+            const selectedMonth = parseInt(monthSelect.value);
+            
+            currentDate.setFullYear(selectedYear);
+            currentDate.setMonth(selectedMonth);
+            renderCalendar();
+        }
+
         // 캘린더 네비게이션
         document.getElementById('prev-month').addEventListener('click', function() {
             currentDate.setMonth(currentDate.getMonth() - 1);
+            updateDropdownsFromCurrentDate();
             renderCalendar();
         });
 
         document.getElementById('next-month').addEventListener('click', function() {
             currentDate.setMonth(currentDate.getMonth() + 1);
+            updateDropdownsFromCurrentDate();
             renderCalendar();
         });
+
+        // 드롭다운 값 변경 이벤트 리스너
+        document.getElementById('year-select').addEventListener('change', updateCalendarFromDropdowns);
+        document.getElementById('month-select').addEventListener('change', updateCalendarFromDropdowns);
+
+        // 현재 날짜에 맞춰 드롭다운 값 업데이트
+        function updateDropdownsFromCurrentDate() {
+            const yearSelect = document.getElementById('year-select');
+            const monthSelect = document.getElementById('month-select');
+            
+            yearSelect.value = currentDate.getFullYear();
+            monthSelect.value = currentDate.getMonth();
+        }
 
         // 탭 클릭 이벤트 처리
         document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -1277,6 +1688,7 @@
 
                 // 캘린더 섹션으로 이동할 때 캘린더 다시 렌더링
                 if (targetSection === 'calendar') {
+                    updateDropdownsFromCurrentDate();
                     renderCalendar();
                 }
             });
@@ -1284,9 +1696,127 @@
 
         // 페이지 로드 시 초기화
         document.addEventListener('DOMContentLoaded', function() {
-            loadEntries();
+            loadUserData();
             updateAllSections();
+            updateUserInterface();
+            
+            // 캘린더 드롭다운 초기화
+            initializeCalendarDropdowns();
+            
+            // 로그인/로그아웃 버튼 이벤트 리스너
+            document.getElementById('login-btn').addEventListener('click', function() {
+                // 향후 실제 로그인 시스템 연동 예정
+                alert('로그인 기능은 향후 Firebase Auth 또는 Supabase Auth로 구현 예정입니다.');
+            });
+            
+            document.getElementById('logout-btn').addEventListener('click', logout);
+            
+            // 설정 페이지 버튼 이벤트 리스너
+            document.getElementById('demo-login-btn').addEventListener('click', demoLogin);
+            document.getElementById('export-data-btn').addEventListener('click', exportData);
+            document.getElementById('backup-data-btn').addEventListener('click', exportData);
+            document.getElementById('reset-data-btn').addEventListener('click', resetData);
+            
+            // 준비 중인 기능들
+            document.getElementById('dark-mode-toggle').addEventListener('click', function() {
+                alert('다크 모드 기능은 향후 구현 예정입니다.');
+            });
+            
+            document.getElementById('language-toggle').addEventListener('click', function() {
+                alert('언어 설정 기능은 향후 구현 예정입니다.');
+            });
         });
+
+        // 사용자 인터페이스 업데이트
+        function updateUserInterface() {
+            const userInfo = document.getElementById('user-info');
+            const loginBtn = document.getElementById('login-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const loginStatus = document.getElementById('login-status');
+            const usernameElement = document.getElementById('username');
+            const userInitial = document.getElementById('user-initial');
+
+            if (currentUser.isLoggedIn) {
+                // 로그인된 상태
+                userInfo.classList.remove('hidden');
+                loginBtn.classList.add('hidden');
+                logoutBtn.classList.remove('hidden');
+                loginStatus.textContent = `로그인됨 (${currentUser.username})`;
+                usernameElement.textContent = currentUser.username;
+                userInitial.textContent = currentUser.username.charAt(0).toUpperCase();
+            } else {
+                // 로그인되지 않은 상태
+                userInfo.classList.add('hidden');
+                loginBtn.classList.remove('hidden');
+                logoutBtn.classList.add('hidden');
+                loginStatus.textContent = '로그인되지 않음';
+            }
+        }
+
+        // 데모 로그인 함수
+        function demoLogin() {
+            currentUser = {
+                id: 'demo_user_001',
+                username: '데모 사용자',
+                isLoggedIn: true
+            };
+            
+            // 사용자별 데이터 로드
+            loadUserData();
+            updateUserInterface();
+            updateAllSections();
+            
+            alert('데모 로그인이 완료되었습니다!');
+        }
+
+        // 로그아웃 함수
+        function logout() {
+            if (confirm('로그아웃하시겠습니까? 현재 데이터는 로컬에 저장됩니다.')) {
+                currentUser = {
+                    id: null,
+                    username: null,
+                    isLoggedIn: false
+                };
+                
+                // 비로그인 사용자용 데이터 로드
+                loadUserData();
+                updateUserInterface();
+                updateAllSections();
+                
+                alert('로그아웃되었습니다.');
+            }
+        }
+
+        // 데이터 내보내기 함수
+        function exportData() {
+            const data = {
+                user: currentUser,
+                entries: entries,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `travel_data_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            URL.revokeObjectURL(url);
+            alert('데이터가 성공적으로 내보내졌습니다!');
+        }
+
+        // 데이터 초기화 함수
+        function resetData() {
+            if (confirm('모든 여행 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                entries = [];
+                saveUserData();
+                updateAllSections();
+                alert('모든 데이터가 초기화되었습니다.');
+            }
+        }
     </script>
 </body>
 </html> 
