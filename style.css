@@ -407,8 +407,8 @@ body {
         min-height: 44px;
     }
     
-    /* 모바일에서 타임라인 카드 최적화 */
-    .timeline-card {
+    /* 모바일에서 콜렉션 타임라인 카드 최적화 */
+    .collection-timeline-card {
         padding: 1rem;
         margin-bottom: 0.75rem;
         /* 모바일에서 터치 피드백 개선 */
@@ -416,8 +416,8 @@ body {
         user-select: none;
     }
     
-    /* 모바일에서 타임라인 카드 터치 영역 최적화 */
-    .timeline-card:active {
+    /* 모바일에서 콜렉션 타임라인 카드 터치 영역 최적화 */
+    .collection-timeline-card:active {
         background-color: #f8fafc;
         transform: scale(0.98);
     }
@@ -434,6 +434,57 @@ body {
         right: 1rem;
         width: 3rem;
         height: 3rem;
+    }
+}
+
+/* 콜렉션 하위 탭 스타일 */
+.collection-tab {
+    transition: all 0.3s ease;
+    min-height: 40px;
+    font-weight: 500;
+}
+
+.collection-tab:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.collection-tab.active {
+    background-color: #3b82f6;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.collection-subsection {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.collection-subsection.hidden {
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+}
+
+.collection-subsection.block {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* 모바일에서 콜렉션 탭 최적화 */
+@media (max-width: 768px) {
+    .collection-tab {
+        min-height: 44px;
+        font-size: 0.875rem;
+        padding: 0.75rem 1rem;
+    }
+    
+    /* 모바일에서 탭 텍스트 줄바꿈 방지 */
+    .collection-tab {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 

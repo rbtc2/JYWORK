@@ -1,6 +1,6 @@
 /**
- * timeline.js - 타임라인 생성, 수정, 삭제 기능
- * 여행 일정의 CRUD 작업과 타임라인 렌더링을 담당
+ * collectionTimeline.js - 콜렉션 타임라인 생성, 수정, 삭제 기능
+ * 여행 일정의 CRUD 작업과 콜렉션 타임라인 렌더링을 담당
  */
 
 // 국가별 국기 이모지 매핑
@@ -13,30 +13,30 @@ const countryFlags = {
     'DE': '🇩🇪'
 };
 
-// 타임라인 렌더링
-function renderTimeline() {
-    const timelineList = document.getElementById('timeline-list');
-    const timelineEmpty = document.getElementById('timeline-empty');
+// 콜렉션 타임라인 렌더링
+function renderCollectionTimeline() {
+    const collectionTimelineList = document.getElementById('collection-timeline-list');
+    const collectionTimelineEmpty = document.getElementById('collection-timeline-empty');
 
     if (entries.length === 0) {
-        timelineList.style.display = 'none';
-        timelineEmpty.style.display = 'block';
+        collectionTimelineList.style.display = 'none';
+        collectionTimelineEmpty.style.display = 'block';
         return;
     }
 
-    timelineList.style.display = 'block';
-    timelineEmpty.style.display = 'none';
+    collectionTimelineList.style.display = 'block';
+    collectionTimelineEmpty.style.display = 'none';
 
     // 날짜순으로 정렬 (최신순)
     const sortedEntries = [...entries].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
 
-    timelineList.innerHTML = sortedEntries.map(entry => {
+    collectionTimelineList.innerHTML = sortedEntries.map(entry => {
         const days = calculateDays(entry.startDate, entry.endDate);
         const purposeText = getPurposeText(entry.purpose);
         const flag = countryFlags[entry.countryCode] || '🏳️';
 
         return `
-            <div class="timeline-card bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer active:scale-[0.98] sm:active:scale-100" 
+            <div class="collection-timeline-card bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer active:scale-[0.98] sm:active:scale-100" 
                  onclick="showEntryDetail('${entry.id}')">
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                     <div class="flex-1">

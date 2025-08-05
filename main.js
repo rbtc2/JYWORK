@@ -99,7 +99,7 @@ function calculateStats() {
 // 모든 섹션 업데이트
 function updateAllSections() {
     calculateStats();
-    renderTimeline();
+    renderCollectionTimeline();
     renderCalendar();
     updateMap();
     
@@ -152,8 +152,105 @@ function initializeTabNavigation() {
                     }
                 }, 100);
             }
+            
+            // 콜렉션 섹션으로 이동할 때 기본 탭 설정
+            if (targetSection === 'collection') {
+                initializeCollectionTabs();
+            }
         });
     });
+}
+
+// 콜렉션 하위 탭 초기화
+function initializeCollectionTabs() {
+    // 모든 콜렉션 탭에서 active 클래스 제거
+    document.querySelectorAll('.collection-tab').forEach(tab => {
+        tab.classList.remove('active');
+        tab.classList.remove('bg-blue-500', 'text-white');
+        tab.classList.add('bg-gray-200', 'text-gray-700');
+    });
+    
+    // 첫 번째 탭(타임라인)을 기본으로 활성화
+    const firstTab = document.querySelector('.collection-tab[data-subsection="timeline"]');
+    if (firstTab) {
+        firstTab.classList.add('active', 'bg-blue-500', 'text-white');
+        firstTab.classList.remove('bg-gray-200', 'text-gray-700');
+    }
+    
+    // 모든 하위 섹션 숨기기
+    document.querySelectorAll('.collection-subsection').forEach(section => {
+        section.classList.add('hidden');
+        section.classList.remove('block');
+    });
+    
+    // 타임라인 하위 섹션 보이기
+    const timelineSubsection = document.getElementById('timeline-subsection');
+    if (timelineSubsection) {
+        timelineSubsection.classList.remove('hidden');
+        timelineSubsection.classList.add('block');
+    }
+    
+    // 타임라인 렌더링
+    renderCollectionTimeline();
+    
+    // 콜렉션 탭 클릭 이벤트 리스너 추가
+    document.querySelectorAll('.collection-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const targetSubsection = this.getAttribute('data-subsection');
+            
+            // 모든 콜렉션 탭에서 active 클래스 제거
+            document.querySelectorAll('.collection-tab').forEach(t => {
+                t.classList.remove('active', 'bg-blue-500', 'text-white');
+                t.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            // 클릭된 탭에 active 클래스 추가
+            this.classList.add('active', 'bg-blue-500', 'text-white');
+            this.classList.remove('bg-gray-200', 'text-gray-700');
+            
+            // 모든 하위 섹션 숨기기
+            document.querySelectorAll('.collection-subsection').forEach(section => {
+                section.classList.add('hidden');
+                section.classList.remove('block');
+            });
+            
+            // 해당 하위 섹션 보이기
+            const targetElement = document.getElementById(targetSubsection + '-subsection');
+            if (targetElement) {
+                targetElement.classList.remove('hidden');
+                targetElement.classList.add('block');
+            }
+            
+            // 타임라인 탭 클릭 시 타임라인 렌더링
+            if (targetSubsection === 'timeline') {
+                renderCollectionTimeline();
+            }
+            
+            // 국가별 보기 탭 클릭 시 준비 중 메시지 표시
+            if (targetSubsection === 'countries') {
+                showComingSoonMessage();
+            }
+        });
+    });
+}
+
+// 준비 중 메시지 표시
+function showComingSoonMessage() {
+    const countriesSubsection = document.getElementById('countries-subsection');
+    if (countriesSubsection) {
+        // 이미 메시지가 있는지 확인
+        const existingMessage = countriesSubsection.querySelector('.text-center');
+        if (!existingMessage) {
+            countriesSubsection.innerHTML = `
+                <div class="text-center py-12 sm:py-16">
+                    <div class="text-4xl sm:text-6xl mb-6">🚧</div>
+                    <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-3">준비 중입니다</h3>
+                    <p class="text-gray-500 text-base sm:text-lg mb-4">국가별 보기 기능은 현재 개발 중입니다.</p>
+                    <p class="text-gray-400 text-sm">곧 더 나은 기능으로 찾아뵙겠습니다!</p>
+                </div>
+            `;
+        }
+    }
 }
 
 // 모달 관련 함수들
@@ -327,6 +424,7 @@ function initializeApp() {
     
     // 이벤트 리스너 초기화
     initializeTabNavigation();
+    initializeCollectionTabs();
     initializeModal();
     initializeDateValidation();
     initializeCalendarEventListeners();

@@ -50,8 +50,8 @@
                 <button class="nav-tab flex-1 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg text-xs sm:text-sm font-medium text-center transition-colors text-gray-600 min-h-[44px]" data-section="dashboard">
                     📊 대시보드
                 </button>
-                <button class="nav-tab flex-1 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg text-xs sm:text-sm font-medium text-center transition-colors text-gray-600 min-h-[44px]" data-section="timeline">
-                    ⏰ 타임라인
+                <button class="nav-tab flex-1 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg text-xs sm:text-sm font-medium text-center transition-colors text-gray-600 min-h-[44px]" data-section="collection">
+                    📚 콜렉션
                 </button>
                 <button class="nav-tab flex-1 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg text-xs sm:text-sm font-medium text-center transition-colors text-gray-600 min-h-[44px]" data-section="calendar">
                     📅 캘린더
@@ -146,29 +146,73 @@
             </div>
         </section>
 
-        <!-- 타임라인 섹션 -->
-        <section id="timeline" class="content-section hidden">
+        <!-- 콜렉션 섹션 -->
+        <section id="collection" class="content-section hidden">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-8">
                 <div class="text-center mb-6 sm:mb-8">
-                    <div class="text-4xl sm:text-6xl mb-4 sm:mb-6">⏰</div>
-                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">타임라인</h1>
+                    <div class="text-4xl sm:text-6xl mb-4 sm:mb-6">📚</div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">콜렉션</h1>
                     <p class="text-gray-600 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
-                        여행 일정을 시간순으로 정리하고 관리하세요. 
-                        각 여행의 시작과 끝, 주요 일정들을 타임라인 형태로 
-                        시각화하여 전체 여행 흐름을 한눈에 파악할 수 있습니다.
+                        여행 기록을 다양한 방식으로 정리하고 관리하세요. 
+                        시간순 정렬, 국가별 분류 등 다양한 관점에서 
+                        여행 기록을 체계적으로 확인할 수 있습니다.
                     </p>
                 </div>
                 
-                <!-- 타임라인 목록 -->
-                <div id="timeline-list" class="space-y-3 sm:space-y-4">
-                    <!-- 여기에 동적으로 타임라인 카드들이 추가됩니다 -->
+                <!-- 하위 탭 네비게이션 -->
+                <div class="flex flex-wrap gap-2 mb-6 sm:mb-8 justify-center sm:justify-start">
+                    <button class="collection-tab active px-4 sm:px-6 py-2 sm:py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm sm:text-base font-medium min-h-[40px] sm:min-h-[44px]" data-subsection="timeline">
+                        ⏰ 타임라인
+                    </button>
+                    <button class="collection-tab px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base font-medium min-h-[40px] sm:min-h-[44px]" data-subsection="countries">
+                        🌍 국가별 보기
+                    </button>
                 </div>
                 
-                <!-- 빈 상태 메시지 -->
-                <div id="timeline-empty" class="text-center py-8 sm:py-12">
-                    <div class="text-3xl sm:text-4xl mb-4">📝</div>
-                    <p class="text-gray-500 text-base sm:text-lg">아직 등록된 여행 일정이 없습니다.</p>
-                    <p class="text-gray-400 text-sm mt-2">우측 하단의 + 버튼을 눌러 첫 여행을 추가해보세요!</p>
+                <!-- 타임라인 하위 섹션 -->
+                <div id="timeline-subsection" class="collection-subsection block">
+                    <div class="text-center mb-6 sm:mb-8">
+                        <div class="text-3xl sm:text-4xl mb-4">⏰</div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4">타임라인</h2>
+                        <p class="text-gray-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
+                            여행 일정을 시간순으로 정리하고 관리하세요. 
+                            각 여행의 시작과 끝, 주요 일정들을 타임라인 형태로 
+                            시각화하여 전체 여행 흐름을 한눈에 파악할 수 있습니다.
+                        </p>
+                    </div>
+                    
+                    <!-- 타임라인 목록 -->
+                    <div id="collection-timeline-list" class="space-y-3 sm:space-y-4">
+                        <!-- 여기에 동적으로 타임라인 카드들이 추가됩니다 -->
+                    </div>
+                    
+                    <!-- 빈 상태 메시지 -->
+                    <div id="collection-timeline-empty" class="text-center py-8 sm:py-12">
+                        <div class="text-3xl sm:text-4xl mb-4">📝</div>
+                        <p class="text-gray-500 text-base sm:text-lg">아직 등록된 여행 일정이 없습니다.</p>
+                        <p class="text-gray-400 text-sm mt-2">우측 하단의 + 버튼을 눌러 첫 여행을 추가해보세요!</p>
+                    </div>
+                </div>
+                
+                <!-- 국가별 보기 하위 섹션 -->
+                <div id="countries-subsection" class="collection-subsection hidden">
+                    <div class="text-center mb-6 sm:mb-8">
+                        <div class="text-3xl sm:text-4xl mb-4">🌍</div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4">국가별 보기</h2>
+                        <p class="text-gray-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
+                            방문한 국가별로 여행 기록을 분류하여 확인하세요. 
+                            각 국가의 방문 횟수, 총 체류일, 주요 도시 등을 
+                            체계적으로 정리하여 국가별 여행 패턴을 분석할 수 있습니다.
+                        </p>
+                    </div>
+                    
+                    <!-- 준비 중 메시지 -->
+                    <div class="text-center py-12 sm:py-16">
+                        <div class="text-4xl sm:text-6xl mb-6">🚧</div>
+                        <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-3">준비 중입니다</h3>
+                        <p class="text-gray-500 text-base sm:text-lg mb-4">국가별 보기 기능은 현재 개발 중입니다.</p>
+                        <p class="text-gray-400 text-sm">곧 더 나은 기능으로 찾아뵙겠습니다!</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -617,7 +661,7 @@
     <script src="utils.js"></script>
     <script src="storage.js"></script>
     <script src="settings.js"></script>
-    <script src="timeline.js"></script>
+    <script src="collectionTimeline.js"></script>
     <script src="calendar.js"></script>
     <script src="map.js"></script>
     <script src="countries.js"></script>
