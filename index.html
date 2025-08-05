@@ -229,32 +229,45 @@
             <!-- 모달 내용 -->
             <form id="travel-form" class="p-6 space-y-4">
                 <!-- 국가 선택 -->
-                <div>
-                    <label for="country" class="block text-sm font-medium text-gray-700 mb-2">국가 *</label>
-                    <select id="country" name="country" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">국가를 선택하세요</option>
-                        <option value="korea">대한민국</option>
-                        <option value="japan">일본</option>
-                        <option value="china">중국</option>
-                        <option value="usa">미국</option>
-                        <option value="uk">영국</option>
-                        <option value="france">프랑스</option>
-                        <option value="germany">독일</option>
-                        <option value="italy">이탈리아</option>
-                        <option value="spain">스페인</option>
-                        <option value="australia">호주</option>
-                        <option value="canada">캐나다</option>
-                        <option value="singapore">싱가포르</option>
-                        <option value="thailand">태국</option>
-                        <option value="vietnam">베트남</option>
-                        <option value="other">기타</option>
-                    </select>
+                <div class="relative">
+                    <label for="country-input" class="block text-sm font-medium text-gray-700 mb-2">국가 *</label>
+                    <input 
+                        type="text" 
+                        id="country-input" 
+                        name="country" 
+                        required 
+                        placeholder="국가명을 입력하거나 선택하세요" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        autocomplete="off"
+                    >
+                    <input type="hidden" id="country-code" name="countryCode">
+                    <input type="hidden" id="country-label" name="countryLabel">
+                    
+                    <!-- 국가 드롭다운 목록 -->
+                    <ul id="country-dropdown" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
+                        <!-- 여기에 필터링된 국가 목록이 동적으로 추가됩니다 -->
+                    </ul>
                 </div>
 
                 <!-- 도시 입력 -->
-                <div>
-                    <label for="city" class="block text-sm font-medium text-gray-700 mb-2">도시 *</label>
-                    <input type="text" id="city" name="city" required placeholder="도시명을 입력하세요" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <div class="relative">
+                    <label for="city-input" class="block text-sm font-medium text-gray-700 mb-2">도시 *</label>
+                    <input 
+                        type="text" 
+                        id="city-input" 
+                        name="city" 
+                        required 
+                        placeholder="국가를 먼저 선택한 후 도시명을 입력하세요" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        autocomplete="off"
+                        disabled
+                    >
+                    <input type="hidden" id="city-name" name="cityName">
+                    
+                    <!-- 도시 드롭다운 목록 -->
+                    <ul id="city-dropdown" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
+                        <!-- 여기에 필터링된 도시 목록이 동적으로 추가됩니다 -->
+                    </ul>
                 </div>
 
                 <!-- 체류 시작일 -->
@@ -311,6 +324,133 @@
         // 전역 변수
         let entries = [];
         let currentDate = new Date();
+        
+        // 국가 데이터 (code, label, aliases, enLabel 구조)
+        const countries = [
+            { code: 'KR', label: '대한민국', enLabel: 'South Korea', aliases: ['Korea', 'South Korea', '한국', '대한민국', 'Republic of Korea'] },
+            { code: 'JP', label: '일본', enLabel: 'Japan', aliases: ['Japan', '일본', 'Nippon'] },
+            { code: 'CN', label: '중국', enLabel: 'China', aliases: ['China', '중국', 'People\'s Republic of China'] },
+            { code: 'US', label: '미국', enLabel: 'United States', aliases: ['USA', 'United States', '미국', 'America'] },
+            { code: 'GB', label: '영국', enLabel: 'United Kingdom', aliases: ['UK', 'United Kingdom', '영국', 'Great Britain'] },
+            { code: 'FR', label: '프랑스', enLabel: 'France', aliases: ['France', '프랑스'] },
+            { code: 'DE', label: '독일', enLabel: 'Germany', aliases: ['Germany', '독일', 'Deutschland'] },
+            { code: 'IT', label: '이탈리아', enLabel: 'Italy', aliases: ['Italy', '이탈리아'] },
+            { code: 'ES', label: '스페인', enLabel: 'Spain', aliases: ['Spain', '스페인'] },
+            { code: 'AU', label: '호주', enLabel: 'Australia', aliases: ['Australia', '호주'] },
+            { code: 'CA', label: '캐나다', enLabel: 'Canada', aliases: ['Canada', '캐나다'] },
+            { code: 'SG', label: '싱가포르', enLabel: 'Singapore', aliases: ['Singapore', '싱가포르'] },
+            { code: 'TH', label: '태국', enLabel: 'Thailand', aliases: ['Thailand', '태국'] },
+            { code: 'VN', label: '베트남', enLabel: 'Vietnam', aliases: ['Vietnam', '베트남'] },
+            { code: 'TW', label: '대만', enLabel: 'Taiwan', aliases: ['Taiwan', '대만'] },
+            { code: 'HK', label: '홍콩', enLabel: 'Hong Kong', aliases: ['Hong Kong', '홍콩'] },
+            { code: 'MY', label: '말레이시아', enLabel: 'Malaysia', aliases: ['Malaysia', '말레이시아'] },
+            { code: 'ID', label: '인도네시아', enLabel: 'Indonesia', aliases: ['Indonesia', '인도네시아'] },
+            { code: 'PH', label: '필리핀', enLabel: 'Philippines', aliases: ['Philippines', '필리핀'] },
+            { code: 'IN', label: '인도', enLabel: 'India', aliases: ['India', '인도'] },
+            { code: 'BR', label: '브라질', enLabel: 'Brazil', aliases: ['Brazil', '브라질'] },
+            { code: 'MX', label: '멕시코', enLabel: 'Mexico', aliases: ['Mexico', '멕시코'] },
+            { code: 'AR', label: '아르헨티나', enLabel: 'Argentina', aliases: ['Argentina', '아르헨티나'] },
+            { code: 'CL', label: '칠레', enLabel: 'Chile', aliases: ['Chile', '칠레'] },
+            { code: 'PE', label: '페루', enLabel: 'Peru', aliases: ['Peru', '페루'] },
+            { code: 'CO', label: '콜롬비아', enLabel: 'Colombia', aliases: ['Colombia', '콜롬비아'] },
+            { code: 'ZA', label: '남아프리카공화국', enLabel: 'South Africa', aliases: ['South Africa', '남아프리카', 'SA'] },
+            { code: 'EG', label: '이집트', enLabel: 'Egypt', aliases: ['Egypt', '이집트'] },
+            { code: 'MA', label: '모로코', enLabel: 'Morocco', aliases: ['Morocco', '모로코'] },
+            { code: 'TR', label: '터키', enLabel: 'Turkey', aliases: ['Turkey', '터키'] },
+            { code: 'RU', label: '러시아', enLabel: 'Russia', aliases: ['Russia', '러시아'] },
+            { code: 'UA', label: '우크라이나', enLabel: 'Ukraine', aliases: ['Ukraine', '우크라이나'] },
+            { code: 'PL', label: '폴란드', enLabel: 'Poland', aliases: ['Poland', '폴란드'] },
+            { code: 'CZ', label: '체코', enLabel: 'Czech Republic', aliases: ['Czech Republic', '체코', 'Czechia'] },
+            { code: 'HU', label: '헝가리', enLabel: 'Hungary', aliases: ['Hungary', '헝가리'] },
+            { code: 'AT', label: '오스트리아', enLabel: 'Austria', aliases: ['Austria', '오스트리아'] },
+            { code: 'CH', label: '스위스', enLabel: 'Switzerland', aliases: ['Switzerland', '스위스'] },
+            { code: 'NL', label: '네덜란드', enLabel: 'Netherlands', aliases: ['Netherlands', '네덜란드', 'Holland'] },
+            { code: 'BE', label: '벨기에', enLabel: 'Belgium', aliases: ['Belgium', '벨기에'] },
+            { code: 'SE', label: '스웨덴', enLabel: 'Sweden', aliases: ['Sweden', '스웨덴'] },
+            { code: 'NO', label: '노르웨이', enLabel: 'Norway', aliases: ['Norway', '노르웨이'] },
+            { code: 'DK', label: '덴마크', enLabel: 'Denmark', aliases: ['Denmark', '덴마크'] },
+            { code: 'FI', label: '핀란드', enLabel: 'Finland', aliases: ['Finland', '핀란드'] },
+            { code: 'IE', label: '아일랜드', enLabel: 'Ireland', aliases: ['Ireland', '아일랜드'] },
+            { code: 'PT', label: '포르투갈', enLabel: 'Portugal', aliases: ['Portugal', '포르투갈'] },
+            { code: 'GR', label: '그리스', enLabel: 'Greece', aliases: ['Greece', '그리스'] },
+            { code: 'HR', label: '크로아티아', enLabel: 'Croatia', aliases: ['Croatia', '크로아티아'] },
+            { code: 'SI', label: '슬로베니아', enLabel: 'Slovenia', aliases: ['Slovenia', '슬로베니아'] },
+            { code: 'SK', label: '슬로바키아', enLabel: 'Slovakia', aliases: ['Slovakia', '슬로바키아'] },
+            { code: 'RO', label: '루마니아', enLabel: 'Romania', aliases: ['Romania', '루마니아'] },
+            { code: 'BG', label: '불가리아', enLabel: 'Bulgaria', aliases: ['Bulgaria', '불가리아'] },
+            { code: 'RS', label: '세르비아', enLabel: 'Serbia', aliases: ['Serbia', '세르비아'] },
+            { code: 'ME', label: '몬테네그로', enLabel: 'Montenegro', aliases: ['Montenegro', '몬테네그로'] },
+            { code: 'MK', label: '북마케도니아', enLabel: 'North Macedonia', aliases: ['North Macedonia', '북마케도니아', 'Macedonia'] },
+            { code: 'AL', label: '알바니아', enLabel: 'Albania', aliases: ['Albania', '알바니아'] },
+            { code: 'BA', label: '보스니아헤르체고비나', enLabel: 'Bosnia and Herzegovina', aliases: ['Bosnia and Herzegovina', '보스니아', 'Bosnia'] },
+            { code: 'XK', label: '코소보', enLabel: 'Kosovo', aliases: ['Kosovo', '코소보'] },
+            { code: 'LV', label: '라트비아', enLabel: 'Latvia', aliases: ['Latvia', '라트비아'] },
+            { code: 'LT', label: '리투아니아', enLabel: 'Lithuania', aliases: ['Lithuania', '리투아니아'] },
+            { code: 'EE', label: '에스토니아', enLabel: 'Estonia', aliases: ['Estonia', '에스토니아'] },
+            { code: 'IS', label: '아이슬란드', enLabel: 'Iceland', aliases: ['Iceland', '아이슬란드'] },
+            { code: 'LU', label: '룩셈부르크', enLabel: 'Luxembourg', aliases: ['Luxembourg', '룩셈부르크'] },
+            { code: 'LI', label: '리히텐슈타인', enLabel: 'Liechtenstein', aliases: ['Liechtenstein', '리히텐슈타인'] },
+            { code: 'MC', label: '모나코', enLabel: 'Monaco', aliases: ['Monaco', '모나코'] },
+            { code: 'SM', label: '산마리노', enLabel: 'San Marino', aliases: ['San Marino', '산마리노'] },
+            { code: 'VA', label: '바티칸', enLabel: 'Vatican City', aliases: ['Vatican City', '바티칸', 'Holy See'] },
+            { code: 'AD', label: '안도라', enLabel: 'Andorra', aliases: ['Andorra', '안도라'] },
+            { code: 'MT', label: '몰타', enLabel: 'Malta', aliases: ['Malta', '몰타'] },
+            { code: 'CY', label: '키프로스', enLabel: 'Cyprus', aliases: ['Cyprus', '키프로스'] },
+            { code: 'GI', label: '지브롤터', enLabel: 'Gibraltar', aliases: ['Gibraltar', '지브롤터'] },
+            { code: 'IM', label: '맨섬', enLabel: 'Isle of Man', aliases: ['Isle of Man', '맨섬'] },
+            { code: 'JE', label: '저지', enLabel: 'Jersey', aliases: ['Jersey', '저지'] },
+            { code: 'GG', label: '건지', enLabel: 'Guernsey', aliases: ['Guernsey', '건지'] },
+            { code: 'FO', label: '페로제도', enLabel: 'Faroe Islands', aliases: ['Faroe Islands', '페로제도'] },
+            { code: 'GL', label: '그린란드', enLabel: 'Greenland', aliases: ['Greenland', '그린란드'] },
+            { code: 'AX', label: '올란드제도', enLabel: 'Åland Islands', aliases: ['Åland Islands', '올란드제도'] },
+            { code: 'SJ', label: '스발바르제도', enLabel: 'Svalbard and Jan Mayen', aliases: ['Svalbard and Jan Mayen', '스발바르제도'] },
+            { code: 'BV', label: '부베섬', enLabel: 'Bouvet Island', aliases: ['Bouvet Island', '부베섬'] },
+            { code: 'TF', label: '프랑스령남부지역', enLabel: 'French Southern Territories', aliases: ['French Southern Territories', '프랑스령남부지역'] },
+            { code: 'HM', label: '허드맥도널드제도', enLabel: 'Heard Island and McDonald Islands', aliases: ['Heard Island and McDonald Islands', '허드맥도널드제도'] },
+            { code: 'AQ', label: '남극', enLabel: 'Antarctica', aliases: ['Antarctica', '남극'] },
+            { code: 'IO', label: '영국령인도양지역', enLabel: 'British Indian Ocean Territory', aliases: ['British Indian Ocean Territory', '영국령인도양지역'] },
+            { code: 'CX', label: '크리스마스섬', enLabel: 'Christmas Island', aliases: ['Christmas Island', '크리스마스섬'] },
+            { code: 'CC', label: '코코스제도', enLabel: 'Cocos (Keeling) Islands', aliases: ['Cocos (Keeling) Islands', '코코스제도'] },
+            { code: 'NF', label: '노퍽섬', enLabel: 'Norfolk Island', aliases: ['Norfolk Island', '노퍽섬'] },
+            { code: 'PN', label: '핏케언제도', enLabel: 'Pitcairn', aliases: ['Pitcairn', '핏케언제도'] },
+            { code: 'TK', label: '토켈라우', enLabel: 'Tokelau', aliases: ['Tokelau', '토켈라우'] },
+            { code: 'NU', label: '니우에', enLabel: 'Niue', aliases: ['Niue', '니우에'] },
+            { code: 'CK', label: '쿡제도', enLabel: 'Cook Islands', aliases: ['Cook Islands', '쿡제도'] },
+            { code: 'WS', label: '사모아', enLabel: 'Samoa', aliases: ['Samoa', '사모아'] },
+            { code: 'TO', label: '통가', enLabel: 'Tonga', aliases: ['Tonga', '통가'] },
+            { code: 'FJ', label: '피지', enLabel: 'Fiji', aliases: ['Fiji', '피지'] },
+            { code: 'VU', label: '바누아투', enLabel: 'Vanuatu', aliases: ['Vanuatu', '바누아투'] },
+            { code: 'NC', label: '뉴칼레도니아', enLabel: 'New Caledonia', aliases: ['New Caledonia', '뉴칼레도니아'] },
+            { code: 'PF', label: '프랑스령폴리네시아', enLabel: 'French Polynesia', aliases: ['French Polynesia', '프랑스령폴리네시아'] },
+            { code: 'WF', label: '왈리스푸투나', enLabel: 'Wallis and Futuna', aliases: ['Wallis and Futuna', '왈리스푸투나'] },
+            { code: 'AS', label: '미국령사모아', enLabel: 'American Samoa', aliases: ['American Samoa', '미국령사모아'] },
+            { code: 'GU', label: '괌', enLabel: 'Guam', aliases: ['Guam', '괌'] },
+            { code: 'MP', label: '북마리아나제도', enLabel: 'Northern Mariana Islands', aliases: ['Northern Mariana Islands', '북마리아나제도'] },
+            { code: 'PW', label: '팔라우', enLabel: 'Palau', aliases: ['Palau', '팔라우'] },
+            { code: 'FM', label: '미크로네시아', enLabel: 'Micronesia', aliases: ['Micronesia', '미크로네시아'] },
+            { code: 'MH', label: '마셜제도', enLabel: 'Marshall Islands', aliases: ['Marshall Islands', '마셜제도'] },
+            { code: 'KI', label: '키리바시', enLabel: 'Kiribati', aliases: ['Kiribati', '키리바시'] },
+            { code: 'NR', label: '나우루', enLabel: 'Nauru', aliases: ['Nauru', '나우루'] },
+            { code: 'TV', label: '투발루', enLabel: 'Tuvalu', aliases: ['Tuvalu', '투발루'] },
+            { code: 'SB', label: '솔로몬제도', enLabel: 'Solomon Islands', aliases: ['Solomon Islands', '솔로몬제도'] },
+            { code: 'PG', label: '파푸아뉴기니', enLabel: 'Papua New Guinea', aliases: ['Papua New Guinea', '파푸아뉴기니'] },
+            { code: 'AU', label: '호주', enLabel: 'Australia', aliases: ['Australia', '호주'] },
+            { code: 'NZ', label: '뉴질랜드', enLabel: 'New Zealand', aliases: ['New Zealand', '뉴질랜드'] },
+            { code: 'NC', label: '뉴칼레도니아', enLabel: 'New Caledonia', aliases: ['New Caledonia', '뉴칼레도니아'] },
+            { code: 'PF', label: '프랑스령폴리네시아', enLabel: 'French Polynesia', aliases: ['French Polynesia', '프랑스령폴리네시아'] },
+            { code: 'WF', label: '왈리스푸투나', enLabel: 'Wallis and Futuna', aliases: ['Wallis and Futuna', '왈리스푸투나'] },
+            { code: 'AS', label: '미국령사모아', enLabel: 'American Samoa', aliases: ['American Samoa', '미국령사모아'] },
+            { code: 'GU', label: '괌', enLabel: 'Guam', aliases: ['Guam', '괌'] },
+            { code: 'MP', label: '북마리아나제도', enLabel: 'Northern Mariana Islands', aliases: ['Northern Mariana Islands', '북마리아나제도'] },
+            { code: 'PW', label: '팔라우', enLabel: 'Palau', aliases: ['Palau', '팔라우'] },
+            { code: 'FM', label: '미크로네시아', enLabel: 'Micronesia', aliases: ['Micronesia', '미크로네시아'] },
+            { code: 'MH', label: '마셜제도', enLabel: 'Marshall Islands', aliases: ['Marshall Islands', '마셜제도'] },
+            { code: 'KI', label: '키리바시', enLabel: 'Kiribati', aliases: ['Kiribati', '키리바시'] },
+            { code: 'NR', label: '나우루', enLabel: 'Nauru', aliases: ['Nauru', '나우루'] },
+            { code: 'TV', label: '투발루', enLabel: 'Tuvalu', aliases: ['Tuvalu', '투발루'] },
+            { code: 'SB', label: '솔로몬제도', enLabel: 'Solomon Islands', aliases: ['Solomon Islands', '솔로몬제도'] },
+            { code: 'PG', label: '파푸아뉴기니', enLabel: 'Papua New Guinea', aliases: ['Papua New Guinea', '파푸아뉴기니'] }
+        ];
 
         // 모달 관련 요소들
         const floatingBtn = document.getElementById('floating-btn');
@@ -318,6 +458,158 @@
         const closeModal = document.getElementById('close-modal');
         const cancelBtn = document.getElementById('cancel-btn');
         const travelForm = document.getElementById('travel-form');
+        
+        // 국가 자동완성 관련 요소들
+        const countryInput = document.getElementById('country-input');
+        const countryCode = document.getElementById('country-code');
+        const countryLabel = document.getElementById('country-label');
+        const countryDropdown = document.getElementById('country-dropdown');
+        
+        // 도시 자동완성 관련 요소들
+        const cityInput = document.getElementById('city-input');
+        const cityName = document.getElementById('city-name');
+        const cityDropdown = document.getElementById('city-dropdown');
+        
+        // 도시 데이터 (국가별 도시 목록)
+        const cities = {
+            'KR': [
+                { name: '서울', enName: 'Seoul', aliases: ['Seoul', '서울', '서울특별시'] },
+                { name: '부산', enName: 'Busan', aliases: ['Busan', '부산', '부산광역시'] },
+                { name: '대구', enName: 'Daegu', aliases: ['Daegu', '대구', '대구광역시'] },
+                { name: '인천', enName: 'Incheon', aliases: ['Incheon', '인천', '인천광역시'] },
+                { name: '광주', enName: 'Gwangju', aliases: ['Gwangju', '광주', '광주광역시'] },
+                { name: '대전', enName: 'Daejeon', aliases: ['Daejeon', '대전', '대전광역시'] },
+                { name: '울산', enName: 'Ulsan', aliases: ['Ulsan', '울산', '울산광역시'] },
+                { name: '제주', enName: 'Jeju', aliases: ['Jeju', '제주', '제주특별자치도'] },
+                { name: '수원', enName: 'Suwon', aliases: ['Suwon', '수원', '수원시'] },
+                { name: '고양', enName: 'Goyang', aliases: ['Goyang', '고양', '고양시'] },
+                { name: '용인', enName: 'Yongin', aliases: ['Yongin', '용인', '용인시'] },
+                { name: '창원', enName: 'Changwon', aliases: ['Changwon', '창원', '창원시'] },
+                { name: '성남', enName: 'Seongnam', aliases: ['Seongnam', '성남', '성남시'] },
+                { name: '부천', enName: 'Bucheon', aliases: ['Bucheon', '부천', '부천시'] },
+                { name: '안산', enName: 'Ansan', aliases: ['Ansan', '안산', '안산시'] },
+                { name: '전주', enName: 'Jeonju', aliases: ['Jeonju', '전주', '전주시'] },
+                { name: '천안', enName: 'Cheonan', aliases: ['Cheonan', '천안', '천안시'] },
+                { name: '청주', enName: 'Cheongju', aliases: ['Cheongju', '청주', '청주시'] },
+                { name: '포항', enName: 'Pohang', aliases: ['Pohang', '포항', '포항시'] },
+                { name: '안양', enName: 'Anyang', aliases: ['Anyang', '안양', '안양시'] }
+            ],
+            'JP': [
+                { name: '도쿄', enName: 'Tokyo', aliases: ['Tokyo', '도쿄', '東京'] },
+                { name: '오사카', enName: 'Osaka', aliases: ['Osaka', '오사카', '大阪'] },
+                { name: '교토', enName: 'Kyoto', aliases: ['Kyoto', '교토', '京都'] },
+                { name: '요코하마', enName: 'Yokohama', aliases: ['Yokohama', '요코하마', '横浜'] },
+                { name: '나고야', enName: 'Nagoya', aliases: ['Nagoya', '나고야', '名古屋'] },
+                { name: '삿포로', enName: 'Sapporo', aliases: ['Sapporo', '삿포로', '札幌'] },
+                { name: '고베', enName: 'Kobe', aliases: ['Kobe', '고베', '神戸'] },
+                { name: '후쿠오카', enName: 'Fukuoka', aliases: ['Fukuoka', '후쿠오카', '福岡'] },
+                { name: '가와사키', enName: 'Kawasaki', aliases: ['Kawasaki', '가와사키', '川崎'] },
+                { name: '히로시마', enName: 'Hiroshima', aliases: ['Hiroshima', '히로시마', '広島'] },
+                { name: '센다이', enName: 'Sendai', aliases: ['Sendai', '센다이', '仙台'] },
+                { name: '지바', enName: 'Chiba', aliases: ['Chiba', '지바', '千葉'] },
+                { name: '기타큐슈', enName: 'Kitakyushu', aliases: ['Kitakyushu', '기타큐슈', '北九州'] },
+                { name: '사카이', enName: 'Sakai', aliases: ['Sakai', '사카이', '堺'] },
+                { name: '니가타', enName: 'Niigata', aliases: ['Niigata', '니가타', '新潟'] },
+                { name: '하마마쓰', enName: 'Hamamatsu', aliases: ['Hamamatsu', '하마마쓰', '浜松'] },
+                { name: '구마모토', enName: 'Kumamoto', aliases: ['Kumamoto', '구마모토', '熊本'] },
+                { name: '사가미하라', enName: 'Sagamihara', aliases: ['Sagamihara', '사가미하라', '相模原'] },
+                { name: '오카야마', enName: 'Okayama', aliases: ['Okayama', '오카야마', '岡山'] },
+                { name: '시즈오카', enName: 'Shizuoka', aliases: ['Shizuoka', '시즈오카', '静岡'] },
+                { name: '히메지', enName: 'Himeji', aliases: ['Himeji', '히메지', '姫路'] }
+            ],
+            'US': [
+                { name: '뉴욕', enName: 'New York', aliases: ['New York', '뉴욕', 'NYC'] },
+                { name: '로스앤젤레스', enName: 'Los Angeles', aliases: ['Los Angeles', '로스앤젤레스', 'LA'] },
+                { name: '시카고', enName: 'Chicago', aliases: ['Chicago', '시카고'] },
+                { name: '휴스턴', enName: 'Houston', aliases: ['Houston', '휴스턴'] },
+                { name: '피닉스', enName: 'Phoenix', aliases: ['Phoenix', '피닉스'] },
+                { name: '필라델피아', enName: 'Philadelphia', aliases: ['Philadelphia', '필라델피아'] },
+                { name: '샌안토니오', enName: 'San Antonio', aliases: ['San Antonio', '샌안토니오'] },
+                { name: '샌디에고', enName: 'San Diego', aliases: ['San Diego', '샌디에고'] },
+                { name: '댈러스', enName: 'Dallas', aliases: ['Dallas', '댈러스'] },
+                { name: '샌호세', enName: 'San Jose', aliases: ['San Jose', '샌호세'] },
+                { name: '오스틴', enName: 'Austin', aliases: ['Austin', '오스틴'] },
+                { name: '잭슨빌', enName: 'Jacksonville', aliases: ['Jacksonville', '잭슨빌'] },
+                { name: '포트워스', enName: 'Fort Worth', aliases: ['Fort Worth', '포트워스'] },
+                { name: '콜럼버스', enName: 'Columbus', aliases: ['Columbus', '콜럼버스'] },
+                { name: '샬럿', enName: 'Charlotte', aliases: ['Charlotte', '샬럿'] },
+                { name: '샌프란시스코', enName: 'San Francisco', aliases: ['San Francisco', '샌프란시스코', 'SF'] },
+                { name: '인디애나폴리스', enName: 'Indianapolis', aliases: ['Indianapolis', '인디애나폴리스'] },
+                { name: '시애틀', enName: 'Seattle', aliases: ['Seattle', '시애틀'] },
+                { name: '덴버', enName: 'Denver', aliases: ['Denver', '덴버'] },
+                { name: '워싱턴', enName: 'Washington', aliases: ['Washington', '워싱턴', 'DC'] },
+                { name: '보스턴', enName: 'Boston', aliases: ['Boston', '보스턴'] }
+            ],
+            'GB': [
+                { name: '런던', enName: 'London', aliases: ['London', '런던'] },
+                { name: '버밍엄', enName: 'Birmingham', aliases: ['Birmingham', '버밍엄'] },
+                { name: '리즈', enName: 'Leeds', aliases: ['Leeds', '리즈'] },
+                { name: '글래스고', enName: 'Glasgow', aliases: ['Glasgow', '글래스고'] },
+                { name: '셰필드', enName: 'Sheffield', aliases: ['Sheffield', '셰필드'] },
+                { name: '브래드포드', enName: 'Bradford', aliases: ['Bradford', '브래드포드'] },
+                { name: '에든버러', enName: 'Edinburgh', aliases: ['Edinburgh', '에든버러'] },
+                { name: '리버풀', enName: 'Liverpool', aliases: ['Liverpool', '리버풀'] },
+                { name: '맨체스터', enName: 'Manchester', aliases: ['Manchester', '맨체스터'] },
+                { name: '브리스틀', enName: 'Bristol', aliases: ['Bristol', '브리스틀'] },
+                { name: '웨이크필드', enName: 'Wakefield', aliases: ['Wakefield', '웨이크필드'] },
+                { name: '카디프', enName: 'Cardiff', aliases: ['Cardiff', '카디프'] },
+                { name: '코벤트리', enName: 'Coventry', aliases: ['Coventry', '코벤트리'] },
+                { name: '레스터', enName: 'Leicester', aliases: ['Leicester', '레스터'] },
+                { name: '스토크온트렌트', enName: 'Stoke-on-Trent', aliases: ['Stoke-on-Trent', '스토크온트렌트'] },
+                { name: '울버햄튼', enName: 'Wolverhampton', aliases: ['Wolverhampton', '울버햄튼'] },
+                { name: '노팅엄', enName: 'Nottingham', aliases: ['Nottingham', '노팅엄'] },
+                { name: '플리머스', enName: 'Plymouth', aliases: ['Plymouth', '플리머스'] },
+                { name: '사우샘프턴', enName: 'Southampton', aliases: ['Southampton', '사우샘프턴'] },
+                { name: '레딩', enName: 'Reading', aliases: ['Reading', '레딩'] },
+                { name: '더비', enName: 'Derby', aliases: ['Derby', '더비'] }
+            ],
+            'FR': [
+                { name: '파리', enName: 'Paris', aliases: ['Paris', '파리'] },
+                { name: '마르세유', enName: 'Marseille', aliases: ['Marseille', '마르세유'] },
+                { name: '리옹', enName: 'Lyon', aliases: ['Lyon', '리옹'] },
+                { name: '툴루즈', enName: 'Toulouse', aliases: ['Toulouse', '툴루즈'] },
+                { name: '니스', enName: 'Nice', aliases: ['Nice', '니스'] },
+                { name: '낭트', enName: 'Nantes', aliases: ['Nantes', '낭트'] },
+                { name: '스트라스부르', enName: 'Strasbourg', aliases: ['Strasbourg', '스트라스부르'] },
+                { name: '몽펠리에', enName: 'Montpellier', aliases: ['Montpellier', '몽펠리에'] },
+                { name: '보르도', enName: 'Bordeaux', aliases: ['Bordeaux', '보르도'] },
+                { name: '릴', enName: 'Lille', aliases: ['Lille', '릴'] },
+                { name: '렌', enName: 'Rennes', aliases: ['Rennes', '렌'] },
+                { name: '르아브르', enName: 'Le Havre', aliases: ['Le Havre', '르아브르'] },
+                { name: '생테티엔', enName: 'Saint-Étienne', aliases: ['Saint-Étienne', '생테티엔'] },
+                { name: '툴롱', enName: 'Toulon', aliases: ['Toulon', '툴롱'] },
+                { name: '그르노블', enName: 'Grenoble', aliases: ['Grenoble', '그르노블'] },
+                { name: '디종', enName: 'Dijon', aliases: ['Dijon', '디종'] },
+                { name: '앙제', enName: 'Angers', aliases: ['Angers', '앙제'] },
+                { name: '생드니', enName: 'Saint-Denis', aliases: ['Saint-Denis', '생드니'] },
+                { name: '빌뢰반', enName: 'Villeurbanne', aliases: ['Villeurbanne', '빌뢰반'] },
+                { name: '르망', enName: 'Le Mans', aliases: ['Le Mans', '르망'] },
+                { name: '엑상프로방스', enName: 'Aix-en-Provence', aliases: ['Aix-en-Provence', '엑상프로방스'] }
+            ],
+            'DE': [
+                { name: '베를린', enName: 'Berlin', aliases: ['Berlin', '베를린'] },
+                { name: '함부르크', enName: 'Hamburg', aliases: ['Hamburg', '함부르크'] },
+                { name: '뮌헨', enName: 'Munich', aliases: ['Munich', '뮌헨', 'München'] },
+                { name: '쾰른', enName: 'Cologne', aliases: ['Cologne', '쾰른', 'Köln'] },
+                { name: '프랑크푸르트', enName: 'Frankfurt', aliases: ['Frankfurt', '프랑크푸르트'] },
+                { name: '슈투트가르트', enName: 'Stuttgart', aliases: ['Stuttgart', '슈투트가르트'] },
+                { name: '뒤셀도르프', enName: 'Düsseldorf', aliases: ['Düsseldorf', '뒤셀도르프'] },
+                { name: '도르트문트', enName: 'Dortmund', aliases: ['Dortmund', '도르트문트'] },
+                { name: '에센', enName: 'Essen', aliases: ['Essen', '에센'] },
+                { name: '라이프치히', enName: 'Leipzig', aliases: ['Leipzig', '라이프치히'] },
+                { name: '브레멘', enName: 'Bremen', aliases: ['Bremen', '브레멘'] },
+                { name: '드레스덴', enName: 'Dresden', aliases: ['Dresden', '드레스덴'] },
+                { name: '하노버', enName: 'Hanover', aliases: ['Hanover', '하노버', 'Hannover'] },
+                { name: '뉘른베르크', enName: 'Nuremberg', aliases: ['Nuremberg', '뉘른베르크', 'Nürnberg'] },
+                { name: '뒤스부르크', enName: 'Duisburg', aliases: ['Duisburg', '뒤스부르크'] },
+                { name: '보훔', enName: 'Bochum', aliases: ['Bochum', '보훔'] },
+                { name: '부퍼탈', enName: 'Wuppertal', aliases: ['Wuppertal', '부퍼탈'] },
+                { name: '빌레펠트', enName: 'Bielefeld', aliases: ['Bielefeld', '빌레펠트'] },
+                { name: '본', enName: 'Bonn', aliases: ['Bonn', '본'] },
+                { name: '만하임', enName: 'Mannheim', aliases: ['Mannheim', '만하임'] },
+                { name: '카를스루에', enName: 'Karlsruhe', aliases: ['Karlsruhe', '카를스루에'] }
+            ]
+        };
 
         // localStorage에서 데이터 불러오기
         function loadEntries() {
@@ -328,6 +620,114 @@
         // localStorage에 데이터 저장
         function saveEntries() {
             localStorage.setItem('travelEntries', JSON.stringify(entries));
+        }
+        
+        // 국가 필터링 함수
+        function filterCountries(query) {
+            if (!query) return countries;
+            const lowerQuery = query.toLowerCase();
+            return countries.filter(country => 
+                country.label.toLowerCase().includes(lowerQuery) ||
+                country.enLabel.toLowerCase().includes(lowerQuery) ||
+                country.code.toLowerCase().includes(lowerQuery) ||
+                country.aliases.some(alias => alias.toLowerCase().includes(lowerQuery))
+            );
+        }
+        
+        // 도시 필터링 함수
+        function filterCities(query, countryCode) {
+            if (!countryCode || !cities[countryCode]) return [];
+            if (!query) return cities[countryCode];
+            
+            const lowerQuery = query.toLowerCase();
+            return cities[countryCode].filter(city => 
+                city.name.toLowerCase().includes(lowerQuery) ||
+                city.enName.toLowerCase().includes(lowerQuery) ||
+                city.aliases.some(alias => alias.toLowerCase().includes(lowerQuery))
+            );
+        }
+        
+        // 국가 드롭다운 렌더링
+        function renderCountryDropdown(filteredCountries) {
+            if (filteredCountries.length === 0) {
+                countryDropdown.innerHTML = '<li class="px-3 py-2 text-gray-500 text-sm">일치하는 국가가 없습니다.</li>';
+                countryDropdown.classList.remove('hidden');
+                return;
+            }
+            
+            countryDropdown.innerHTML = filteredCountries.map(country => `
+                <li class="country-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm" 
+                    data-code="${country.code}" 
+                    data-label="${country.label}">
+                    <span class="font-medium">${country.label}</span>
+                    <span class="text-gray-500 ml-2">(${country.code})</span>
+                </li>
+            `).join('');
+            
+            countryDropdown.classList.remove('hidden');
+        }
+        
+        // 도시 드롭다운 렌더링
+        function renderCityDropdown(filteredCities) {
+            if (filteredCities.length === 0) {
+                cityDropdown.innerHTML = '<li class="px-3 py-2 text-gray-500 text-sm">일치하는 도시가 없습니다.</li>';
+                cityDropdown.classList.remove('hidden');
+                return;
+            }
+            
+            cityDropdown.innerHTML = filteredCities.map(city => `
+                <li class="city-option px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm" 
+                    data-name="${city.name}" 
+                    data-en-name="${city.enName}">
+                    <span class="font-medium">${city.name}</span>
+                    <span class="text-gray-500 ml-2">(${city.enName})</span>
+                </li>
+            `).join('');
+            
+            cityDropdown.classList.remove('hidden');
+        }
+        
+        // 국가 선택 처리
+        function selectCountry(code, label) {
+            countryInput.value = label;
+            countryCode.value = code;
+            countryLabel.value = label;
+            countryDropdown.classList.add('hidden');
+            
+            // 도시 입력 필드 활성화 및 초기화
+            cityInput.disabled = false;
+            cityInput.value = '';
+            cityName.value = '';
+            cityInput.placeholder = '도시명을 입력하거나 선택하세요';
+        }
+        
+        // 국가 입력값 자동 매칭
+        function autoSelectCountry(inputValue) {
+            const filteredCountries = filterCountries(inputValue);
+            if (filteredCountries.length === 1) {
+                const country = filteredCountries[0];
+                selectCountry(country.code, country.label);
+                return true;
+            }
+            return false;
+        }
+        
+        // 도시 선택 처리
+        function selectCity(name, enName) {
+            cityInput.value = name;
+            cityName.value = name;
+            cityDropdown.classList.add('hidden');
+        }
+        
+        // 도시 입력값 자동 매칭
+        function autoSelectCity(inputValue, countryCode) {
+            const filteredCities = filterCities(inputValue, countryCode);
+            if (filteredCities.length === 1) {
+                const city = filteredCities[0];
+                selectCity(city.name, city.enName);
+                return true;
+            }
+            return false;
         }
 
         // 날짜 차이 계산 (체류일 수)
@@ -526,6 +926,111 @@
             renderCalendar();
         }
 
+        // 국가 자동완성 이벤트 리스너들
+        countryInput.addEventListener('input', function() {
+            const query = this.value;
+            const filteredCountries = filterCountries(query);
+            renderCountryDropdown(filteredCountries);
+        });
+        
+        countryInput.addEventListener('focus', function() {
+            if (this.value) {
+                const filteredCountries = filterCountries(this.value);
+                renderCountryDropdown(filteredCountries);
+            } else {
+                renderCountryDropdown(countries);
+            }
+        });
+        
+        countryInput.addEventListener('blur', function() {
+            // 약간의 지연을 두어 클릭 이벤트가 처리될 수 있도록 함
+            setTimeout(() => {
+                countryDropdown.classList.add('hidden');
+                
+                // 국가가 선택되지 않았고 입력값이 있으면 자동 매칭 시도
+                if (!countryCode.value && this.value.trim()) {
+                    autoSelectCountry(this.value.trim());
+                }
+            }, 200);
+        });
+        
+        // 국가 입력 필드에서 엔터 키 처리
+        countryInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (!countryCode.value && this.value.trim()) {
+                    autoSelectCountry(this.value.trim());
+                }
+            }
+        });
+        
+        // 국가 옵션 클릭 이벤트 (이벤트 위임 사용)
+        countryDropdown.addEventListener('click', function(e) {
+            if (e.target.closest('.country-option')) {
+                const option = e.target.closest('.country-option');
+                const code = option.dataset.code;
+                const label = option.dataset.label;
+                selectCountry(code, label);
+            }
+        });
+        
+        // 도시 자동완성 이벤트 리스너들
+        cityInput.addEventListener('input', function() {
+            const query = this.value;
+            const selectedCountryCode = document.getElementById('country-code').value;
+            const filteredCities = filterCities(query, selectedCountryCode);
+            renderCityDropdown(filteredCities);
+        });
+        
+        cityInput.addEventListener('focus', function() {
+            const selectedCountryCode = document.getElementById('country-code').value;
+            if (!selectedCountryCode) {
+                cityInput.placeholder = '먼저 국가를 선택해주세요';
+                return;
+            }
+            
+            if (this.value) {
+                const filteredCities = filterCities(this.value, selectedCountryCode);
+                renderCityDropdown(filteredCities);
+            } else {
+                renderCityDropdown(cities[selectedCountryCode] || []);
+            }
+        });
+        
+        cityInput.addEventListener('blur', function() {
+            // 약간의 지연을 두어 클릭 이벤트가 처리될 수 있도록 함
+            setTimeout(() => {
+                cityDropdown.classList.add('hidden');
+                
+                // 도시가 선택되지 않았고 입력값이 있으면 자동 매칭 시도
+                const selectedCountryCode = document.getElementById('country-code').value;
+                if (!cityName.value && this.value.trim() && selectedCountryCode) {
+                    autoSelectCity(this.value.trim(), selectedCountryCode);
+                }
+            }, 200);
+        });
+        
+        // 도시 입력 필드에서 엔터 키 처리
+        cityInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const selectedCountryCode = document.getElementById('country-code').value;
+                if (!cityName.value && this.value.trim() && selectedCountryCode) {
+                    autoSelectCity(this.value.trim(), selectedCountryCode);
+                }
+            }
+        });
+        
+        // 도시 옵션 클릭 이벤트 (이벤트 위임 사용)
+        cityDropdown.addEventListener('click', function(e) {
+            if (e.target.closest('.city-option')) {
+                const option = e.target.closest('.city-option');
+                const name = option.dataset.name;
+                const enName = option.dataset.enName;
+                selectCity(name, enName);
+            }
+        });
+        
         // 모달 열기
         floatingBtn.addEventListener('click', function() {
             modalOverlay.classList.remove('hidden');
@@ -559,8 +1064,11 @@
             e.preventDefault();
             
             const formData = {
-                country: document.getElementById('country').value,
-                city: document.getElementById('city').value,
+                country: document.getElementById('country-input').value,
+                countryCode: document.getElementById('country-code').value,
+                countryLabel: document.getElementById('country-label').value,
+                city: document.getElementById('city-input').value,
+                cityName: document.getElementById('city-name').value,
                 startDate: document.getElementById('start-date').value,
                 endDate: document.getElementById('end-date').value,
                 purpose: document.getElementById('purpose').value,
