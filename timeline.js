@@ -43,18 +43,10 @@ function renderTimeline() {
                         <h3 class="text-lg font-semibold text-gray-800">${flag} ${entry.country} / ${entry.city}</h3>
                         <p class="text-sm text-gray-600">${purposeText}</p>
                     </div>
-                    <div class="flex items-center space-x-2">
+                    <div class="flex items-center">
                         <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
                             ${days}일
                         </span>
-                        <div class="flex space-x-1">
-                            <button onclick="event.stopPropagation(); modifyEntry('${entry.id}')" class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200 transition-colors">
-                                수정
-                            </button>
-                            <button onclick="event.stopPropagation(); deleteEntry('${entry.id}')" class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200 transition-colors">
-                                삭제
-                            </button>
-                        </div>
                     </div>
                 </div>
                 <div class="text-sm text-gray-500 mb-3">
