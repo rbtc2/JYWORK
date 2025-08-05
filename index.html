@@ -121,9 +121,10 @@
                 
                 <!-- 통계 카드들 -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-blue-50 rounded-xl p-6 text-center">
+                    <div id="countries-card" class="bg-blue-50 rounded-xl p-6 text-center cursor-pointer hover:bg-blue-100 transition-colors transform hover:scale-105">
                         <div class="text-3xl font-bold text-blue-600 mb-2" id="total-countries">0</div>
                         <div class="text-blue-800 font-medium">방문 국가</div>
+                        <div class="text-xs text-blue-600 mt-2">클릭하여 배지 보기</div>
                     </div>
                     <div class="bg-green-50 rounded-xl p-6 text-center">
                         <div class="text-3xl font-bold text-green-600 mb-2" id="total-cities">0</div>
@@ -539,6 +540,78 @@
         </div>
     </div>
 
+    <!-- 방문 국가 배지 컬렉션 모달 오버레이 -->
+    <div id="countries-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <!-- 모달 창 -->
+        <div class="bg-white rounded-xl shadow-xl w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto">
+            <!-- 모달 헤더 -->
+            <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-800">🌍 방문 국가 배지 컬렉션</h2>
+                <button id="close-countries-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- 모달 내용 -->
+            <div class="p-6">
+                <!-- 정렬 옵션 -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">정렬 옵션</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button id="sort-name" class="sort-btn active px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium">
+                            국가 이름순
+                        </button>
+                        <button id="sort-visit-order" class="sort-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium">
+                            방문 순서순
+                        </button>
+                        <button id="sort-stay-days" class="sort-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium">
+                            체류일 순
+                        </button>
+                        <button id="sort-visit-count" class="sort-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium">
+                            방문 횟수순
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 통계 요약 -->
+                <div class="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                        <div>
+                            <div class="text-2xl font-bold text-blue-600" id="total-visited-countries">0</div>
+                            <div class="text-sm text-blue-800">방문 국가</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-green-600" id="total-visit-count">0</div>
+                            <div class="text-sm text-green-800">총 방문 횟수</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-purple-600" id="total-stay-days">0</div>
+                            <div class="text-sm text-purple-800">총 체류일</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-orange-600" id="avg-stay-days">0</div>
+                            <div class="text-sm text-orange-800">평균 체류일</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 국가 배지 컬렉션 -->
+                <div id="countries-collection" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <!-- 여기에 국가 배지들이 동적으로 추가됩니다 -->
+                </div>
+
+                <!-- 빈 상태 메시지 -->
+                <div id="countries-empty" class="text-center py-12 hidden">
+                    <div class="text-6xl mb-4">🌍</div>
+                    <p class="text-gray-500 text-lg">아직 방문한 국가가 없습니다.</p>
+                    <p class="text-gray-400 text-sm mt-2">우측 하단의 + 버튼을 눌러 첫 여행을 추가해보세요!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript 파일들 -->
     <script src="data.js"></script>
     <script src="utils.js"></script>
@@ -547,6 +620,7 @@
     <script src="timeline.js"></script>
     <script src="calendar.js"></script>
     <script src="map.js"></script>
+    <script src="countries.js"></script>
     <script src="main.js"></script>
 </body>
 </html> 

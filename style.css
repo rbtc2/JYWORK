@@ -135,4 +135,165 @@ body {
         height: 60vh !important;
         max-height: 400px !important;
     }
+}
+
+/* 국가 배지 컬렉션 스타일 */
+.country-badge {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.country-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.5s;
+}
+
+.country-badge:hover::before {
+    left: 100%;
+}
+
+.country-badge:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Unlocked 배지 애니메이션 */
+.unlocked-badge {
+    animation: unlockedPulse 2s infinite;
+    background: linear-gradient(45deg, #fbbf24, #f59e0b, #d97706);
+    background-size: 200% 200%;
+    animation: unlockedPulse 2s infinite, gradientShift 3s infinite;
+}
+
+@keyframes unlockedPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.9;
+    }
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* 정렬 버튼 스타일 */
+.sort-btn {
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.sort-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+}
+
+.sort-btn:active::after {
+    width: 100px;
+    height: 100px;
+}
+
+/* 모달 애니메이션 */
+#countries-modal-overlay {
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* 국가 배지 그리드 반응형 */
+@media (max-width: 640px) {
+    #countries-collection {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    #countries-collection {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1025px) {
+    #countries-collection {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1280px) {
+    #countries-collection {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* 통계 카드 호버 효과 */
+#countries-card {
+    position: relative;
+    overflow: hidden;
+}
+
+#countries-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+    transition: left 0.6s;
+}
+
+#countries-card:hover::after {
+    left: 100%;
+}
+
+/* 로딩 애니메이션 */
+.country-badge.loading {
+    animation: skeletonLoading 1.5s infinite;
+}
+
+@keyframes skeletonLoading {
+    0% {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
 } 

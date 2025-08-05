@@ -102,6 +102,11 @@ function updateAllSections() {
     renderTimeline();
     renderCalendar();
     updateMap();
+    
+    // Countries 컬렉션 업데이트 (모달이 열려있는 경우)
+    if (typeof renderCountriesCollection === 'function') {
+        renderCountriesCollection();
+    }
 }
 
 // 탭 클릭 이벤트 처리
@@ -304,6 +309,80 @@ function initializeApp() {
     loadUserData();
     loadResidenceData();
     
+    // 샘플 데이터 추가 (개발용 - 실제 배포 시 제거)
+    if (entries.length === 0) {
+        const sampleEntries = [
+            {
+                id: '1',
+                country: '일본',
+                countryCode: 'JP',
+                countryLabel: '일본',
+                city: '도쿄',
+                cityName: '도쿄',
+                startDate: '2023-03-15',
+                endDate: '2023-03-20',
+                purpose: 'travel',
+                companions: '김철수',
+                memo: '벚꽃 구경'
+            },
+            {
+                id: '2',
+                country: '미국',
+                countryCode: 'US',
+                countryLabel: '미국',
+                city: '뉴욕',
+                cityName: '뉴욕',
+                startDate: '2023-06-10',
+                endDate: '2023-06-15',
+                purpose: 'business',
+                companions: '',
+                memo: '출장'
+            },
+            {
+                id: '3',
+                country: '프랑스',
+                countryCode: 'FR',
+                countryLabel: '프랑스',
+                city: '파리',
+                cityName: '파리',
+                startDate: '2023-09-05',
+                endDate: '2023-09-12',
+                purpose: 'travel',
+                companions: '이영희',
+                memo: '에펠탑 관광'
+            },
+            {
+                id: '4',
+                country: '일본',
+                countryCode: 'JP',
+                countryLabel: '일본',
+                city: '오사카',
+                cityName: '오사카',
+                startDate: '2023-12-20',
+                endDate: '2023-12-25',
+                purpose: 'travel',
+                companions: '박민수',
+                memo: '겨울 여행'
+            },
+            {
+                id: '5',
+                country: '영국',
+                countryCode: 'GB',
+                countryLabel: '영국',
+                city: '런던',
+                cityName: '런던',
+                startDate: '2024-01-10',
+                endDate: '2024-01-15',
+                purpose: 'study',
+                companions: '',
+                memo: '어학 연수'
+            }
+        ];
+        
+        entries.push(...sampleEntries);
+        saveUserData();
+    }
+    
     // UI 업데이트
     updateAllSections();
     updateUserInterface();
@@ -325,6 +404,11 @@ function initializeApp() {
     initializeCalendarEventListeners();
     initializeSettingsEventListeners();
     initializeAutocompleteEventListeners();
+    
+    // Countries 모듈 초기화
+    if (typeof initializeCountriesModule === 'function') {
+        initializeCountriesModule();
+    }
 }
 
 // 페이지 로드 시 초기화
