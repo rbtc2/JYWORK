@@ -218,6 +218,7 @@ function initializeModal() {
             startDate: document.getElementById('start-date').value,
             endDate: document.getElementById('end-date').value,
             purpose: document.getElementById('purpose').value,
+            companions: document.getElementById('companions').value,
             memo: document.getElementById('memo').value
         };
 

@@ -3,6 +3,16 @@
  * 여행 일정의 CRUD 작업과 타임라인 렌더링을 담당
  */
 
+// 국가별 국기 이모지 매핑
+const countryFlags = {
+    'KR': '🇰🇷',
+    'JP': '🇯🇵',
+    'US': '🇺🇸',
+    'GB': '🇬🇧',
+    'FR': '🇫🇷',
+    'DE': '🇩🇪'
+};
+
 // 타임라인 렌더링
 function renderTimeline() {
     const timelineList = document.getElementById('timeline-list');
@@ -23,12 +33,14 @@ function renderTimeline() {
     timelineList.innerHTML = sortedEntries.map(entry => {
         const days = calculateDays(entry.startDate, entry.endDate);
         const purposeText = getPurposeText(entry.purpose);
+        const flag = countryFlags[entry.countryCode] || '🏳️';
 
         return `
-            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer" 
+                 onclick="showEntryDetail('${entry.id}')">
                 <div class="flex justify-between items-start mb-3">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-800">${entry.country} / ${entry.city}</h3>
+                        <h3 class="text-lg font-semibold text-gray-800">${flag} ${entry.country} / ${entry.city}</h3>
                         <p class="text-sm text-gray-600">${purposeText}</p>
                     </div>
                     <div class="flex items-center space-x-2">
@@ -36,10 +48,10 @@ function renderTimeline() {
                             ${days}일
                         </span>
                         <div class="flex space-x-1">
-                            <button onclick="modifyEntry('${entry.id}')" class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200 transition-colors">
+                            <button onclick="event.stopPropagation(); modifyEntry('${entry.id}')" class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200 transition-colors">
                                 수정
                             </button>
-                            <button onclick="deleteEntry('${entry.id}')" class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200 transition-colors">
+                            <button onclick="event.stopPropagation(); deleteEntry('${entry.id}')" class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200 transition-colors">
                                 삭제
                             </button>
                         </div>
@@ -75,6 +87,7 @@ function modifyEntry(entryId) {
     document.getElementById('start-date').value = entry.startDate;
     document.getElementById('end-date').value = entry.endDate;
     document.getElementById('purpose').value = entry.purpose;
+    document.getElementById('companions').value = entry.companions || '';
     document.getElementById('memo').value = entry.memo || '';
 
     // 도시 입력 필드 활성화
@@ -117,4 +130,148 @@ function getPurposeText(purpose) {
         'transit': '비행 경유'
     };
     return textMap[purpose] || purpose;
+} 
+
+// 일정 상세 정보 모달 표시
+function showEntryDetail(entryId) {
+    const entry = entries.find(e => e.id === entryId);
+    if (!entry) return;
+
+    const days = calculateDays(entry.startDate, entry.endDate);
+    const purposeText = getPurposeText(entry.purpose);
+    const flag = countryFlags[entry.countryCode] || '🏳️';
+
+    // 모달 HTML 생성
+    const modalHTML = `
+        <div id="entry-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <!-- 헤더 -->
+                <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl">${flag}</span>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">${entry.country} / ${entry.city}</h2>
+                            <p class="text-lg text-gray-600">${entry.startDate} ~ ${entry.endDate}</p>
+                        </div>
+                    </div>
+                    <button onclick="closeEntryDetail()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">
+                        ×
+                    </button>
+                </div>
+
+                <!-- 기본 정보 -->
+                <div class="p-6 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- 기본 정보 카드 -->
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold text-blue-800 mb-4 flex items-center">
+                                <span class="mr-2">📋</span>기본 정보
+                            </h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">국가:</span>
+                                    <span class="font-medium">${flag} ${entry.country}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">도시:</span>
+                                    <span class="font-medium">${entry.city}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">체류 기간:</span>
+                                    <span class="font-medium">${entry.startDate} ~ ${entry.endDate}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">체류 목적:</span>
+                                    <span class="font-medium">${purposeText}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">총 체류 일수:</span>
+                                    <span class="font-medium text-blue-600">${days}일</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 추가 정보 카드 -->
+                        <div class="bg-green-50 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold text-green-800 mb-4 flex items-center">
+                                <span class="mr-2">📝</span>추가 정보
+                            </h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">동행자:</span>
+                                    <span class="font-medium">${entry.companions || '없음'}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">메모:</span>
+                                    <span class="font-medium">${entry.memo || '없음'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 확장 준비 공간 -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                            <span class="mr-2">🔮</span>향후 확장 예정
+                        </h3>
+                        <div class="text-gray-500 text-sm">
+                            <p>• 사진 갤러리</p>
+                            <p>• 지도 위치 표시</p>
+                            <p>• 예산 정보</p>
+                            <p>• 숙소 정보</p>
+                            <p>• 교통편 정보</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 하단 버튼 -->
+                <div class="flex justify-end space-x-3 p-6 border-t border-gray-200">
+                    <button onclick="modifyEntry('${entry.id}'); closeEntryDetail();" 
+                            class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
+                        수정
+                    </button>
+                    <button onclick="deleteEntry('${entry.id}'); closeEntryDetail();" 
+                            class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                        삭제
+                    </button>
+                    <button onclick="closeEntryDetail()" 
+                            class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                        닫기
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // 기존 모달이 있다면 제거
+    const existingModal = document.getElementById('entry-detail-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // 새 모달 추가
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // ESC 키로 모달 닫기
+    document.addEventListener('keydown', function closeOnEsc(e) {
+        if (e.key === 'Escape') {
+            closeEntryDetail();
+            document.removeEventListener('keydown', closeOnEsc);
+        }
+    });
+
+    // 모달 외부 클릭으로 닫기
+    document.getElementById('entry-detail-modal').addEventListener('click', function(e) {
+        if (e.target.id === 'entry-detail-modal') {
+            closeEntryDetail();
+        }
+    });
+}
+
+// 일정 상세 정보 모달 닫기
+function closeEntryDetail() {
+    const modal = document.getElementById('entry-detail-modal');
+    if (modal) {
+        modal.remove();
+    }
 } 
