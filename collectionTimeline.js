@@ -132,6 +132,10 @@ function showEntryDetail(entryId) {
     const days = calculateDays(entry.startDate, entry.endDate);
     const purposeText = getPurposeText(entry.purpose);
     const flag = countryFlags[entry.countryCode] || '🏳️';
+    
+    // 도시 좌표 가져오기
+    const cityCoord = cityCoordinates[entry.city];
+    const hasMap = cityCoord && cityCoord.lat && cityCoord.lng;
 
     // 모달 HTML 생성
     const modalHTML = `
@@ -201,19 +205,24 @@ function showEntryDetail(entryId) {
                         </div>
                     </div>
 
-                    <!-- 확장 준비 공간 -->
+                    <!-- 위치 지도 -->
+                    ${hasMap ? `
                     <div class="bg-gray-50 rounded-lg p-4">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <span class="mr-2">🔮</span>향후 확장 예정
+                            <span class="mr-2">🗺️</span>위치
                         </h3>
-                        <div class="text-gray-500 text-sm">
-                            <p>• 사진 갤러리</p>
-                            <p>• 지도 위치 표시</p>
-                            <p>• 예산 정보</p>
-                            <p>• 숙소 정보</p>
-                            <p>• 교통편 정보</p>
+                        <div id="mini-map-${entry.id}" class="mini-map-container"></div>
+                    </div>
+                    ` : `
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                            <span class="mr-2">🗺️</span>위치
+                        </h3>
+                        <div class="text-gray-500 text-sm text-center py-8">
+                            <p>📍 ${entry.city}의 위치 정보를 확인할 수 없습니다.</p>
                         </div>
                     </div>
+                    `}
                 </div>
 
                 <!-- 하단 버튼 -->
@@ -260,6 +269,84 @@ function showEntryDetail(entryId) {
             closeEntryDetail();
         }
     });
+
+    // 지도 초기화 (좌표가 있는 경우)
+    if (hasMap) {
+        setTimeout(() => {
+            initializeMiniMap(entry.id, cityCoord.lat, cityCoord.lng, entry.city);
+        }, 100);
+    }
+}
+
+// 미니맵 초기화 함수
+function initializeMiniMap(entryId, lat, lng, cityName) {
+    const mapContainer = document.getElementById(`mini-map-${entryId}`);
+    if (!mapContainer) return;
+
+    // Leaflet 지도 생성 (국가 전체가 보이도록 줌 레벨 조정)
+    const miniMap = L.map(mapContainer, {
+        center: [lat, lng],
+        zoom: 7, // 국가 전체가 보이도록 줌 레벨 조정
+        interactive: false,
+        dragging: false,
+        zoomControl: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false,
+        tap: false,
+        touchZoom: false,
+        bounceAtZoomLimits: false,
+        zoomSnap: 0, // 줌 스냅 비활성화
+        zoomDelta: 0, // 줌 델타 비활성화
+        wheelPxPerZoomLevel: 0, // 휠 줌 비활성화
+        maxZoom: 7, // 최대 줌 레벨 고정
+        minZoom: 7, // 최소 줌 레벨 고정
+        maxBounds: null, // 경계 제한 해제
+        maxBoundsViscosity: 0 // 경계 점성 비활성화
+    });
+
+    // OpenStreetMap 타일 레이어 추가 (지형이 잘 보이는 스타일)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 7, // 타일 레이어도 최대 줌 제한
+        minZoom: 7, // 타일 레이어도 최소 줌 제한
+        updateWhenZooming: false, // 줌 시 업데이트 비활성화
+        updateWhenIdle: false, // 유휴 시 업데이트 비활성화
+        keepBuffer: 0, // 버퍼 비활성화
+        maxNativeZoom: 7 // 네이티브 최대 줌 제한
+    }).addTo(miniMap);
+
+    // 마커 추가 (툴팁 없이, 국가 전체가 보이도록 크기 조정)
+    const marker = L.marker([lat, lng], {
+        icon: L.divIcon({
+            className: 'custom-marker',
+            html: '<div style="background-color: #3B82F6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.4);"></div>',
+            iconSize: [16, 16],
+            iconAnchor: [8, 8]
+        })
+    }).addTo(miniMap);
+
+    // 지도 크기 조정 및 줌 레벨 강제 고정
+    setTimeout(() => {
+        miniMap.invalidateSize();
+        miniMap.setZoom(7, { animate: false }); // 줌 레벨 강제 고정
+        
+        // 모든 줌 관련 이벤트 비활성화
+        miniMap.off('zoomstart');
+        miniMap.off('zoom');
+        miniMap.off('zoomend');
+        miniMap.off('viewreset');
+        
+        // 지도 완전 고정
+        miniMap.dragging.disable();
+        miniMap.touchZoom.disable();
+        miniMap.doubleClickZoom.disable();
+        miniMap.scrollWheelZoom.disable();
+        miniMap.boxZoom.disable();
+        miniMap.keyboard.disable();
+        miniMap.tap.disable();
+    }, 200);
 }
 
 // 일정 상세 정보 모달 닫기
