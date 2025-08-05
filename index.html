@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>세계 여행 앱</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -97,6 +101,47 @@
                 padding: 0.5rem 0.75rem;
             }
         }
+
+        /* 지도 마커 스타일 */
+        .custom-marker {
+            background: none;
+            border: none;
+        }
+
+        .marker-pin {
+            font-size: 24px;
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .marker-pin:hover {
+            transform: scale(1.2);
+        }
+
+        /* 팝업 스타일 */
+        .custom-popup .leaflet-popup-content-wrapper {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-popup .leaflet-popup-content {
+            margin: 0;
+            padding: 0;
+        }
+
+        .popup-content {
+            padding: 12px;
+        }
+
+        /* 지도 컨테이너 반응형 */
+        @media (max-width: 768px) {
+            #map-container {
+                height: 60vh !important;
+                max-height: 400px !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -156,18 +201,39 @@
         <!-- 세계지도 섹션 -->
         <section id="world-map" class="content-section block">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                <div class="text-center">
+                <div class="text-center mb-8">
                     <div class="text-6xl mb-6">🗺️</div>
                     <h1 class="text-3xl font-bold text-gray-800 mb-4">세계지도</h1>
                     <p class="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
                         전 세계 여행지를 인터랙티브 지도에서 탐색하세요. 
-                        각 국가와 도시를 클릭하여 상세 정보를 확인할 수 있으며, 
-                        방문한 곳과 가고 싶은 곳을 마커로 표시할 수 있습니다.
+                        방문한 도시들이 지도에 마커로 표시되며, 
+                        마커를 클릭하면 상세 정보를 확인할 수 있습니다.
                     </p>
-                    <div class="mt-8 p-4 bg-blue-50 rounded-lg">
-                        <p class="text-blue-800 text-sm">
-                            💡 지도를 확대/축소하고 드래그하여 원하는 지역을 탐색해보세요.
-                        </p>
+                </div>
+                
+                <!-- 지도 컨테이너 -->
+                <div id="map-container" class="w-full h-[80vh] max-h-[600px] rounded-xl shadow-md mb-16 overflow-hidden">
+                    <div id="world-map" class="w-full h-full"></div>
+                </div>
+                
+                <!-- 지도 컨트롤 -->
+                <div class="mt-4 flex flex-wrap gap-2 justify-center">
+                    <button id="fit-bounds-btn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">
+                        전체 보기
+                    </button>
+                    <button id="clear-markers-btn" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm">
+                        마커 숨기기
+                    </button>
+                    <button id="show-markers-btn" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm">
+                        마커 보기
+                    </button>
+                </div>
+                
+                <!-- 마커 정보 패널 -->
+                <div id="marker-info-panel" class="mt-4 bg-gray-50 rounded-lg p-4 hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">방문 도시 정보</h3>
+                    <div id="marker-info-content" class="text-sm text-gray-600">
+                        <!-- 여기에 마커 정보가 동적으로 추가됩니다 -->
                     </div>
                 </div>
             </div>
@@ -699,6 +765,146 @@
         const cityName = document.getElementById('city-name');
         const cityDropdown = document.getElementById('city-dropdown');
         
+        // 도시 좌표 매핑 테이블
+        const cityCoordinates = {
+            // 한국 도시들
+            "서울": { lat: 37.5665, lng: 126.9780 },
+            "부산": { lat: 35.1796, lng: 129.0756 },
+            "대구": { lat: 35.8714, lng: 128.6014 },
+            "인천": { lat: 37.4563, lng: 126.7052 },
+            "광주": { lat: 35.1595, lng: 126.8526 },
+            "대전": { lat: 36.3504, lng: 127.3845 },
+            "울산": { lat: 35.5384, lng: 129.3114 },
+            "제주": { lat: 33.4996, lng: 126.5312 },
+            "수원": { lat: 37.2636, lng: 127.0286 },
+            "고양": { lat: 37.6584, lng: 126.8320 },
+            "용인": { lat: 37.2411, lng: 127.1776 },
+            "창원": { lat: 35.2278, lng: 128.6817 },
+            "성남": { lat: 37.4449, lng: 127.1389 },
+            "부천": { lat: 37.5035, lng: 126.7660 },
+            "안산": { lat: 37.3219, lng: 126.8309 },
+            "전주": { lat: 35.8242, lng: 127.1479 },
+            "천안": { lat: 36.8154, lng: 127.1139 },
+            "청주": { lat: 36.6424, lng: 127.4890 },
+            "포항": { lat: 36.0320, lng: 129.3650 },
+            "안양": { lat: 37.3922, lng: 126.9269 },
+            
+            // 일본 도시들
+            "도쿄": { lat: 35.6895, lng: 139.6917 },
+            "오사카": { lat: 34.6937, lng: 135.5023 },
+            "교토": { lat: 35.0116, lng: 135.7681 },
+            "요코하마": { lat: 35.4437, lng: 139.6380 },
+            "나고야": { lat: 35.1815, lng: 136.9066 },
+            "삿포로": { lat: 43.0618, lng: 141.3545 },
+            "고베": { lat: 34.6901, lng: 135.1955 },
+            "후쿠오카": { lat: 33.5902, lng: 130.4017 },
+            "가와사키": { lat: 35.5309, lng: 139.7030 },
+            "히로시마": { lat: 34.3853, lng: 132.4553 },
+            "센다이": { lat: 38.2688, lng: 140.8721 },
+            "지바": { lat: 35.6073, lng: 140.1063 },
+            "기타큐슈": { lat: 33.8833, lng: 130.8833 },
+            "사카이": { lat: 34.5733, lng: 135.4833 },
+            "니가타": { lat: 37.9161, lng: 139.0364 },
+            "하마마쓰": { lat: 34.7108, lng: 137.7261 },
+            "구마모토": { lat: 32.7898, lng: 130.7417 },
+            "사가미하라": { lat: 35.5714, lng: 139.3750 },
+            "오카야마": { lat: 34.6618, lng: 133.9344 },
+            "시즈오카": { lat: 34.9769, lng: 138.3831 },
+            "히메지": { lat: 34.8167, lng: 134.7000 },
+            
+            // 미국 도시들
+            "뉴욕": { lat: 40.7128, lng: -74.0060 },
+            "로스앤젤레스": { lat: 34.0522, lng: -118.2437 },
+            "시카고": { lat: 41.8781, lng: -87.6298 },
+            "휴스턴": { lat: 29.7604, lng: -95.3698 },
+            "피닉스": { lat: 33.4484, lng: -112.0740 },
+            "필라델피아": { lat: 39.9526, lng: -75.1652 },
+            "샌안토니오": { lat: 29.4241, lng: -98.4936 },
+            "샌디에고": { lat: 32.7157, lng: -117.1611 },
+            "댈러스": { lat: 32.7767, lng: -96.7970 },
+            "샌호세": { lat: 37.3382, lng: -121.8863 },
+            "오스틴": { lat: 30.2672, lng: -97.7431 },
+            "잭슨빌": { lat: 30.3322, lng: -81.6557 },
+            "포트워스": { lat: 32.7555, lng: -97.3308 },
+            "콜럼버스": { lat: 39.9612, lng: -82.9988 },
+            "샬럿": { lat: 35.2271, lng: -80.8431 },
+            "샌프란시스코": { lat: 37.7749, lng: -122.4194 },
+            "인디애나폴리스": { lat: 39.7684, lng: -86.1581 },
+            "시애틀": { lat: 47.6062, lng: -122.3321 },
+            "덴버": { lat: 39.7392, lng: -104.9903 },
+            "워싱턴": { lat: 38.9072, lng: -77.0369 },
+            "보스턴": { lat: 42.3601, lng: -71.0589 },
+            
+            // 영국 도시들
+            "런던": { lat: 51.5074, lng: -0.1278 },
+            "버밍엄": { lat: 52.4862, lng: -1.8904 },
+            "리즈": { lat: 53.8008, lng: -1.5491 },
+            "글래스고": { lat: 55.8642, lng: -4.2518 },
+            "셰필드": { lat: 53.3811, lng: -1.4701 },
+            "브래드포드": { lat: 53.7958, lng: -1.7594 },
+            "에든버러": { lat: 55.9533, lng: -3.1883 },
+            "리버풀": { lat: 53.4084, lng: -2.9916 },
+            "맨체스터": { lat: 53.4808, lng: -2.2426 },
+            "브리스틀": { lat: 51.4545, lng: -2.5879 },
+            "웨이크필드": { lat: 53.6833, lng: -1.4977 },
+            "카디프": { lat: 51.4816, lng: -3.1791 },
+            "코벤트리": { lat: 52.4068, lng: -1.5197 },
+            "레스터": { lat: 52.6369, lng: -1.1398 },
+            "스토크온트렌트": { lat: 53.0027, lng: -2.1794 },
+            "울버햄튼": { lat: 52.5862, lng: -2.1286 },
+            "노팅엄": { lat: 52.9548, lng: -1.1581 },
+            "플리머스": { lat: 50.3755, lng: -4.1427 },
+            "사우샘프턴": { lat: 50.9097, lng: -1.4044 },
+            "레딩": { lat: 51.4543, lng: -0.9781 },
+            "더비": { lat: 52.9225, lng: -1.4746 },
+            
+            // 프랑스 도시들
+            "파리": { lat: 48.8566, lng: 2.3522 },
+            "마르세유": { lat: 43.2965, lng: 5.3698 },
+            "리옹": { lat: 45.7578, lng: 4.8320 },
+            "툴루즈": { lat: 43.6047, lng: 1.4442 },
+            "니스": { lat: 43.7102, lng: 7.2620 },
+            "낭트": { lat: 47.2184, lng: -1.5536 },
+            "스트라스부르": { lat: 48.5734, lng: 7.7521 },
+            "몽펠리에": { lat: 43.6108, lng: 3.8767 },
+            "보르도": { lat: 44.8378, lng: -0.5792 },
+            "릴": { lat: 50.6292, lng: 3.0573 },
+            "렌": { lat: 48.1173, lng: -1.6778 },
+            "르아브르": { lat: 49.4944, lng: 0.1079 },
+            "생테티엔": { lat: 45.4408, lng: 4.3872 },
+            "툴롱": { lat: 43.1242, lng: 5.9280 },
+            "그르노블": { lat: 45.1885, lng: 5.7245 },
+            "디종": { lat: 47.3220, lng: 5.0415 },
+            "앙제": { lat: 47.4736, lng: -0.5542 },
+            "생드니": { lat: 48.9362, lng: 2.3574 },
+            "빌뢰반": { lat: 45.7640, lng: 4.8357 },
+            "르망": { lat: 47.9959, lng: 0.2018 },
+            "엑상프로방스": { lat: 43.5297, lng: 5.4474 },
+            
+            // 독일 도시들
+            "베를린": { lat: 52.5200, lng: 13.4050 },
+            "함부르크": { lat: 53.5511, lng: 9.9937 },
+            "뮌헨": { lat: 48.1351, lng: 11.5820 },
+            "쾰른": { lat: 50.9375, lng: 6.9603 },
+            "프랑크푸르트": { lat: 50.1109, lng: 8.6821 },
+            "슈투트가르트": { lat: 48.7758, lng: 9.1829 },
+            "뒤셀도르프": { lat: 51.2277, lng: 6.7735 },
+            "도르트문트": { lat: 51.5136, lng: 7.4653 },
+            "에센": { lat: 51.4556, lng: 7.0116 },
+            "라이프치히": { lat: 51.3397, lng: 12.3731 },
+            "브레멘": { lat: 53.0793, lng: 8.8017 },
+            "드레스덴": { lat: 51.0504, lng: 13.7373 },
+            "하노버": { lat: 52.3759, lng: 9.7320 },
+            "뉘른베르크": { lat: 49.4521, lng: 11.0767 },
+            "뒤스부르크": { lat: 51.4344, lng: 6.7623 },
+            "보훔": { lat: 51.4818, lng: 7.2162 },
+            "부퍼탈": { lat: 51.2562, lng: 7.1508 },
+            "빌레펠트": { lat: 52.0302, lng: 8.5325 },
+            "본": { lat: 50.7374, lng: 7.0982 },
+            "만하임": { lat: 49.4875, lng: 8.4660 },
+            "카를스루에": { lat: 49.0069, lng: 8.4037 }
+        };
+
         // 도시 데이터 (국가별 도시 목록)
         const cities = {
             'KR': [
@@ -1308,11 +1514,230 @@
             calendarBody.innerHTML = calendarHTML;
         }
 
+        // 지도 관련 변수들
+        let map = null;
+        let markers = [];
+        let markerLayer = null;
+
+        // 지도 초기화
+        function initializeMap() {
+            if (map) {
+                map.remove();
+            }
+
+            // 지도 생성
+            map = L.map('world-map').setView([20, 0], 2);
+
+            // OpenStreetMap 타일 레이어 추가
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 18
+            }).addTo(map);
+
+            // 마커 레이어 생성
+            markerLayer = L.layerGroup().addTo(map);
+
+            // 지도 크기 재계산 (리사이징 문제 방지)
+            setTimeout(() => {
+                if (map) {
+                    map.invalidateSize();
+                }
+            }, 100);
+
+            // 지도 컨트롤 이벤트 리스너
+            document.getElementById('fit-bounds-btn').addEventListener('click', fitBounds);
+            document.getElementById('clear-markers-btn').addEventListener('click', hideMarkers);
+            document.getElementById('show-markers-btn').addEventListener('click', showMarkers);
+        }
+
+        // 마커 생성 및 추가
+        function createMarkers() {
+            // 기존 마커 제거
+            if (markerLayer) {
+                markerLayer.clearLayers();
+            }
+            markers = [];
+
+            // 중복 제거된 도시 목록 생성
+            const uniqueCities = new Map();
+            
+            entries.forEach(entry => {
+                const cityKey = `${entry.country}-${entry.city}`;
+                if (!uniqueCities.has(cityKey)) {
+                    uniqueCities.set(cityKey, {
+                        country: entry.country,
+                        city: entry.city,
+                        entries: []
+                    });
+                }
+                uniqueCities.get(cityKey).entries.push(entry);
+            });
+
+            // 각 도시에 대해 마커 생성
+            uniqueCities.forEach((cityData, cityKey) => {
+                const coordinates = cityCoordinates[cityData.city];
+                if (coordinates) {
+                    const marker = L.marker([coordinates.lat, coordinates.lng], {
+                        icon: L.divIcon({
+                            className: 'custom-marker',
+                            html: '<div class="marker-pin">📍</div>',
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 30]
+                        })
+                    });
+
+                    // 팝업 내용 생성
+                    const popupContent = createPopupContent(cityData);
+                    marker.bindPopup(popupContent, {
+                        maxWidth: 300,
+                        className: 'custom-popup'
+                    });
+
+                    // 마커 클릭 이벤트
+                    marker.on('click', function() {
+                        showMarkerInfo(cityData);
+                    });
+
+                    marker.addTo(markerLayer);
+                    markers.push(marker);
+                }
+            });
+        }
+
+        // 팝업 내용 생성
+        function createPopupContent(cityData) {
+            const purposeText = {
+                'travel': '여행',
+                'business': '출장',
+                'study': '유학',
+                'working-holiday': '워킹 홀리데이',
+                'family-visit': '가족 방문',
+                'dispatch': '파견',
+                'exchange': '교환학생',
+                'volunteer': '봉사활동',
+                'medical': '의료',
+                'language': '어학 연수',
+                'transit': '비행 경유'
+            };
+
+            let content = `
+                <div class="popup-content">
+                    <h3 class="font-bold text-lg mb-2">${cityData.city}, ${cityData.country}</h3>
+                    <div class="text-sm space-y-1">
+            `;
+
+            cityData.entries.forEach((entry, index) => {
+                const purpose = purposeText[entry.purpose] || entry.purpose;
+                const days = calculateDays(entry.startDate, entry.endDate);
+                
+                content += `
+                    <div class="border-l-2 border-blue-500 pl-2 mb-2">
+                        <div class="font-medium">${purpose}</div>
+                        <div class="text-gray-600">📅 ${entry.startDate} ~ ${entry.endDate}</div>
+                        <div class="text-gray-600">⏱️ ${days}일</div>
+                        ${entry.memo ? `<div class="text-gray-600">📝 ${entry.memo}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            content += `
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">
+                        총 ${cityData.entries.length}회 방문
+                    </div>
+                </div>
+            `;
+
+            return content;
+        }
+
+        // 마커 정보 패널 표시
+        function showMarkerInfo(cityData) {
+            const panel = document.getElementById('marker-info-panel');
+            const content = document.getElementById('marker-info-content');
+            
+            const purposeText = {
+                'travel': '여행',
+                'business': '출장',
+                'study': '유학',
+                'working-holiday': '워킹 홀리데이',
+                'family-visit': '가족 방문',
+                'dispatch': '파견',
+                'exchange': '교환학생',
+                'volunteer': '봉사활동',
+                'medical': '의료',
+                'language': '어학 연수',
+                'transit': '비행 경유'
+            };
+
+            let infoContent = `
+                <div class="space-y-3">
+                    <div class="font-semibold text-lg">${cityData.city}, ${cityData.country}</div>
+                    <div class="text-sm space-y-2">
+            `;
+
+            cityData.entries.forEach((entry, index) => {
+                const purpose = purposeText[entry.purpose] || entry.purpose;
+                const days = calculateDays(entry.startDate, entry.endDate);
+                
+                infoContent += `
+                    <div class="bg-white p-3 rounded border">
+                        <div class="font-medium text-blue-600">${purpose}</div>
+                        <div class="text-gray-600">📅 ${entry.startDate} ~ ${entry.endDate}</div>
+                        <div class="text-gray-600">⏱️ ${days}일</div>
+                        ${entry.memo ? `<div class="text-gray-600 mt-1">📝 ${entry.memo}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            infoContent += `
+                    </div>
+                    <div class="text-sm text-gray-500 border-t pt-2">
+                        총 ${cityData.entries.length}회 방문
+                    </div>
+                </div>
+            `;
+
+            content.innerHTML = infoContent;
+            panel.classList.remove('hidden');
+        }
+
+        // 지도 범위에 맞춰 보기
+        function fitBounds() {
+            if (markers.length > 0) {
+                const group = new L.featureGroup(markers);
+                map.fitBounds(group.getBounds().pad(0.1));
+            } else {
+                map.setView([20, 0], 2);
+            }
+        }
+
+        // 마커 숨기기
+        function hideMarkers() {
+            if (markerLayer) {
+                markerLayer.clearLayers();
+            }
+            document.getElementById('marker-info-panel').classList.add('hidden');
+        }
+
+        // 마커 보기
+        function showMarkers() {
+            createMarkers();
+        }
+
         // 모든 섹션 업데이트
         function updateAllSections() {
             calculateStats();
             renderTimeline();
             renderCalendar();
+            updateMap();
+        }
+
+        // 지도 업데이트
+        function updateMap() {
+            if (map) {
+                createMarkers();
+            }
         }
 
         // 수정 함수
@@ -1691,6 +2116,16 @@
                     updateDropdownsFromCurrentDate();
                     renderCalendar();
                 }
+                
+                // 세계지도 섹션으로 이동할 때 지도 업데이트
+                if (targetSection === 'world-map') {
+                    setTimeout(() => {
+                        if (map) {
+                            map.invalidateSize();
+                            createMarkers();
+                        }
+                    }, 100);
+                }
             });
         });
 
@@ -1702,6 +2137,12 @@
             
             // 캘린더 드롭다운 초기화
             initializeCalendarDropdowns();
+            
+            // 지도 초기화 (약간의 지연을 두어 DOM이 완전히 로드된 후 실행)
+            setTimeout(() => {
+                initializeMap();
+                createMarkers();
+            }, 100);
             
             // 로그인/로그아웃 버튼 이벤트 리스너
             document.getElementById('login-btn').addEventListener('click', function() {
