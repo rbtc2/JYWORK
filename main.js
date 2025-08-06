@@ -107,6 +107,12 @@ function updateAllSections() {
     if (typeof renderCountriesCollection === 'function') {
         renderCountriesCollection();
     }
+    
+    // 별점별 보기 업데이트 (별점별 보기 탭이 활성화된 경우)
+    const ratingSubsection = document.getElementById('rating-subsection');
+    if (ratingSubsection && !ratingSubsection.classList.contains('hidden')) {
+        renderRatingTimeline();
+    }
 }
 
 // 탭 클릭 이벤트 처리
@@ -226,31 +232,19 @@ function initializeCollectionTabs() {
                 renderCollectionTimeline();
             }
             
-            // 국가별 보기 탭 클릭 시 준비 중 메시지 표시
-            if (targetSubsection === 'countries') {
-                showComingSoonMessage();
+            // 별점별 보기 탭 클릭 시 별점별 보기 렌더링
+            if (targetSubsection === 'rating') {
+                renderRatingTimeline('date');
+                initializeRatingSortButtons();
             }
         });
     });
 }
 
-// 준비 중 메시지 표시
-function showComingSoonMessage() {
-    const countriesSubsection = document.getElementById('countries-subsection');
-    if (countriesSubsection) {
-        // 이미 메시지가 있는지 확인
-        const existingMessage = countriesSubsection.querySelector('.text-center');
-        if (!existingMessage) {
-            countriesSubsection.innerHTML = `
-                <div class="text-center py-12 sm:py-16">
-                    <div class="text-4xl sm:text-6xl mb-6">🚧</div>
-                    <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-3">준비 중입니다</h3>
-                    <p class="text-gray-500 text-base sm:text-lg mb-4">국가별 보기 기능은 현재 개발 중입니다.</p>
-                    <p class="text-gray-400 text-sm">곧 더 나은 기능으로 찾아뵙겠습니다!</p>
-                </div>
-            `;
-        }
-    }
+// 별점별 보기 초기화
+function initializeRatingView() {
+    renderRatingTimeline('date');
+    initializeRatingSortButtons();
 }
 
 // 모달 관련 함수들

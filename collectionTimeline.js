@@ -448,6 +448,93 @@ function initializeMiniMap(entryId, lat, lng, cityName) {
     }
 }
 
+// 별점별 보기 렌더링
+function renderRatingTimeline(sortType = 'date') {
+    const ratingTimelineList = document.getElementById('rating-timeline-list');
+    const ratingTimelineEmpty = document.getElementById('rating-timeline-empty');
+
+    // 별점이 있는 일정만 필터링
+    const ratedEntries = entries.filter(entry => entry.rating && entry.rating > 0);
+
+    if (ratedEntries.length === 0) {
+        ratingTimelineList.style.display = 'none';
+        ratingTimelineEmpty.style.display = 'block';
+        return;
+    }
+
+    ratingTimelineList.style.display = 'block';
+    ratingTimelineEmpty.style.display = 'none';
+
+    // 정렬 로직
+    let sortedEntries;
+    switch (sortType) {
+        case 'rating-high':
+            sortedEntries = [...ratedEntries].sort((a, b) => b.rating - a.rating);
+            break;
+        case 'rating-low':
+            sortedEntries = [...ratedEntries].sort((a, b) => a.rating - b.rating);
+            break;
+        case 'date':
+        default:
+            sortedEntries = [...ratedEntries].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+            break;
+    }
+
+    ratingTimelineList.innerHTML = sortedEntries.map(entry => {
+        const days = calculateDays(entry.startDate, entry.endDate);
+        const purposeText = getPurposeText(entry.purpose);
+        const flag = countryFlags[entry.countryCode] || '🏳️';
+        const ratingDisplay = displayRatingInCard(entry.rating);
+
+        return `
+            <div class="collection-timeline-card bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer active:scale-[0.98] sm:active:scale-100" 
+                 onclick="showEntryDetail('${entry.id}')">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                    <div class="flex-1">
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 break-words">${flag} ${entry.country} / ${entry.city}</h3>
+                        <p class="text-xs sm:text-sm text-gray-600 mt-1">${purposeText}</p>
+                    </div>
+                    <div class="flex items-center justify-end sm:justify-start">
+                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap">
+                            ${days}일
+                        </span>
+                    </div>
+                </div>
+                <div class="text-xs sm:text-sm text-gray-500 mt-3">
+                    📅 ${entry.startDate} ~ ${entry.endDate}
+                </div>
+                ${ratingDisplay}
+                ${entry.memo ? `<p class="text-xs sm:text-sm text-gray-600 bg-gray-50 p-2 sm:p-3 rounded break-words mt-3">📝 ${entry.memo}</p>` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+// 별점별 정렬 버튼 이벤트 핸들러
+function initializeRatingSortButtons() {
+    const sortButtons = document.querySelectorAll('.rating-sort-btn');
+    
+    sortButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // 모든 버튼 비활성화
+            sortButtons.forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-500', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            // 클릭된 버튼 활성화
+            this.classList.add('active', 'bg-blue-500', 'text-white');
+            this.classList.remove('bg-gray-200', 'text-gray-700');
+            
+            // 정렬 타입 가져오기
+            const sortType = this.getAttribute('data-sort');
+            
+            // 별점별 보기 렌더링
+            renderRatingTimeline(sortType);
+        });
+    });
+}
+
 // 일정 상세 정보 모달 닫기
 function closeEntryDetail() {
     const modal = document.getElementById('entry-detail-modal');

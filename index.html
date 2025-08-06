@@ -149,8 +149,8 @@
                     <button class="collection-tab active px-4 sm:px-6 py-2 sm:py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm sm:text-base font-medium min-h-[40px] sm:min-h-[44px]" data-subsection="timeline">
                         ⏰ 타임라인
                     </button>
-                    <button class="collection-tab px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base font-medium min-h-[40px] sm:min-h-[44px]" data-subsection="countries">
-                        🌍 국가별 보기
+                    <button class="collection-tab px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base font-medium min-h-[40px] sm:min-h-[44px]" data-subsection="rating">
+                        ⭐ 별점별 보기
                     </button>
                 </div>
                 
@@ -170,15 +170,32 @@
                     </div>
                 </div>
                 
-                <!-- 국가별 보기 하위 섹션 -->
-                <div id="countries-subsection" class="collection-subsection hidden">
+                <!-- 별점별 보기 하위 섹션 -->
+                <div id="rating-subsection" class="collection-subsection hidden">
                     
-                    <!-- 준비 중 메시지 -->
-                    <div class="text-center py-12 sm:py-16">
-                        <div class="text-4xl sm:text-6xl mb-6">🚧</div>
-                        <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-3">준비 중입니다</h3>
-                        <p class="text-gray-500 text-base sm:text-lg mb-4">국가별 보기 기능은 현재 개발 중입니다.</p>
-                        <p class="text-gray-400 text-sm">곧 더 나은 기능으로 찾아뵙겠습니다!</p>
+                    <!-- 정렬 옵션 -->
+                    <div class="flex flex-wrap gap-2 mb-6 sm:mb-8 justify-center sm:justify-start">
+                        <button id="sort-date" class="rating-sort-btn active px-4 sm:px-6 py-2 sm:py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm sm:text-base font-medium min-h-[40px] sm:min-h-[44px]" data-sort="date">
+                            📅 날짜 최신 순
+                        </button>
+                        <button id="sort-rating-high" class="rating-sort-btn px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base font-medium min-h-[40px] sm:min-h-[44px]" data-sort="rating-high">
+                            ⭐ 별점 높은 순
+                        </button>
+                        <button id="sort-rating-low" class="rating-sort-btn px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base font-medium min-h-[40px] sm:min-h-[44px]" data-sort="rating-low">
+                            ⭐ 별점 낮은 순
+                        </button>
+                    </div>
+                    
+                    <!-- 별점별 일정 목록 -->
+                    <div id="rating-timeline-list" class="space-y-3 sm:space-y-4">
+                        <!-- 여기에 동적으로 별점별 일정 카드들이 추가됩니다 -->
+                    </div>
+                    
+                    <!-- 빈 상태 메시지 -->
+                    <div id="rating-timeline-empty" class="text-center py-8 sm:py-12">
+                        <div class="text-3xl sm:text-4xl mb-4">⭐</div>
+                        <p class="text-gray-500 text-base sm:text-lg">아직 등록된 여행 일정이 없습니다.</p>
+                        <p class="text-gray-400 text-sm mt-2">우측 하단의 + 버튼을 눌러 첫 여행을 추가해보세요!</p>
                     </div>
                 </div>
             </div>
