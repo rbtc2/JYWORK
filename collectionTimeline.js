@@ -8,6 +8,10 @@ let timelineCurrentPage = 1;
 let ratingCurrentPage = 1;
 const ITEMS_PER_PAGE = 10;
 
+// 정렬 상태 관리
+let timelineSortType = 'newest'; // 'newest' 또는 'oldest'
+let ratingSortType = 'rating-high'; // 'rating-high' 또는 'rating-low'
+
 // 국가별 국기 이모지 매핑
 const countryFlags = {
     'KR': '🇰🇷',
@@ -167,8 +171,17 @@ function renderCollectionTimeline() {
     collectionTimelineList.style.display = 'block';
     collectionTimelineEmpty.style.display = 'none';
 
-    // 날짜순으로 정렬 (최신순)
-    const sortedEntries = [...entries].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+    // 정렬 로직
+    let sortedEntries;
+    switch (timelineSortType) {
+        case 'oldest':
+            sortedEntries = [...entries].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+            break;
+        case 'newest':
+        default:
+            sortedEntries = [...entries].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+            break;
+    }
     
     // 페이지네이션 적용
     const totalPages = getTotalPages(sortedEntries.length, ITEMS_PER_PAGE);
@@ -588,7 +601,7 @@ function initializeMiniMap(entryId, lat, lng, cityName) {
 }
 
 // 별점별 보기 렌더링
-function renderRatingTimeline(sortType = 'date') {
+function renderRatingTimeline() {
     const ratingTimelineList = document.getElementById('rating-timeline-list');
     const ratingTimelineEmpty = document.getElementById('rating-timeline-empty');
 
@@ -606,18 +619,25 @@ function renderRatingTimeline(sortType = 'date') {
     ratingTimelineList.style.display = 'block';
     ratingTimelineEmpty.style.display = 'none';
 
-    // 정렬 로직
+    // 정렬 로직 - 별점 순으로 정렬하고, 같은 별점 내에서는 날짜 최신순
     let sortedEntries;
-    switch (sortType) {
-        case 'rating-high':
-            sortedEntries = [...ratedEntries].sort((a, b) => b.rating - a.rating);
-            break;
+    switch (ratingSortType) {
         case 'rating-low':
-            sortedEntries = [...ratedEntries].sort((a, b) => a.rating - b.rating);
+            sortedEntries = [...ratedEntries].sort((a, b) => {
+                if (a.rating !== b.rating) {
+                    return a.rating - b.rating;
+                }
+                return new Date(b.startDate) - new Date(a.startDate);
+            });
             break;
-        case 'date':
+        case 'rating-high':
         default:
-            sortedEntries = [...ratedEntries].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+            sortedEntries = [...ratedEntries].sort((a, b) => {
+                if (a.rating !== b.rating) {
+                    return b.rating - a.rating;
+                }
+                return new Date(b.startDate) - new Date(a.startDate);
+            });
             break;
     }
     
@@ -664,6 +684,40 @@ function renderRatingTimeline(sortType = 'date') {
     renderPagination(ratingCurrentPage, totalPages, 'rating-pagination', 'rating-prev', 'rating-next', 'rating-page-numbers');
 }
 
+// 타임라인 정렬 버튼 이벤트 핸들러
+function initializeTimelineSortButtons() {
+    const sortButtons = document.querySelectorAll('.timeline-sort-btn');
+    
+    sortButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // 모든 버튼 비활성화
+            sortButtons.forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-500', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            // 클릭된 버튼 활성화
+            this.classList.add('active', 'bg-blue-500', 'text-white');
+            this.classList.remove('bg-gray-200', 'text-gray-700');
+            
+            // 정렬 타입 가져오기
+            const sortType = this.getAttribute('data-sort');
+            timelineSortType = sortType;
+            
+            // 정렬 설정 저장
+            if (typeof saveSortSettings === 'function') {
+                saveSortSettings();
+            }
+            
+            // 페이지네이션 초기화
+            timelineCurrentPage = 1;
+            
+            // 타임라인 렌더링
+            renderCollectionTimeline();
+        });
+    });
+}
+
 // 별점별 정렬 버튼 이벤트 핸들러
 function initializeRatingSortButtons() {
     const sortButtons = document.querySelectorAll('.rating-sort-btn');
@@ -682,20 +736,57 @@ function initializeRatingSortButtons() {
             
             // 정렬 타입 가져오기
             const sortType = this.getAttribute('data-sort');
+            ratingSortType = sortType;
+            
+            // 정렬 설정 저장
+            if (typeof saveSortSettings === 'function') {
+                saveSortSettings();
+            }
             
             // 페이지네이션 초기화
             ratingCurrentPage = 1;
             
             // 별점별 보기 렌더링
-            renderRatingTimeline(sortType);
+            renderRatingTimeline();
         });
     });
 }
 
-// 페이지네이션 상태 초기화 함수
+// 정렬 버튼 상태 업데이트 함수
+function updateSortButtonStates() {
+    // 타임라인 정렬 버튼 상태 업데이트
+    const timelineSortButtons = document.querySelectorAll('.timeline-sort-btn');
+    timelineSortButtons.forEach(button => {
+        const sortType = button.getAttribute('data-sort');
+        if (sortType === timelineSortType) {
+            button.classList.add('active', 'bg-blue-500', 'text-white');
+            button.classList.remove('bg-gray-200', 'text-gray-700');
+        } else {
+            button.classList.remove('active', 'bg-blue-500', 'text-white');
+            button.classList.add('bg-gray-200', 'text-gray-700');
+        }
+    });
+    
+    // 별점별 정렬 버튼 상태 업데이트
+    const ratingSortButtons = document.querySelectorAll('.rating-sort-btn');
+    ratingSortButtons.forEach(button => {
+        const sortType = button.getAttribute('data-sort');
+        if (sortType === ratingSortType) {
+            button.classList.add('active', 'bg-blue-500', 'text-white');
+            button.classList.remove('bg-gray-200', 'text-gray-700');
+        } else {
+            button.classList.remove('active', 'bg-blue-500', 'text-white');
+            button.classList.add('bg-gray-200', 'text-gray-700');
+        }
+    });
+}
+
+// 페이지네이션 및 정렬 상태 초기화 함수
 function resetPagination() {
     timelineCurrentPage = 1;
     ratingCurrentPage = 1;
+    timelineSortType = 'newest';
+    ratingSortType = 'rating-high';
 }
 
 // 일정 상세 정보 모달 닫기

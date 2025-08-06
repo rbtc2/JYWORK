@@ -102,6 +102,40 @@ function exportData() {
     alert('데이터가 성공적으로 내보내졌습니다!');
 }
 
+// 정렬 상태 저장
+function saveSortSettings() {
+    const sortSettings = {
+        timelineSortType: timelineSortType || 'newest',
+        ratingSortType: ratingSortType || 'rating-high'
+    };
+    
+    if (currentUser.isLoggedIn && currentUser.id) {
+        const sortKey = `user_${currentUser.id}_sortSettings`;
+        localStorage.setItem(sortKey, JSON.stringify(sortSettings));
+    } else {
+        localStorage.setItem('sortSettings', JSON.stringify(sortSettings));
+    }
+}
+
+// 정렬 상태 불러오기
+function loadSortSettings() {
+    let savedSettings;
+    
+    if (currentUser.isLoggedIn && currentUser.id) {
+        const sortKey = `user_${currentUser.id}_sortSettings`;
+        const savedData = localStorage.getItem(sortKey);
+        savedSettings = savedData ? JSON.parse(savedData) : null;
+    } else {
+        const savedData = localStorage.getItem('sortSettings');
+        savedSettings = savedData ? JSON.parse(savedData) : null;
+    }
+    
+    if (savedSettings) {
+        timelineSortType = savedSettings.timelineSortType || 'newest';
+        ratingSortType = savedSettings.ratingSortType || 'rating-high';
+    }
+}
+
 // 데이터 초기화 함수
 function resetData() {
     if (confirm('모든 여행 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {

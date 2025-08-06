@@ -203,6 +203,12 @@ function initializeCollectionTabs() {
     
     // 타임라인 렌더링
     renderCollectionTimeline();
+    initializeTimelineSortButtons();
+    
+    // 정렬 버튼 상태 업데이트
+    if (typeof updateSortButtonStates === 'function') {
+        updateSortButtonStates();
+    }
     
     // 콜렉션 탭 클릭 이벤트 리스너 추가
     document.querySelectorAll('.collection-tab').forEach(tab => {
@@ -239,6 +245,12 @@ function initializeCollectionTabs() {
                     resetPagination();
                 }
                 renderCollectionTimeline();
+                initializeTimelineSortButtons();
+                
+                // 정렬 버튼 상태 업데이트
+                if (typeof updateSortButtonStates === 'function') {
+                    updateSortButtonStates();
+                }
             }
             
             // 별점별 보기 탭 클릭 시 별점별 보기 렌더링
@@ -247,8 +259,13 @@ function initializeCollectionTabs() {
                 if (typeof resetPagination === 'function') {
                     resetPagination();
                 }
-                renderRatingTimeline('date');
+                renderRatingTimeline();
                 initializeRatingSortButtons();
+                
+                // 정렬 버튼 상태 업데이트
+                if (typeof updateSortButtonStates === 'function') {
+                    updateSortButtonStates();
+                }
             }
         });
     });
@@ -256,8 +273,13 @@ function initializeCollectionTabs() {
 
 // 별점별 보기 초기화
 function initializeRatingView() {
-    renderRatingTimeline('date');
+    renderRatingTimeline();
     initializeRatingSortButtons();
+    
+    // 정렬 버튼 상태 업데이트
+    if (typeof updateSortButtonStates === 'function') {
+        updateSortButtonStates();
+    }
 }
 
 // 모달 관련 함수들
@@ -522,7 +544,10 @@ function initializeApp() {
     loadUserData();
     loadResidenceData();
     
-
+    // 정렬 설정 로드
+    if (typeof loadSortSettings === 'function') {
+        loadSortSettings();
+    }
     
     // UI 업데이트
     updateAllSections();

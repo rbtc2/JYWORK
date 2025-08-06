@@ -157,6 +157,16 @@
                 <!-- 타임라인 하위 섹션 -->
                 <div id="timeline-subsection" class="collection-subsection block">
                     
+                    <!-- 타임라인 정렬 옵션 -->
+                    <div class="flex flex-wrap gap-2 mb-6 sm:mb-8 justify-center sm:justify-start">
+                        <button id="timeline-sort-newest" class="timeline-sort-btn active px-4 sm:px-6 py-2 sm:py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm sm:text-base font-medium min-h-[40px] sm:min-h-[44px]" data-sort="newest">
+                            📅 날짜 최신 순
+                        </button>
+                        <button id="timeline-sort-oldest" class="timeline-sort-btn px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base font-medium min-h-[40px] sm:min-h-[44px]" data-sort="oldest">
+                            📅 날짜 오래된 순
+                        </button>
+                    </div>
+                    
                     <!-- 타임라인 목록 -->
                     <div id="collection-timeline-list" class="space-y-3 sm:space-y-4">
                         <!-- 여기에 동적으로 타임라인 카드들이 추가됩니다 -->
@@ -188,10 +198,7 @@
                     
                     <!-- 정렬 옵션 -->
                     <div class="flex flex-wrap gap-2 mb-6 sm:mb-8 justify-center sm:justify-start">
-                        <button id="sort-date" class="rating-sort-btn active px-4 sm:px-6 py-2 sm:py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm sm:text-base font-medium min-h-[40px] sm:min-h-[44px]" data-sort="date">
-                            📅 날짜 최신 순
-                        </button>
-                        <button id="sort-rating-high" class="rating-sort-btn px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base font-medium min-h-[40px] sm:min-h-[44px]" data-sort="rating-high">
+                        <button id="sort-rating-high" class="rating-sort-btn active px-4 sm:px-6 py-2 sm:py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm sm:text-base font-medium min-h-[40px] sm:min-h-[44px]" data-sort="rating-high">
                             ⭐ 별점 높은 순
                         </button>
                         <button id="sort-rating-low" class="rating-sort-btn px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base font-medium min-h-[40px] sm:min-h-[44px]" data-sort="rating-low">
