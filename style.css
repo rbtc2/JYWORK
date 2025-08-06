@@ -64,15 +64,42 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* 이벤트 색상 변형 */
-.calendar-event.event-1 { background-color: #4285f4; border-left-color: #1a73e8; }
-.calendar-event.event-2 { background-color: #ea4335; border-left-color: #d93025; }
-.calendar-event.event-3 { background-color: #fbbc04; border-left-color: #f9ab00; }
-.calendar-event.event-4 { background-color: #34a853; border-left-color: #137333; }
-.calendar-event.event-5 { background-color: #9c27b0; border-left-color: #7b1fa2; }
-.calendar-event.event-6 { background-color: #ff9800; border-left-color: #f57c00; }
-.calendar-event.event-7 { background-color: #795548; border-left-color: #5d4037; }
-.calendar-event.event-8 { background-color: #607d8b; border-left-color: #455a64; }
+/* 대륙별 색상 변형 */
+.calendar-event[data-continent="asia"] { 
+    background-color: #3B82F6; 
+    border-left-color: #1D4ED8; 
+    color: white; 
+}
+.calendar-event[data-continent="europe"] { 
+    background-color: #F97316; 
+    border-left-color: #EA580C; 
+    color: white; 
+}
+.calendar-event[data-continent="north-america"] { 
+    background-color: #EF4444; 
+    border-left-color: #DC2626; 
+    color: white; 
+}
+.calendar-event[data-continent="south-america"] { 
+    background-color: #10B981; 
+    border-left-color: #059669; 
+    color: white; 
+}
+.calendar-event[data-continent="africa"] { 
+    background-color: #8B5CF6; 
+    border-left-color: #7C3AED; 
+    color: white; 
+}
+.calendar-event[data-continent="oceania"] { 
+    background-color: #EAB308; 
+    border-left-color: #CA8A04; 
+    color: white; 
+}
+.calendar-event[data-continent="unknown"] { 
+    background-color: #6B7280; 
+    border-left-color: #4B5563; 
+    color: white; 
+}
 
 /* 툴팁 스타일 */
 .calendar-tooltip {

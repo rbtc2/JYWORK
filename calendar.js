@@ -3,6 +3,102 @@
  * 월별 캘린더 렌더링, 이벤트 표시, 네비게이션 등을 담당
  */
 
+// 국가별 대륙 매핑
+const countryToContinent = {
+    // 아시아 (Asia)
+    'KR': 'asia', 'JP': 'asia', 'CN': 'asia', 'TW': 'asia', 'HK': 'asia', 'MO': 'asia',
+    'TH': 'asia', 'VN': 'asia', 'MY': 'asia', 'SG': 'asia', 'ID': 'asia', 'PH': 'asia',
+    'MM': 'asia', 'LA': 'asia', 'KH': 'asia', 'BD': 'asia', 'LK': 'asia', 'NP': 'asia',
+    'BT': 'asia', 'MV': 'asia', 'PK': 'asia', 'AF': 'asia', 'IR': 'asia', 'IQ': 'asia',
+    'SA': 'asia', 'AE': 'asia', 'OM': 'asia', 'YE': 'asia', 'JO': 'asia', 'LB': 'asia',
+    'SY': 'asia', 'IL': 'asia', 'PS': 'asia', 'TR': 'asia', 'GE': 'asia', 'AM': 'asia',
+    'AZ': 'asia', 'KZ': 'asia', 'UZ': 'asia', 'TM': 'asia', 'KG': 'asia', 'TJ': 'asia',
+    'MN': 'asia', 'KP': 'asia', 'IN': 'asia', 'BN': 'asia', 'KH': 'asia', 'LA': 'asia',
+    'MM': 'asia', 'MY': 'asia', 'PH': 'asia', 'SG': 'asia', 'TH': 'asia', 'VN': 'asia',
+    'BD': 'asia', 'BT': 'asia', 'IN': 'asia', 'LK': 'asia', 'MV': 'asia', 'NP': 'asia',
+    'PK': 'asia', 'AF': 'asia', 'IR': 'asia', 'IQ': 'asia', 'JO': 'asia', 'KW': 'asia',
+    'LB': 'asia', 'OM': 'asia', 'QA': 'asia', 'SA': 'asia', 'SY': 'asia', 'AE': 'asia',
+    'YE': 'asia', 'AM': 'asia', 'AZ': 'asia', 'BH': 'asia', 'CY': 'asia', 'GE': 'asia',
+    'IL': 'asia', 'JO': 'asia', 'KW': 'asia', 'LB': 'asia', 'OM': 'asia', 'PS': 'asia',
+    'QA': 'asia', 'SA': 'asia', 'SY': 'asia', 'TR': 'asia', 'AE': 'asia', 'YE': 'asia',
+    
+    // 유럽 (Europe)
+    'GB': 'europe', 'DE': 'europe', 'FR': 'europe', 'IT': 'europe', 'ES': 'europe',
+    'NL': 'europe', 'SE': 'europe', 'NO': 'europe', 'DK': 'europe', 'FI': 'europe',
+    'CH': 'europe', 'AT': 'europe', 'BE': 'europe', 'IE': 'europe', 'PT': 'europe',
+    'GR': 'europe', 'PL': 'europe', 'CZ': 'europe', 'HU': 'europe', 'RO': 'europe',
+    'BG': 'europe', 'HR': 'europe', 'SI': 'europe', 'SK': 'europe', 'LT': 'europe',
+    'LV': 'europe', 'EE': 'europe', 'MT': 'europe', 'CY': 'europe', 'LU': 'europe',
+    'IS': 'europe', 'LI': 'europe', 'MC': 'europe', 'SM': 'europe', 'VA': 'europe',
+    'AD': 'europe', 'AL': 'europe', 'BA': 'europe', 'ME': 'europe', 'MK': 'europe',
+    'RS': 'europe', 'XK': 'europe', 'BY': 'europe', 'MD': 'europe', 'UA': 'europe',
+    'RU': 'europe', 'KZ': 'europe', 'UZ': 'europe', 'TM': 'europe', 'KG': 'europe',
+    'TJ': 'europe', 'AZ': 'europe', 'GE': 'europe', 'AM': 'europe',
+    
+    // 북아메리카 (North America)
+    'US': 'north-america', 'CA': 'north-america', 'MX': 'north-america',
+    'GT': 'north-america', 'BZ': 'north-america', 'SV': 'north-america',
+    'HN': 'north-america', 'NI': 'north-america', 'CR': 'north-america',
+    'PA': 'north-america', 'CU': 'north-america', 'JM': 'north-america',
+    'HT': 'north-america', 'DO': 'north-america', 'PR': 'north-america',
+    'TT': 'north-america', 'BB': 'north-america', 'GD': 'north-america',
+    'LC': 'north-america', 'VC': 'north-america', 'AG': 'north-america',
+    'KN': 'north-america', 'DM': 'north-america', 'BS': 'north-america',
+    'TC': 'north-america', 'AI': 'north-america', 'VG': 'north-america',
+    'VI': 'north-america', 'AW': 'north-america', 'CW': 'north-america',
+    'SX': 'north-america', 'BL': 'north-america', 'MF': 'north-america',
+    'GP': 'north-america', 'MQ': 'north-america', 'RE': 'north-america',
+    'YT': 'north-america', 'PM': 'north-america', 'ST': 'north-america',
+    
+    // 남아메리카 (South America)
+    'BR': 'south-america', 'AR': 'south-america', 'CL': 'south-america',
+    'CO': 'south-america', 'PE': 'south-america', 'VE': 'south-america',
+    'EC': 'south-america', 'BO': 'south-america', 'PY': 'south-america',
+    'UY': 'south-america', 'GY': 'south-america', 'SR': 'south-america',
+    'GF': 'south-america', 'FK': 'south-america', 'PE': 'south-america',
+    'CO': 'south-america', 'VE': 'south-america', 'EC': 'south-america',
+    'BO': 'south-america', 'PY': 'south-america', 'UY': 'south-america',
+    'GY': 'south-america', 'SR': 'south-america', 'GF': 'south-america',
+    'FK': 'south-america',
+    
+    // 아프리카 (Africa)
+    'ZA': 'africa', 'EG': 'africa', 'NG': 'africa', 'KE': 'africa', 'GH': 'africa',
+    'UG': 'africa', 'TZ': 'africa', 'ET': 'africa', 'SD': 'africa', 'DZ': 'africa',
+    'MA': 'africa', 'TN': 'africa', 'LY': 'africa', 'TD': 'africa', 'NE': 'africa',
+    'ML': 'africa', 'BF': 'africa', 'CI': 'africa', 'SN': 'africa', 'GN': 'africa',
+    'SL': 'africa', 'LR': 'africa', 'TG': 'africa', 'BJ': 'africa', 'GW': 'africa',
+    'CV': 'africa', 'GM': 'africa', 'MR': 'africa', 'AO': 'africa', 'MZ': 'africa',
+    'ZW': 'africa', 'BW': 'africa', 'NA': 'africa', 'SZ': 'africa', 'LS': 'africa',
+    'MW': 'africa', 'ZM': 'africa', 'MG': 'africa', 'MU': 'africa', 'SC': 'africa',
+    'KM': 'africa', 'DJ': 'africa', 'SO': 'africa', 'ER': 'africa', 'CF': 'africa',
+    'CM': 'africa', 'GQ': 'africa', 'GA': 'africa', 'CG': 'africa', 'CD': 'africa',
+    'RW': 'africa', 'BI': 'africa', 'SS': 'africa', 'CF': 'africa', 'TD': 'africa',
+    'NE': 'africa', 'ML': 'africa', 'BF': 'africa', 'CI': 'africa', 'SN': 'africa',
+    'GN': 'africa', 'SL': 'africa', 'LR': 'africa', 'TG': 'africa', 'BJ': 'africa',
+    'GW': 'africa', 'CV': 'africa', 'GM': 'africa', 'MR': 'africa',
+    
+    // 오세아니아 (Oceania)
+    'AU': 'oceania', 'NZ': 'oceania', 'FJ': 'oceania', 'PG': 'oceania',
+    'SB': 'oceania', 'VU': 'oceania', 'NC': 'oceania', 'PF': 'oceania',
+    'TO': 'oceania', 'WS': 'oceania', 'KI': 'oceania', 'TV': 'oceania',
+    'NR': 'oceania', 'PW': 'oceania', 'MH': 'oceania', 'FM': 'oceania',
+    'CK': 'oceania', 'NU': 'oceania', 'TK': 'oceania', 'WF': 'oceania',
+    'AS': 'oceania', 'GU': 'oceania', 'MP': 'oceania', 'PR': 'oceania',
+    'VI': 'oceania', 'BL': 'oceania', 'MF': 'oceania', 'GP': 'oceania',
+    'MQ': 'oceania', 'RE': 'oceania', 'YT': 'oceania', 'PM': 'oceania',
+    'ST': 'oceania'
+};
+
+// 대륙별 색상 매핑
+const continentColors = {
+    'asia': { bg: '#3B82F6', border: '#1D4ED8', text: 'white' },        // Blue
+    'europe': { bg: '#F97316', border: '#EA580C', text: 'white' },       // Orange
+    'north-america': { bg: '#EF4444', border: '#DC2626', text: 'white' }, // Red
+    'south-america': { bg: '#10B981', border: '#059669', text: 'white' }, // Green
+    'africa': { bg: '#8B5CF6', border: '#7C3AED', text: 'white' },       // Purple
+    'oceania': { bg: '#EAB308', border: '#CA8A04', text: 'white' }        // Yellow
+};
+
 // 국가 코드를 국기 이모지로 변환하는 함수
 function getCountryFlag(countryCode) {
     if (!countryCode) return null;
@@ -46,6 +142,17 @@ function getCountryFlag(countryCode) {
     return flagMap[code] || null;
 }
 
+// 국가 코드로 대륙을 가져오는 함수
+function getContinentFromCountryCode(countryCode) {
+    if (!countryCode) return 'unknown';
+    return countryToContinent[countryCode.toUpperCase()] || 'unknown';
+}
+
+// 대륙별 색상을 가져오는 함수
+function getContinentColor(continent) {
+    return continentColors[continent] || { bg: '#6B7280', border: '#4B5563', text: 'white' };
+}
+
 // 텍스트를 축약하는 함수
 function truncateText(text, maxLength = 6) {
     if (!text) return '';
@@ -61,7 +168,12 @@ function getEventDisplayText(entry) {
         return flag;
     }
     
-    // 국기 이모지가 없는 경우 텍스트 축약
+    // 국기 이모지가 없는 경우 2글자 국가 코드 사용
+    if (entry.countryCode) {
+        return entry.countryCode.toUpperCase();
+    }
+    
+    // 국가 코드도 없는 경우 텍스트 축약
     return truncateText(entry.country, 6);
 }
 
@@ -128,24 +240,26 @@ function renderCalendar() {
                 // 툴팁 내용을 안전하게 생성
                 const tooltipText = `${event.country} / ${event.city}\\n${purposeText}\\n📅 ${event.startDate} ~ ${event.endDate}${event.memo ? '\\n📝 ' + event.memo : ''}`;
                 
-                // 이벤트 색상 클래스 결정 (순환)
-                const colorClass = `event-${(index % 8) + 1}`;
+                // 대륙별 색상 결정
+                const continent = getContinentFromCountryCode(event.countryCode);
+                const continentColor = getContinentColor(continent);
                 
                 // 일정 표시 텍스트 생성
                 const displayText = getEventDisplayText(event);
                 
                 dayContent += `
-                    <div class="calendar-event ${colorClass} text-xs overflow-hidden whitespace-nowrap"
+                    <div class="calendar-event text-xs overflow-hidden whitespace-nowrap"
                          data-event-index="${index}"
                          data-tooltip="${tooltipText.replace(/"/g, '&quot;')}"
                          data-entry-id="${event.id}"
+                         data-continent="${continent}"
                          onmouseenter="createTooltip(event, this.dataset.tooltip)"
                          onmouseleave="removeTooltip()"
                          ontouchstart="handleTouchEvent(event, this.dataset.tooltip)"
                          ontouchend="handleTouchEnd(event)"
                          onclick="showEntryDetail('${event.id}')"
                          title="${event.country}"
-                         style="cursor: pointer; max-height: 1.2em; line-height: 1.2em; max-width: 100%;">
+                         style="cursor: pointer; max-height: 1.2em; line-height: 1.2em; max-width: 100%; background-color: ${continentColor.bg}; border-left-color: ${continentColor.border}; color: ${continentColor.text};">
                         <span class="truncate block w-full">${displayText}</span>
                     </div>
                 `;
