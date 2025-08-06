@@ -162,6 +162,19 @@
                         <!-- 여기에 동적으로 타임라인 카드들이 추가됩니다 -->
                     </div>
                     
+                    <!-- 타임라인 페이지네이션 -->
+                    <div id="timeline-pagination" class="flex justify-center items-center gap-2 mt-6 sm:mt-8 hidden">
+                        <button id="timeline-prev" class="px-3 sm:px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm min-h-[40px] disabled:opacity-50 disabled:cursor-not-allowed">
+                            이전
+                        </button>
+                        <div id="timeline-page-numbers" class="flex gap-1">
+                            <!-- 페이지 번호들이 동적으로 생성됩니다 -->
+                        </div>
+                        <button id="timeline-next" class="px-3 sm:px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm min-h-[40px] disabled:opacity-50 disabled:cursor-not-allowed">
+                            다음
+                        </button>
+                    </div>
+                    
                     <!-- 빈 상태 메시지 -->
                     <div id="collection-timeline-empty" class="text-center py-8 sm:py-12">
                         <div class="text-3xl sm:text-4xl mb-4">📝</div>
@@ -189,6 +202,19 @@
                     <!-- 별점별 일정 목록 -->
                     <div id="rating-timeline-list" class="space-y-3 sm:space-y-4">
                         <!-- 여기에 동적으로 별점별 일정 카드들이 추가됩니다 -->
+                    </div>
+                    
+                    <!-- 별점별 페이지네이션 -->
+                    <div id="rating-pagination" class="flex justify-center items-center gap-2 mt-6 sm:mt-8 hidden">
+                        <button id="rating-prev" class="px-3 sm:px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm min-h-[40px] disabled:opacity-50 disabled:cursor-not-allowed">
+                            이전
+                        </button>
+                        <div id="rating-page-numbers" class="flex gap-1">
+                            <!-- 페이지 번호들이 동적으로 생성됩니다 -->
+                        </div>
+                        <button id="rating-next" class="px-3 sm:px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm min-h-[40px] disabled:opacity-50 disabled:cursor-not-allowed">
+                            다음
+                        </button>
                     </div>
                     
                     <!-- 빈 상태 메시지 -->

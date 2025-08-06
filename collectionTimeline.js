@@ -3,6 +3,11 @@
  * 여행 일정의 CRUD 작업과 콜렉션 타임라인 렌더링을 담당
  */
 
+// 페이지네이션 상태 관리
+let timelineCurrentPage = 1;
+let ratingCurrentPage = 1;
+const ITEMS_PER_PAGE = 10;
+
 // 국가별 국기 이모지 매핑
 const countryFlags = {
     'KR': '🇰🇷',
@@ -12,6 +17,125 @@ const countryFlags = {
     'FR': '🇫🇷',
     'DE': '🇩🇪'
 };
+
+// 페이지네이션 유틸리티 함수들
+function getPaginatedItems(items, currentPage, itemsPerPage) {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return items.slice(startIndex, endIndex);
+}
+
+function getTotalPages(totalItems, itemsPerPage) {
+    return Math.ceil(totalItems / itemsPerPage);
+}
+
+function renderPagination(currentPage, totalPages, paginationId, prevId, nextId, pageNumbersId) {
+    const paginationContainer = document.getElementById(paginationId);
+    const prevButton = document.getElementById(prevId);
+    const nextButton = document.getElementById(nextId);
+    const pageNumbersContainer = document.getElementById(pageNumbersId);
+    
+    if (totalPages <= 1) {
+        paginationContainer.classList.add('hidden');
+        return;
+    }
+    
+    paginationContainer.classList.remove('hidden');
+    
+    // 이전/다음 버튼 상태 업데이트
+    prevButton.disabled = currentPage === 1;
+    nextButton.disabled = currentPage === totalPages;
+    
+    // 페이지 번호 생성
+    let pageNumbersHTML = '';
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const isActive = i === currentPage;
+        pageNumbersHTML += `
+            <button class="page-number px-3 sm:px-4 py-2 text-sm min-h-[40px] rounded-lg transition-colors ${
+                isActive 
+                    ? 'bg-blue-500 text-white font-bold' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }" data-page="${i}">
+                ${i}
+            </button>
+        `;
+    }
+    
+    pageNumbersContainer.innerHTML = pageNumbersHTML;
+    
+    // 페이지 번호 클릭 이벤트 추가
+    pageNumbersContainer.querySelectorAll('.page-number').forEach(button => {
+        button.addEventListener('click', function() {
+            const page = parseInt(this.getAttribute('data-page'));
+            if (paginationId === 'timeline-pagination') {
+                timelineCurrentPage = page;
+                renderCollectionTimeline();
+            } else if (paginationId === 'rating-pagination') {
+                ratingCurrentPage = page;
+                renderRatingTimeline();
+            }
+            // 페이지 변경 시 상단으로 스크롤
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
+}
+
+function initializePaginationButtons() {
+    // 타임라인 페이지네이션 버튼
+    const timelinePrev = document.getElementById('timeline-prev');
+    const timelineNext = document.getElementById('timeline-next');
+    
+    if (timelinePrev && timelineNext) {
+        timelinePrev.addEventListener('click', function() {
+            if (timelineCurrentPage > 1) {
+                timelineCurrentPage--;
+                renderCollectionTimeline();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+        
+        timelineNext.addEventListener('click', function() {
+            const totalPages = getTotalPages(entries.length, ITEMS_PER_PAGE);
+            if (timelineCurrentPage < totalPages) {
+                timelineCurrentPage++;
+                renderCollectionTimeline();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    }
+    
+    // 별점별 페이지네이션 버튼
+    const ratingPrev = document.getElementById('rating-prev');
+    const ratingNext = document.getElementById('rating-next');
+    
+    if (ratingPrev && ratingNext) {
+        ratingPrev.addEventListener('click', function() {
+            if (ratingCurrentPage > 1) {
+                ratingCurrentPage--;
+                renderRatingTimeline();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+        
+        ratingNext.addEventListener('click', function() {
+            const ratedEntries = entries.filter(entry => entry.rating && entry.rating > 0);
+            const totalPages = getTotalPages(ratedEntries.length, ITEMS_PER_PAGE);
+            if (ratingCurrentPage < totalPages) {
+                ratingCurrentPage++;
+                renderRatingTimeline();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    }
+}
 
 // 별점 표시 헬퍼 함수
 function displayRatingInCard(rating) {
@@ -35,6 +159,8 @@ function renderCollectionTimeline() {
     if (entries.length === 0) {
         collectionTimelineList.style.display = 'none';
         collectionTimelineEmpty.style.display = 'block';
+        // 페이지네이션 숨기기
+        document.getElementById('timeline-pagination').classList.add('hidden');
         return;
     }
 
@@ -43,8 +169,18 @@ function renderCollectionTimeline() {
 
     // 날짜순으로 정렬 (최신순)
     const sortedEntries = [...entries].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+    
+    // 페이지네이션 적용
+    const totalPages = getTotalPages(sortedEntries.length, ITEMS_PER_PAGE);
+    
+    // 현재 페이지가 총 페이지 수를 초과하면 마지막 페이지로 조정
+    if (timelineCurrentPage > totalPages && totalPages > 0) {
+        timelineCurrentPage = totalPages;
+    }
+    
+    const paginatedEntries = getPaginatedItems(sortedEntries, timelineCurrentPage, ITEMS_PER_PAGE);
 
-    collectionTimelineList.innerHTML = sortedEntries.map(entry => {
+    collectionTimelineList.innerHTML = paginatedEntries.map(entry => {
         const days = calculateDays(entry.startDate, entry.endDate);
         const purposeText = getPurposeText(entry.purpose);
         const flag = countryFlags[entry.countryCode] || '🏳️';
@@ -72,6 +208,9 @@ function renderCollectionTimeline() {
             </div>
         `;
     }).join('');
+    
+    // 페이지네이션 렌더링
+    renderPagination(timelineCurrentPage, totalPages, 'timeline-pagination', 'timeline-prev', 'timeline-next', 'timeline-page-numbers');
 }
 
 // 수정 함수
@@ -459,6 +598,8 @@ function renderRatingTimeline(sortType = 'date') {
     if (ratedEntries.length === 0) {
         ratingTimelineList.style.display = 'none';
         ratingTimelineEmpty.style.display = 'block';
+        // 페이지네이션 숨기기
+        document.getElementById('rating-pagination').classList.add('hidden');
         return;
     }
 
@@ -479,8 +620,18 @@ function renderRatingTimeline(sortType = 'date') {
             sortedEntries = [...ratedEntries].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
             break;
     }
+    
+    // 페이지네이션 적용
+    const totalPages = getTotalPages(sortedEntries.length, ITEMS_PER_PAGE);
+    
+    // 현재 페이지가 총 페이지 수를 초과하면 마지막 페이지로 조정
+    if (ratingCurrentPage > totalPages && totalPages > 0) {
+        ratingCurrentPage = totalPages;
+    }
+    
+    const paginatedEntries = getPaginatedItems(sortedEntries, ratingCurrentPage, ITEMS_PER_PAGE);
 
-    ratingTimelineList.innerHTML = sortedEntries.map(entry => {
+    ratingTimelineList.innerHTML = paginatedEntries.map(entry => {
         const days = calculateDays(entry.startDate, entry.endDate);
         const purposeText = getPurposeText(entry.purpose);
         const flag = countryFlags[entry.countryCode] || '🏳️';
@@ -508,6 +659,9 @@ function renderRatingTimeline(sortType = 'date') {
             </div>
         `;
     }).join('');
+    
+    // 페이지네이션 렌더링
+    renderPagination(ratingCurrentPage, totalPages, 'rating-pagination', 'rating-prev', 'rating-next', 'rating-page-numbers');
 }
 
 // 별점별 정렬 버튼 이벤트 핸들러
@@ -529,10 +683,19 @@ function initializeRatingSortButtons() {
             // 정렬 타입 가져오기
             const sortType = this.getAttribute('data-sort');
             
+            // 페이지네이션 초기화
+            ratingCurrentPage = 1;
+            
             // 별점별 보기 렌더링
             renderRatingTimeline(sortType);
         });
     });
+}
+
+// 페이지네이션 상태 초기화 함수
+function resetPagination() {
+    timelineCurrentPage = 1;
+    ratingCurrentPage = 1;
 }
 
 // 일정 상세 정보 모달 닫기

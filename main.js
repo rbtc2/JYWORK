@@ -196,6 +196,11 @@ function initializeCollectionTabs() {
         timelineSubsection.classList.add('block');
     }
     
+    // 페이지네이션 초기화
+    if (typeof resetPagination === 'function') {
+        resetPagination();
+    }
+    
     // 타임라인 렌더링
     renderCollectionTimeline();
     
@@ -229,11 +234,19 @@ function initializeCollectionTabs() {
             
             // 타임라인 탭 클릭 시 타임라인 렌더링
             if (targetSubsection === 'timeline') {
+                // 페이지네이션 초기화
+                if (typeof resetPagination === 'function') {
+                    resetPagination();
+                }
                 renderCollectionTimeline();
             }
             
             // 별점별 보기 탭 클릭 시 별점별 보기 렌더링
             if (targetSubsection === 'rating') {
+                // 페이지네이션 초기화
+                if (typeof resetPagination === 'function') {
+                    resetPagination();
+                }
                 renderRatingTimeline('date');
                 initializeRatingSortButtons();
             }
@@ -534,6 +547,11 @@ function initializeApp() {
     initializeCalendarEventListeners();
     initializeSettingsEventListeners();
     initializeAutocompleteEventListeners();
+    
+    // 페이지네이션 초기화
+    if (typeof initializePaginationButtons === 'function') {
+        initializePaginationButtons();
+    }
     
     // Countries 모듈 초기화
     if (typeof initializeCountriesModule === 'function') {
