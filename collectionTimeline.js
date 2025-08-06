@@ -13,6 +13,20 @@ const countryFlags = {
     'DE': '🇩🇪'
 };
 
+// 별점 표시 헬퍼 함수
+function displayRatingInCard(rating) {
+    if (!rating || rating === 0) return '';
+    
+    const filledStars = '⭐'.repeat(rating);
+    const emptyStars = '☆'.repeat(5 - rating);
+    
+    return `
+        <div class="flex items-center gap-1 mt-2">
+            <span class="text-xs">${filledStars}${emptyStars}</span>
+        </div>
+    `;
+}
+
 // 콜렉션 타임라인 렌더링
 function renderCollectionTimeline() {
     const collectionTimelineList = document.getElementById('collection-timeline-list');
@@ -34,6 +48,7 @@ function renderCollectionTimeline() {
         const days = calculateDays(entry.startDate, entry.endDate);
         const purposeText = getPurposeText(entry.purpose);
         const flag = countryFlags[entry.countryCode] || '🏳️';
+        const ratingDisplay = displayRatingInCard(entry.rating);
 
         return `
             <div class="collection-timeline-card bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer active:scale-[0.98] sm:active:scale-100" 
@@ -52,6 +67,7 @@ function renderCollectionTimeline() {
                 <div class="text-xs sm:text-sm text-gray-500 mt-3">
                     📅 ${entry.startDate} ~ ${entry.endDate}
                 </div>
+                ${ratingDisplay}
                 ${entry.memo ? `<p class="text-xs sm:text-sm text-gray-600 bg-gray-50 p-2 sm:p-3 rounded break-words mt-3">📝 ${entry.memo}</p>` : ''}
             </div>
         `;
