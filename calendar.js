@@ -255,8 +255,6 @@ function renderCalendar() {
                          data-continent="${continent}"
                          onmouseenter="createTooltip(event, this.dataset.tooltip)"
                          onmouseleave="removeTooltip()"
-                         ontouchstart="handleTouchEvent(event, this.dataset.tooltip)"
-                         ontouchend="handleTouchEnd(event)"
                          onclick="showEntryDetail('${event.id}')"
                          title="${event.country}"
                          style="cursor: pointer; max-height: 1.2em; line-height: 1.2em; max-width: 100%; background-color: ${continentColor.bg}; border-left-color: ${continentColor.border}; color: ${continentColor.text};">
@@ -336,45 +334,8 @@ function removeTooltip() {
     }
 }
 
-// 모바일 터치 이벤트 처리
-let touchTimeout = null;
+// 툴팁 관련 변수
 let activeTooltip = null;
-
-function handleTouchEvent(event, tooltipContent) {
-    event.preventDefault();
-    
-    // 터치 시작 시 타이머 설정
-    touchTimeout = setTimeout(() => {
-        if (activeTooltip) {
-            // 이미 열린 툴팁이 있으면 닫기
-            removeTooltip();
-            activeTooltip = null;
-        } else {
-            // 툴팁 열기
-            createTooltip(event, tooltipContent);
-            activeTooltip = event.target;
-            
-            // 다른 곳 터치 시 툴팁 닫기
-            setTimeout(() => {
-                document.addEventListener('touchstart', function closeTooltip(e) {
-                    if (!event.target.contains(e.target)) {
-                        removeTooltip();
-                        activeTooltip = null;
-                        document.removeEventListener('touchstart', closeTooltip);
-                    }
-                }, { once: true });
-            }, 100);
-        }
-    }, 200); // 200ms 지연으로 클릭과 구분
-}
-
-// 터치 종료 시 타이머 취소
-function handleTouchEnd(event) {
-    if (touchTimeout) {
-        clearTimeout(touchTimeout);
-        touchTimeout = null;
-    }
-}
 
 // 연도/월 드롭다운 초기화
 function initializeCalendarDropdowns() {
