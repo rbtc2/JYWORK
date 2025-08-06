@@ -275,6 +275,11 @@ function initializeModal() {
         document.body.style.overflow = '';
         travelForm.reset();
         
+        // 별점 초기화
+        if (window.resetRating) {
+            window.resetRating();
+        }
+        
         // 수정 모드 리셋
         isEditMode = false;
         editingEntryId = null;
@@ -311,6 +316,13 @@ function initializeModal() {
             return;
         }
         
+        // 별점 검증
+        const rating = document.getElementById('rating').value;
+        if (!rating || rating === '') {
+            alert('별점을 선택해주세요.');
+            return;
+        }
+        
         const formData = {
             country: document.getElementById('country-input').value,
             countryCode: document.getElementById('country-code').value,
@@ -320,6 +332,7 @@ function initializeModal() {
             startDate: document.getElementById('start-date').value,
             endDate: document.getElementById('end-date').value,
             purpose: document.getElementById('purpose').value,
+            rating: document.getElementById('rating').value,
             companions: document.getElementById('companions').value,
             memo: document.getElementById('memo').value
         };
@@ -382,22 +395,118 @@ function initializeDateValidation() {
             }
         }
     });
+}
 
-    // 종료일 변경 시 유효성 검사
-    document.getElementById('end-date').addEventListener('change', function() {
-        const startDate = document.getElementById('start-date').value;
-        const endDate = this.value;
+// 별점 시스템 초기화
+function initializeRatingSystem() {
+    const starIcons = document.querySelectorAll('.star-icon');
+    const ratingInput = document.getElementById('rating');
+    const ratingText = document.getElementById('rating-text');
+    let currentRating = 0;
+    let hoverRating = 0;
+
+    // 별점 초기화 함수
+    function resetRating() {
+        starIcons.forEach((star, index) => {
+            star.classList.remove('text-yellow-400', 'text-gray-300');
+            star.classList.add('text-gray-300');
+            star.style.fill = 'none';
+        });
+        currentRating = 0;
+        ratingInput.value = '';
+        ratingText.textContent = '별점을 선택해주세요';
         
-        if (startDate && endDate) {
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            
-            if (end < start) {
-                alert('체류 종료일은 체류 시작일보다 이전일 수 없습니다.');
-                this.value = startDate; // 종료일을 시작일로 설정
+        // 컨테이너 클래스 제거
+        const ratingContainer = document.getElementById('rating-container');
+        ratingContainer.classList.remove('has-rating');
+    }
+
+    // 별점 업데이트 함수
+    function updateStars(rating) {
+        starIcons.forEach((star, index) => {
+            const starRating = index + 1;
+            if (starRating <= rating) {
+                star.classList.remove('text-gray-300');
+                star.classList.add('text-yellow-400');
+                star.style.fill = 'currentColor';
+            } else {
+                star.classList.remove('text-yellow-400');
+                star.classList.add('text-gray-300');
+                star.style.fill = 'none';
             }
+        });
+        
+        // 컨테이너 클래스 업데이트
+        const ratingContainer = document.getElementById('rating-container');
+        if (rating > 0) {
+            ratingContainer.classList.add('has-rating');
+        } else {
+            ratingContainer.classList.remove('has-rating');
         }
+    }
+
+    // 별점 텍스트 업데이트 함수
+    function updateRatingText(rating) {
+        const ratingTexts = {
+            1: '매우 나쁨',
+            2: '나쁨',
+            3: '보통',
+            4: '좋음',
+            5: '매우 좋음'
+        };
+        ratingText.textContent = rating > 0 ? `${rating}점 - ${ratingTexts[rating]}` : '별점을 선택해주세요';
+    }
+
+    // 각 별에 이벤트 리스너 추가
+    starIcons.forEach((star, index) => {
+        const starRating = index + 1;
+
+        // 클릭 이벤트
+        star.addEventListener('click', function() {
+            currentRating = starRating;
+            ratingInput.value = currentRating;
+            updateStars(currentRating);
+            updateRatingText(currentRating);
+        });
+
+        // 터치 이벤트 (모바일 지원)
+        star.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            currentRating = starRating;
+            ratingInput.value = currentRating;
+            updateStars(currentRating);
+            updateRatingText(currentRating);
+        });
+
+        // 호버 이벤트 (마우스 진입)
+        star.addEventListener('mouseenter', function() {
+            hoverRating = starRating;
+            updateStars(hoverRating);
+        });
+
+        // 호버 이벤트 (마우스 나감)
+        star.addEventListener('mouseleave', function() {
+            hoverRating = 0;
+            updateStars(currentRating);
+        });
     });
+
+    // 별점 컨테이너에 호버 이벤트 추가 (전체 영역)
+    const ratingContainer = document.getElementById('rating-container');
+    ratingContainer.addEventListener('mouseleave', function() {
+        hoverRating = 0;
+        updateStars(currentRating);
+    });
+
+    // 별점 초기화 함수를 전역에서 접근 가능하도록 설정
+    window.resetRating = resetRating;
+    window.getCurrentRating = () => currentRating;
+    window.setRating = (rating) => {
+        currentRating = rating;
+        ratingInput.value = rating;
+        updateStars(rating);
+        updateRatingText(rating);
+    };
 }
 
 // 애플리케이션 초기화
@@ -427,6 +536,7 @@ function initializeApp() {
     initializeCollectionTabs();
     initializeModal();
     initializeDateValidation();
+    initializeRatingSystem();
     initializeCalendarEventListeners();
     initializeSettingsEventListeners();
     initializeAutocompleteEventListeners();

@@ -82,6 +82,11 @@ function modifyEntry(entryId) {
     document.getElementById('companions').value = entry.companions || '';
     document.getElementById('memo').value = entry.memo || '';
 
+    // 별점 설정
+    if (entry.rating && window.setRating) {
+        window.setRating(parseInt(entry.rating));
+    }
+
     // 도시 입력 필드 활성화
     document.getElementById('city-input').disabled = false;
 
@@ -122,7 +127,20 @@ function getPurposeText(purpose) {
         'transit': '비행 경유'
     };
     return textMap[purpose] || purpose;
-} 
+}
+
+// 별점 생성 함수
+function generateStarRating(rating) {
+    let starsHTML = '';
+    for (let i = 1; i <= 5; i++) {
+        if (i <= rating) {
+            starsHTML += '<svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>';
+        } else {
+            starsHTML += '<svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>';
+        }
+    }
+    return starsHTML;
+}
 
 // 일정 상세 정보 모달 표시
 function showEntryDetail(entryId) {
@@ -193,6 +211,13 @@ function showEntryDetail(entryId) {
                                 <span class="mr-2">📝</span>추가 정보
                             </h3>
                             <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">별점 평가:</span>
+                                    <div class="flex items-center">
+                                        ${generateStarRating(entry.rating || 0)}
+                                        <span class="ml-2 text-sm text-gray-600">${entry.rating || 0}점</span>
+                                    </div>
+                                </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600">동행자:</span>
                                     <span class="font-medium">${entry.companions || '없음'}</span>

@@ -551,3 +551,62 @@ body {
         height: 160px;
     }
 } 
+
+/* 별점 시스템 스타일 */
+.star-icon {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.star-icon:hover {
+    transform: scale(1.1);
+}
+
+.star-icon:active {
+    transform: scale(0.95);
+}
+
+/* 모바일에서 별점 터치 영역 확대 */
+@media (max-width: 768px) {
+    .star-icon {
+        width: 2rem !important;
+        height: 2rem !important;
+        min-width: 44px;
+        min-height: 44px;
+    }
+    
+    .rating-stars {
+        gap: 0.25rem !important;
+    }
+}
+
+/* 별점 컨테이너 스타일 */
+#rating-container {
+    min-height: 44px;
+    align-items: center;
+}
+
+#rating-text {
+    transition: color 0.2s ease;
+}
+
+/* 별점 선택 시 텍스트 색상 변경 */
+#rating-container.has-rating #rating-text {
+    color: #1f2937;
+    font-weight: 500;
+}
+
+/* 별점 애니메이션 */
+@keyframes starPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.star-icon.selected {
+    animation: starPulse 0.3s ease;
+} 
