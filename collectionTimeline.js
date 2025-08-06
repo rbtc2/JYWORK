@@ -41,10 +41,12 @@ function renderPagination(currentPage, totalPages, paginationId, prevId, nextId,
     
     if (totalPages <= 1) {
         paginationContainer.classList.add('hidden');
+        paginationContainer.classList.remove('flex');
         return;
     }
     
     paginationContainer.classList.remove('hidden');
+    paginationContainer.classList.add('flex');
     
     // 이전/다음 버튼 상태 업데이트
     prevButton.disabled = currentPage === 1;

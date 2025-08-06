@@ -230,6 +230,7 @@ function initializeSortButtons() {
 function openCountriesModal() {
     const modal = document.getElementById('countries-modal-overlay');
     modal.classList.remove('hidden');
+    modal.classList.add('flex');
     renderCountriesCollection();
 }
 
@@ -237,6 +238,7 @@ function openCountriesModal() {
 function closeCountriesModal() {
     const modal = document.getElementById('countries-modal-overlay');
     modal.classList.add('hidden');
+    modal.classList.remove('flex');
 }
 
 // 모달 이벤트 초기화

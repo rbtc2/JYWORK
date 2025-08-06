@@ -15,6 +15,7 @@ function updateUserInterface() {
     if (currentUser.isLoggedIn) {
         // 로그인된 상태
         userInfo.classList.remove('hidden');
+        userInfo.classList.add('flex');
         loginBtn.classList.add('hidden');
         logoutBtn.classList.remove('hidden');
         loginStatus.textContent = `로그인됨 (${currentUser.username})`;
@@ -23,6 +24,7 @@ function updateUserInterface() {
     } else {
         // 로그인되지 않은 상태
         userInfo.classList.add('hidden');
+        userInfo.classList.remove('flex');
         loginBtn.classList.remove('hidden');
         logoutBtn.classList.add('hidden');
         loginStatus.textContent = '로그인되지 않음';
