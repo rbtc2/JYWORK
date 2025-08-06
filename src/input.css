@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 커스텀 스타일 */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer components {
+  /* 네비게이션 탭 스타일 */
+  .nav-tab {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  .nav-tab.active {
+    @apply bg-blue-500 text-white shadow-sm;
+  }
+  
+  .nav-tab:not(.active) {
+    @apply bg-gray-100 text-gray-600 hover:bg-gray-200;
+  }
+  
+  /* 콘텐츠 섹션 */
+  .content-section {
+    @apply animate-fade-in;
+  }
+  
+  /* 카드 스타일 */
+  .collection-timeline-card {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  .collection-timeline-card:hover {
+    @apply transform scale-[1.02] shadow-lg;
+  }
+  
+  /* 미니맵 컨테이너 */
+  .mini-map-container {
+    @apply border border-gray-200;
+  }
+  
+  /* 커스텀 마커 스타일 */
+  .custom-marker {
+    @apply shadow-lg;
+  }
+  
+  /* 모달 스타일 */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4;
+  }
+  
+  .modal-content {
+    @apply bg-white rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto;
+  }
+  
+  /* 버튼 스타일 */
+  .btn-primary {
+    @apply px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium;
+  }
+  
+  .btn-danger {
+    @apply px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium;
+  }
+  
+  .btn-success {
+    @apply px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium;
+  }
+  
+  /* 폼 스타일 */
+  .form-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+  
+  /* 로딩 스피너 */
+  .loading-spinner {
+    @apply animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500;
+  }
+  
+  /* 툴팁 */
+  .tooltip {
+    @apply absolute z-10 px-2 py-1 text-xs text-white bg-gray-900 rounded shadow-lg opacity-0 transition-opacity duration-200;
+  }
+  
+  .tooltip.show {
+    @apply opacity-100;
+  }
+}
+
+@layer utilities {
+  /* 텍스트 그라데이션 */
+  .text-gradient {
+    @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+  }
+  
+  /* 스크롤바 스타일링 */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f7fafc;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #f7fafc;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+  }
+  
+  /* 반응형 유틸리티 */
+  .container-responsive {
+    @apply max-w-4xl mx-auto px-3 sm:px-4;
+  }
+  
+  /* 애니메이션 유틸리티 */
+  .animate-bounce-gentle {
+    animation: bounceGentle 2s infinite;
+  }
+} 

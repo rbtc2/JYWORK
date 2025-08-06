@@ -1,77 +1,29 @@
 {
-  "name": "travel-tracker",
+  "name": "world-travel-app",
   "version": "1.0.0",
-  "description": "여행 기록 및 관리 웹 애플리케이션",
+  "description": "세계 여행 앱 - 여행 일정 관리 및 세계지도 시각화",
   "main": "index.html",
   "scripts": {
-    "start": "live-server --port=3000 --open=/",
-    "dev": "live-server --port=3000 --open=/ --watch=.",
-    "build": "echo 'Build process for future deployment'",
-    "build:prod": "npm run lint && npm run format && echo 'Production build completed'",
-    "lint": "eslint *.js",
-    "lint:fix": "eslint *.js --fix",
-    "format": "prettier --write \"**/*.{js,html,css,json}\"",
-    "clean": "rm -rf node_modules package-lock.json && npm install",
-    "clean:git": "bash cleanup-git.sh",
-    "test": "echo 'Tests will be added in future versions'",
-    "prepare": "husky install",
-    "postinstall": "echo 'Dependencies installed successfully. Run npm run dev to start development server.'",
-    "validate": "npm run lint && npm run format",
-    "precommit": "npm run validate"
+    "dev": "npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+    "dev:server": "npx live-server --port=3000 --open=/ --watch=.",
+    "build": "npx tailwindcss -i ./src/input.css -o ./dist/output.css --minify",
+    "build:prod": "npm run build && echo 'Production build completed!'",
+    "start": "npm run build && npx live-server --port=3000 --open=/"
   },
   "keywords": [
     "travel",
-    "tracker",
-    "localstorage",
-    "pwa",
+    "world-map",
     "leaflet",
     "tailwindcss",
-    "javascript",
-    "web-app"
+    "javascript"
   ],
-  "author": "Travel Tracker Team",
+  "author": "Your Name",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.3",
-    "husky": "^9.0.11",
-    "lint-staged": "^15.2.2",
-    "live-server": "^1.2.2",
-    "prettier": "^3.2.5"
+    "tailwindcss": "^3.4.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "live-server": "^1.2.2"
   },
-  "dependencies": {
-    "leaflet": "^1.9.4"
-  },
-  "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=8.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/your-username/travel-tracker.git"
-  },
-  "bugs": {
-    "url": "https://github.com/your-username/travel-tracker/issues"
-  },
-  "homepage": "https://github.com/your-username/travel-tracker#readme",
-  "lint-staged": {
-    "*.js": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{html,css,json}": [
-      "prettier --write"
-    ]
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ],
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  }
-} 
+  "dependencies": {}
+}
