@@ -134,9 +134,9 @@ function generateStarRating(rating) {
     let starsHTML = '';
     for (let i = 1; i <= 5; i++) {
         if (i <= rating) {
-            starsHTML += '<svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>';
+            starsHTML += '<svg class="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>';
         } else {
-            starsHTML += '<svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>';
+            starsHTML += '<svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>';
         }
     }
     return starsHTML;
@@ -158,11 +158,11 @@ function showEntryDetail(entryId) {
     // 모달 HTML 생성
     const modalHTML = `
         <div id="entry-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <!-- 헤더 -->
-                <div class="flex justify-between items-center p-6 border-b border-gray-200">
-                    <div class="flex items-center space-x-3">
-                        <span class="text-3xl">${flag}</span>
+                <div class="flex justify-between items-center p-6 border-b border-gray-100">
+                    <div class="flex items-center space-x-4">
+                        <span class="text-4xl">${flag}</span>
                         <div>
                             <h2 class="text-2xl font-bold text-gray-800">${entry.country} / ${entry.city}</h2>
                             <p class="text-lg text-gray-600">${entry.startDate} ~ ${entry.endDate}</p>
@@ -173,85 +173,97 @@ function showEntryDetail(entryId) {
                     </button>
                 </div>
 
-                <!-- 기본 정보 -->
+                <!-- 카드 본문 -->
                 <div class="p-6 space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- 기본 정보 카드 -->
-                        <div class="bg-blue-50 rounded-lg p-4">
-                            <h3 class="text-lg font-semibold text-blue-800 mb-4 flex items-center">
-                                <span class="mr-2">📋</span>기본 정보
-                            </h3>
-                            <div class="space-y-3">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">국가:</span>
-                                    <span class="font-medium">${flag} ${entry.country}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">도시:</span>
-                                    <span class="font-medium">${entry.city}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">체류 기간:</span>
-                                    <span class="font-medium">${entry.startDate} ~ ${entry.endDate}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">체류 목적:</span>
-                                    <span class="font-medium">${purposeText}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">총 체류 일수:</span>
-                                    <span class="font-medium text-blue-600">${days}일</span>
+                    <!-- 체류 정보 섹션 -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">📅</span>
+                                <div>
+                                    <p class="text-sm text-gray-500">체류 기간</p>
+                                    <p class="text-lg font-semibold text-gray-800">${entry.startDate} ~ ${entry.endDate}</p>
                                 </div>
                             </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">총 체류 일수</p>
+                                <p class="text-xl font-bold text-blue-600">${days}일</p>
+                            </div>
                         </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <span class="text-2xl">🎯</span>
+                            <div>
+                                <p class="text-sm text-gray-500">체류 목적</p>
+                                <p class="text-lg font-semibold text-gray-800">${purposeText}</p>
+                            </div>
+                        </div>
+                    </div>
 
-                        <!-- 추가 정보 카드 -->
-                        <div class="bg-green-50 rounded-lg p-4">
-                            <h3 class="text-lg font-semibold text-green-800 mb-4 flex items-center">
-                                <span class="mr-2">📝</span>추가 정보
-                            </h3>
-                            <div class="space-y-3">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">별점 평가:</span>
-                                    <div class="flex items-center">
-                                        ${generateStarRating(entry.rating || 0)}
-                                        <span class="ml-2 text-sm text-gray-600">${entry.rating || 0}점</span>
-                                    </div>
+                    <!-- 별점, 메모, 동행자 정보 -->
+                    <div class="bg-gray-50 rounded-lg p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">⭐</span>
+                                <div>
+                                    <p class="text-sm text-gray-500">별점 평가</p>
+                                    <p class="text-lg font-semibold text-gray-800">${entry.rating || 0}점</p>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">동행자:</span>
-                                    <span class="font-medium">${entry.companions || '없음'}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">메모:</span>
-                                    <span class="font-medium">${entry.memo || '없음'}</span>
-                                </div>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                ${generateStarRating(entry.rating || 0)}
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3">
+                            <span class="text-2xl mt-1">👥</span>
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-500">동행자</p>
+                                <p class="text-lg font-semibold text-gray-800">${entry.companions || '없음'}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3">
+                            <span class="text-2xl mt-1">📝</span>
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-500">메모</p>
+                                <p class="text-lg font-semibold text-gray-800">${entry.memo || '없음'}</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- 위치 지도 -->
                     ${hasMap ? `
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <span class="mr-2">🗺️</span>위치
-                        </h3>
-                        <div id="mini-map-${entry.id}" class="mini-map-container"></div>
+                    <div class="mt-6">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <span class="text-2xl">🗺️</span>
+                            <div>
+                                <p class="text-sm text-gray-500">위치</p>
+                                <p class="text-lg font-semibold text-gray-800">${entry.city}</p>
+                            </div>
+                        </div>
+                        <div id="mini-map-${entry.id}" class="mini-map-container rounded-lg overflow-hidden h-48"></div>
                     </div>
                     ` : `
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <span class="mr-2">🗺️</span>위치
-                        </h3>
-                        <div class="text-gray-500 text-sm text-center py-8">
-                            <p>📍 ${entry.city}의 위치 정보를 확인할 수 없습니다.</p>
+                    <div class="mt-6">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <span class="text-2xl">🗺️</span>
+                            <div>
+                                <p class="text-sm text-gray-500">위치</p>
+                                <p class="text-lg font-semibold text-gray-800">${entry.city}</p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg overflow-hidden h-48 flex items-center justify-center">
+                            <div class="text-center">
+                                <p class="text-gray-500 text-sm">📍 위치 정보를 확인할 수 없습니다</p>
+                            </div>
                         </div>
                     </div>
                     `}
                 </div>
 
                 <!-- 하단 버튼 -->
-                <div class="p-4 sm:p-6 border-t border-gray-200">
+                <div class="p-6 border-t border-gray-100">
                     <div class="flex flex-col sm:flex-row justify-end gap-3">
                         <button onclick="closeEntryDetail()" 
                                 class="w-full sm:w-auto px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm sm:text-base font-medium min-h-[44px] sm:min-h-[40px]">
@@ -305,73 +317,119 @@ function showEntryDetail(entryId) {
 
 // 미니맵 초기화 함수
 function initializeMiniMap(entryId, lat, lng, cityName) {
-    const mapContainer = document.getElementById(`mini-map-${entryId}`);
-    if (!mapContainer) return;
+    try {
+        const mapContainer = document.getElementById(`mini-map-${entryId}`);
+        if (!mapContainer) {
+            console.warn(`MiniMap container not found for entry ${entryId}`);
+            return;
+        }
 
-    // Leaflet 지도 생성 (국가 전체가 보이도록 줌 레벨 조정)
-    const miniMap = L.map(mapContainer, {
-        center: [lat, lng],
-        zoom: 7, // 국가 전체가 보이도록 줌 레벨 조정
-        interactive: false,
-        dragging: false,
-        zoomControl: false,
-        scrollWheelZoom: false,
-        doubleClickZoom: false,
-        boxZoom: false,
-        keyboard: false,
-        tap: false,
-        touchZoom: false,
-        bounceAtZoomLimits: false,
-        zoomSnap: 0, // 줌 스냅 비활성화
-        zoomDelta: 0, // 줌 델타 비활성화
-        wheelPxPerZoomLevel: 0, // 휠 줌 비활성화
-        maxZoom: 7, // 최대 줌 레벨 고정
-        minZoom: 7, // 최소 줌 레벨 고정
-        maxBounds: null, // 경계 제한 해제
-        maxBoundsViscosity: 0 // 경계 점성 비활성화
-    });
+        // Leaflet 라이브러리 확인
+        if (typeof L === 'undefined' || !L.map) {
+            console.error('Leaflet library is not loaded');
+            return;
+        }
 
-    // OpenStreetMap 타일 레이어 추가 (지형이 잘 보이는 스타일)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 7, // 타일 레이어도 최대 줌 제한
-        minZoom: 7, // 타일 레이어도 최소 줌 제한
-        updateWhenZooming: false, // 줌 시 업데이트 비활성화
-        updateWhenIdle: false, // 유휴 시 업데이트 비활성화
-        keepBuffer: 0, // 버퍼 비활성화
-        maxNativeZoom: 7 // 네이티브 최대 줌 제한
-    }).addTo(miniMap);
+        // 좌표 유효성 검증
+        if (typeof lat !== 'number' || typeof lng !== 'number' || 
+            isNaN(lat) || isNaN(lng)) {
+            console.warn(`Invalid coordinates for entry ${entryId}: lat=${lat}, lng=${lng}`);
+            return;
+        }
 
-    // 마커 추가 (툴팁 없이, 국가 전체가 보이도록 크기 조정)
-    const marker = L.marker([lat, lng], {
-        icon: L.divIcon({
-            className: 'custom-marker',
-            html: '<div style="background-color: #3B82F6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.4);"></div>',
-            iconSize: [16, 16],
-            iconAnchor: [8, 8]
-        })
-    }).addTo(miniMap);
+        // Leaflet 지도 생성 (국가 전체가 보이도록 줌 레벨 조정)
+        const miniMap = L.map(mapContainer, {
+            center: [lat, lng],
+            zoom: 7, // 국가 전체가 보이도록 줌 레벨 조정
+            interactive: false,
+            dragging: false,
+            zoomControl: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            boxZoom: false,
+            keyboard: false,
+            tap: false,
+            touchZoom: false,
+            bounceAtZoomLimits: false,
+            zoomSnap: 0, // 줌 스냅 비활성화
+            zoomDelta: 0, // 줌 델타 비활성화
+            wheelPxPerZoomLevel: 0, // 휠 줌 비활성화
+            maxZoom: 7, // 최대 줌 레벨 고정
+            minZoom: 7, // 최소 줌 레벨 고정
+            maxBounds: null, // 경계 제한 해제
+            maxBoundsViscosity: 0 // 경계 점성 비활성화
+        });
 
-    // 지도 크기 조정 및 줌 레벨 강제 고정
-    setTimeout(() => {
-        miniMap.invalidateSize();
-        miniMap.setZoom(7, { animate: false }); // 줌 레벨 강제 고정
-        
-        // 모든 줌 관련 이벤트 비활성화
-        miniMap.off('zoomstart');
-        miniMap.off('zoom');
-        miniMap.off('zoomend');
-        miniMap.off('viewreset');
-        
-        // 지도 완전 고정
-        miniMap.dragging.disable();
-        miniMap.touchZoom.disable();
-        miniMap.doubleClickZoom.disable();
-        miniMap.scrollWheelZoom.disable();
-        miniMap.boxZoom.disable();
-        miniMap.keyboard.disable();
-        miniMap.tap.disable();
-    }, 200);
+        // OpenStreetMap 타일 레이어 추가 (지형이 잘 보이는 스타일)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 7, // 타일 레이어도 최대 줌 제한
+            minZoom: 7, // 타일 레이어도 최소 줌 제한
+            updateWhenZooming: false, // 줌 시 업데이트 비활성화
+            updateWhenIdle: false, // 유휴 시 업데이트 비활성화
+            keepBuffer: 0, // 버퍼 비활성화
+            maxNativeZoom: 7 // 네이티브 최대 줌 제한
+        }).addTo(miniMap);
+
+        // 마커 추가 (툴팁 없이, 국가 전체가 보이도록 크기 조정)
+        const marker = L.marker([lat, lng], {
+            icon: L.divIcon({
+                className: 'custom-marker',
+                html: '<div style="background-color: #3B82F6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.4);"></div>',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            })
+        }).addTo(miniMap);
+
+        // 지도 크기 조정 및 줌 레벨 강제 고정
+        setTimeout(() => {
+            try {
+                // miniMap 객체 유효성 검증
+                if (!miniMap || typeof miniMap.invalidateSize !== 'function') {
+                    console.warn('MiniMap initialization failed: map object is not valid');
+                    return;
+                }
+
+                miniMap.invalidateSize();
+                miniMap.setZoom(7, { animate: false }); // 줌 레벨 강제 고정
+                
+                // 모든 줌 관련 이벤트 비활성화
+                miniMap.off('zoomstart');
+                miniMap.off('zoom');
+                miniMap.off('zoomend');
+                miniMap.off('viewreset');
+                
+                // 지도 완전 고정 - 안전한 메서드 체이닝 사용
+                if (miniMap.dragging && typeof miniMap.dragging.disable === 'function') {
+                    miniMap.dragging.disable();
+                }
+                if (miniMap.touchZoom && typeof miniMap.touchZoom.disable === 'function') {
+                    miniMap.touchZoom.disable();
+                }
+                if (miniMap.doubleClickZoom && typeof miniMap.doubleClickZoom.disable === 'function') {
+                    miniMap.doubleClickZoom.disable();
+                }
+                if (miniMap.scrollWheelZoom && typeof miniMap.scrollWheelZoom.disable === 'function') {
+                    miniMap.scrollWheelZoom.disable();
+                }
+                if (miniMap.boxZoom && typeof miniMap.boxZoom.disable === 'function') {
+                    miniMap.boxZoom.disable();
+                }
+                if (miniMap.keyboard && typeof miniMap.keyboard.disable === 'function') {
+                    miniMap.keyboard.disable();
+                }
+                if (miniMap.tap && typeof miniMap.tap.disable === 'function') {
+                    miniMap.tap.disable();
+                }
+            } catch (error) {
+                console.warn('Error during miniMap initialization:', error);
+                // 에러 발생 시에도 지도는 계속 표시되도록 함
+            }
+        }, 200);
+    } catch (error) {
+        console.error('Error initializing miniMap:', error);
+        // 에러 발생 시에도 사용자 경험에 영향을 주지 않도록 함
+    }
 }
 
 // 일정 상세 정보 모달 닫기
