@@ -206,7 +206,7 @@ function renderCollectionTimeline() {
                  onclick="showEntryDetail('${entry.id}')">
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                     <div class="flex-1">
-                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 break-words">${flag} ${entry.country} / ${entry.city}</h3>
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 break-words">${flag} ${entry.country} > ${entry.city}</h3>
                         <p class="text-xs sm:text-sm text-gray-600 mt-1">${purposeText}</p>
                     </div>
                     <div class="flex items-center justify-end sm:justify-start">
@@ -330,15 +330,28 @@ function showEntryDetail(entryId) {
         <div id="entry-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <!-- 헤더 -->
-                <div class="flex justify-between items-center p-6 border-b border-gray-100">
-                    <div class="flex items-center space-x-4">
-                        <span class="text-4xl">${flag}</span>
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-800">${entry.country} / ${entry.city}</h2>
-                            <p class="text-lg text-gray-600">${entry.startDate} ~ ${entry.endDate}</p>
+                <div class="flex justify-between items-start sm:items-center p-4 sm:p-6 border-b border-gray-100">
+                    <div class="flex items-start sm:items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
+                        <span class="text-3xl sm:text-4xl flex-shrink-0" aria-label="${entry.country} 국기">${flag}</span>
+                        <div class="flex-1 min-w-0">
+                            <!-- 모바일: 상하 구조 -->
+                            <div class="block sm:hidden">
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <span class="text-xs text-gray-500 font-medium">${entry.countryCode}</span>
+                                    <h2 class="text-sm text-gray-600 truncate">${entry.country}</h2>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800 truncate">${entry.city}</h3>
+                            </div>
+                            <!-- 데스크탑: 한 줄 구조 -->
+                            <div class="hidden sm:block">
+                                <h2 class="text-xl sm:text-2xl font-bold text-gray-800 truncate">${entry.country} > ${entry.city}</h2>
+                            </div>
+                            <p class="text-sm sm:text-lg text-gray-600 mt-1 truncate">${entry.startDate} ~ ${entry.endDate}</p>
                         </div>
                     </div>
-                    <button onclick="closeEntryDetail()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">
+                    <button onclick="closeEntryDetail()" 
+                            class="text-gray-400 hover:text-gray-600 text-xl sm:text-2xl font-bold flex-shrink-0 ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                            aria-label="모달 닫기">
                         ×
                     </button>
                 </div>
@@ -664,7 +677,7 @@ function renderRatingTimeline() {
                  onclick="showEntryDetail('${entry.id}')">
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                     <div class="flex-1">
-                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 break-words">${flag} ${entry.country} / ${entry.city}</h3>
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 break-words">${flag} ${entry.country} > ${entry.city}</h3>
                         <p class="text-xs sm:text-sm text-gray-600 mt-1">${purposeText}</p>
                     </div>
                     <div class="flex items-center justify-end sm:justify-start">
