@@ -538,8 +538,83 @@ function initializeRatingSystem() {
     };
 }
 
+// 모바일 더블탭 줌 방지 초기화
+function initializeMobileZoomPrevention() {
+    // 모바일 디바이스 감지
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (!isMobile) return; // 모바일이 아닌 경우 실행하지 않음
+    
+    let lastTouchEnd = 0;
+    let touchStartTime = 0;
+    let touchStartY = 0;
+    
+    // 더블탭 방지
+    document.addEventListener('touchend', function(event) {
+        const now = (new Date()).getTime();
+        const timeDiff = now - lastTouchEnd;
+        
+        if (timeDiff <= 300 && timeDiff > 0) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        }
+        lastTouchEnd = now;
+    }, { passive: false });
+    
+    // iOS Safari에서의 제스처 이벤트 처리
+    document.addEventListener('gesturestart', function(event) {
+        event.preventDefault();
+    }, { passive: false });
+    
+    document.addEventListener('gesturechange', function(event) {
+        event.preventDefault();
+    }, { passive: false });
+    
+    document.addEventListener('gestureend', function(event) {
+        event.preventDefault();
+    }, { passive: false });
+    
+    // 터치 시작 시 시간 기록
+    document.addEventListener('touchstart', function(event) {
+        touchStartTime = Date.now();
+        touchStartY = event.touches[0].clientY;
+    }, { passive: true });
+    
+    // 스크롤 영역에서의 터치 동작 보존
+    const scrollableElements = document.querySelectorAll('.overflow-y-auto, #country-dropdown, .leaflet-container');
+    scrollableElements.forEach(element => {
+        element.addEventListener('touchstart', function(event) {
+            // 스크롤 영역에서는 더블탭 방지를 적용하지 않음
+            event.stopPropagation();
+        }, { passive: true });
+        
+        element.addEventListener('touchend', function(event) {
+            // 스크롤 영역에서는 더블탭 방지를 적용하지 않음
+            event.stopPropagation();
+        }, { passive: true });
+    });
+    
+    // 지도 영역에서의 터치 동작 보존
+    const mapElements = document.querySelectorAll('#map-container, #map-render, .leaflet-container');
+    mapElements.forEach(element => {
+        element.addEventListener('touchstart', function(event) {
+            // 지도 영역에서는 모든 터치 동작 허용
+            event.stopPropagation();
+        }, { passive: true });
+        
+        element.addEventListener('touchend', function(event) {
+            // 지도 영역에서는 모든 터치 동작 허용
+            event.stopPropagation();
+        }, { passive: true });
+    });
+}
+
 // 애플리케이션 초기화
 function initializeApp() {
+    // 모바일 더블탭 줌 방지 초기화
+    initializeMobileZoomPrevention();
+    
     // 데이터 로드
     loadUserData();
     loadResidenceData();
@@ -594,4 +669,11 @@ function initializeApp() {
 }
 
 // 페이지 로드 시 초기화
-document.addEventListener('DOMContentLoaded', initializeApp); 
+document.addEventListener('DOMContentLoaded', initializeApp);
+
+// 개발 모드에서 모바일 줌 방지 상태 확인 (콘솔에서 확인 가능)
+if (typeof console !== 'undefined' && console.log) {
+    console.log('🚀 모바일 더블탭 줌 방지 기능이 활성화되었습니다.');
+    console.log('📱 모바일 디바이스 감지:', /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+    console.log('🎯 터치 액션 설정:', getComputedStyle(document.body).touchAction);
+} 

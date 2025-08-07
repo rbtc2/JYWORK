@@ -1,5 +1,80 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* 모바일 더블탭 줌 방지 */
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* 모바일에서 더블탭 줌 방지를 위한 추가 설정 */
+@media (max-width: 768px) {
+    body {
+        touch-action: manipulation;
+    }
+    
+    /* 지도 영역은 터치 동작 허용 (줌/드래그) */
+    #map-container,
+    #map-render,
+    .leaflet-container {
+        touch-action: pan-x pan-y pinch-zoom;
+        -webkit-touch-callout: default;
+        -webkit-user-select: auto;
+        user-select: auto;
+    }
+    
+    /* 버튼과 인터랙티브 요소들 */
+    button,
+    .nav-tab,
+    .calendar-event,
+    .country-badge,
+    .sort-btn,
+    .collection-tab {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* 드롭다운 스크롤 영역 */
+    #country-dropdown,
+    .overflow-y-auto {
+        touch-action: pan-y;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* 모달 및 팝업 영역 */
+    .modal,
+    .modal-content,
+    #countries-modal-overlay {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* 입력 필드에서 텍스트 선택 허용 */
+    input[type="text"],
+    input[type="date"],
+    textarea,
+    select {
+        touch-action: manipulation;
+        -webkit-user-select: text;
+        user-select: text;
+        -webkit-touch-callout: default;
+    }
+    
+    /* 캘린더 테이블 셀 */
+    #calendar-table td {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* 별점 영역 */
+    .star-icon,
+    #rating-container {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
 }
 
 .nav-tab {
