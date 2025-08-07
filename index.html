@@ -631,7 +631,22 @@
                 <!-- 메모 -->
                 <div>
                     <label for="memo" class="block text-sm font-medium text-gray-700 mb-2">메모</label>
-                    <textarea id="memo" name="memo" rows="3" placeholder="추가 메모를 입력하세요 (선택사항)" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm"></textarea>
+                    <div class="relative">
+                        <textarea 
+                            id="memo" 
+                            name="memo" 
+                            rows="3" 
+                            maxlength="300"
+                            placeholder="추가 메모를 입력하세요 (선택사항)" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm pr-16"
+                        ></textarea>
+                        <div class="absolute bottom-2 right-2 text-xs text-gray-400">
+                            <span id="memo-char-count">0</span>/300
+                        </div>
+                    </div>
+                    <div id="memo-warning" class="hidden mt-1 text-xs text-red-500">
+                        글자 수 제한에 도달했습니다.
+                    </div>
                 </div>
 
                 <!-- 제출 버튼 -->

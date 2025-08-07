@@ -108,6 +108,40 @@ function getCityNameByCode(countryCode, cityName) {
     return cityName;
 }
 
+// 메모 텍스트를 안전하게 처리하는 함수
+function sanitizeMemo(memo) {
+    if (!memo || typeof memo !== 'string') return '';
+    return memo.replace(/[<>]/g, ''); // XSS 방지를 위한 기본적인 이스케이프
+}
+
+// 동행자 텍스트를 안전하게 처리하는 함수
+function sanitizeCompanions(companions) {
+    if (!companions || typeof companions !== 'string') return '';
+    return companions.replace(/[<>]/g, ''); // XSS 방지를 위한 기본적인 이스케이프
+}
+
+// 메모 텍스트를 카드뷰용으로 축약하는 함수
+function truncateMemoForCard(memo, maxLength = 50) {
+    if (!memo || typeof memo !== 'string') return '';
+    const sanitizedMemo = sanitizeMemo(memo);
+    if (sanitizedMemo.length <= maxLength) return sanitizedMemo;
+    return sanitizedMemo.substring(0, maxLength) + '...';
+}
+
+// 메모 텍스트를 상세 모달용으로 축약하는 함수
+function truncateMemoForDetail(memo, maxLength = 100) {
+    if (!memo || typeof memo !== 'string') return '';
+    const sanitizedMemo = sanitizeMemo(memo);
+    if (sanitizedMemo.length <= maxLength) return sanitizedMemo;
+    return sanitizedMemo.substring(0, maxLength) + '...';
+}
+
+// 메모가 축약되었는지 확인하는 함수
+function isMemoTruncated(memo, maxLength = 100) {
+    if (!memo || typeof memo !== 'string') return false;
+    return memo.length > maxLength;
+}
+
 // 페이지네이션 유틸리티 함수들
 function getPaginatedItems(items, currentPage, itemsPerPage) {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -309,7 +343,7 @@ function renderCollectionTimeline() {
                     📅 ${entry.startDate} ~ ${entry.endDate}
                 </div>
                 ${ratingDisplay}
-                ${entry.memo ? `<p class="text-xs sm:text-sm text-gray-600 bg-gray-50 p-2 sm:p-3 rounded break-words mt-3">📝 ${sanitizeMemo(entry.memo)}</p>` : ''}
+                ${entry.memo ? `<p class="text-xs sm:text-sm text-gray-600 bg-gray-50 p-2 sm:p-3 rounded mt-3 overflow-hidden"><span class="line-clamp-1">📝 ${truncateMemoForCard(entry.memo)}</span></p>` : ''}
             </div>
         `;
     }).join('');
@@ -507,7 +541,18 @@ function showEntryDetail(entryId) {
                             <span class="text-2xl mt-1">📝</span>
                             <div class="flex-1">
                                 <p class="text-sm text-gray-500">메모</p>
-                                <p class="text-lg font-semibold text-gray-800">${sanitizeMemo(entry.memo) || '없음'}</p>
+                                <div class="text-lg font-semibold text-gray-800">
+                                    ${entry.memo ? `
+                                        <div id="memo-content-${entry.id}" class="memo-content">
+                                            <span id="memo-text-${entry.id}">${isMemoTruncated(entry.memo, 100) ? truncateMemoForDetail(entry.memo) : sanitizeMemo(entry.memo)}</span>
+                                            ${isMemoTruncated(entry.memo, 100) ? `
+                                                <button onclick="toggleMemoDetail('${entry.id}')" class="ml-2 text-blue-600 hover:text-blue-800 text-sm font-medium underline">
+                                                    더보기
+                                                </button>
+                                            ` : ''}
+                                        </div>
+                                    ` : '없음'}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -798,7 +843,7 @@ function renderRatingTimeline() {
                     📅 ${entry.startDate} ~ ${entry.endDate}
                 </div>
                 ${ratingDisplay}
-                ${entry.memo ? `<p class="text-xs sm:text-sm text-gray-600 bg-gray-50 p-2 sm:p-3 rounded break-words mt-3">📝 ${sanitizeMemo(entry.memo)}</p>` : ''}
+                ${entry.memo ? `<p class="text-xs sm:text-sm text-gray-600 bg-gray-50 p-2 sm:p-3 rounded mt-3 overflow-hidden"><span class="line-clamp-1">📝 ${truncateMemoForCard(entry.memo)}</span></p>` : ''}
             </div>
         `;
     }).join('');
@@ -921,6 +966,37 @@ function cleanupEntryDetailModal() {
             globalEventManager.removeEventListener(listenerKey);
         });
         delete modal._cleanupListeners;
+    }
+}
+
+// 메모 더보기/접기 토글 함수
+function toggleMemoDetail(entryId) {
+    const memoText = document.getElementById(`memo-text-${entryId}`);
+    const memoContent = document.getElementById(`memo-content-${entryId}`);
+    const entry = entries.find(e => e.id === entryId);
+    
+    if (!entry || !entry.memo) return;
+    
+    const isExpanded = memoText.textContent === sanitizeMemo(entry.memo);
+    
+    if (isExpanded) {
+        // 접기
+        memoText.textContent = truncateMemoForDetail(entry.memo);
+        memoContent.innerHTML = `
+            <span id="memo-text-${entryId}">${truncateMemoForDetail(entry.memo)}</span>
+            <button onclick="toggleMemoDetail('${entryId}')" class="ml-2 text-blue-600 hover:text-blue-800 text-sm font-medium underline">
+                더보기
+            </button>
+        `;
+    } else {
+        // 더보기
+        memoText.textContent = sanitizeMemo(entry.memo);
+        memoContent.innerHTML = `
+            <span id="memo-text-${entryId}">${sanitizeMemo(entry.memo)}</span>
+            <button onclick="toggleMemoDetail('${entryId}')" class="ml-2 text-blue-600 hover:text-blue-800 text-sm font-medium underline">
+                접기
+            </button>
+        `;
     }
 }
 

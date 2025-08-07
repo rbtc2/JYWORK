@@ -28,6 +28,46 @@ let userResidence = {
 let isEditMode = false;
 let editingEntryId = null;
 
+// 메모 글자 수 카운터 초기화
+function initializeMemoCounter() {
+    const memoTextarea = document.getElementById('memo');
+    const charCount = document.getElementById('memo-char-count');
+    const warning = document.getElementById('memo-warning');
+    
+    if (!memoTextarea || !charCount) return;
+    
+    function updateCounter() {
+        const currentLength = memoTextarea.value.length;
+        const maxLength = parseInt(memoTextarea.getAttribute('maxlength'));
+        
+        charCount.textContent = currentLength;
+        
+        // 경고 메시지 표시/숨김
+        if (currentLength >= maxLength) {
+            warning.classList.remove('hidden');
+            charCount.classList.add('text-red-500');
+        } else {
+            warning.classList.add('hidden');
+            charCount.classList.remove('text-red-500');
+        }
+    }
+    
+    // 초기 카운터 설정
+    updateCounter();
+    
+    // 입력 이벤트 리스너
+    memoTextarea.addEventListener('input', updateCounter);
+    memoTextarea.addEventListener('keydown', function(e) {
+        const currentLength = memoTextarea.value.length;
+        const maxLength = parseInt(memoTextarea.getAttribute('maxlength'));
+        
+        // 글자 수 제한에 도달했을 때 추가 입력 방지
+        if (currentLength >= maxLength && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab' && e.key !== 'Enter') {
+            e.preventDefault();
+        }
+    });
+}
+
 // 날짜 차이 계산 (체류일 수)
 function calculateDays(startDate, endDate) {
     const start = new Date(startDate);
@@ -691,6 +731,7 @@ function initializeApp() {
     initializeCalendarEventListeners();
     initializeSettingsEventListeners();
     initializeAutocompleteEventListeners();
+    initializeMemoCounter();
     
     // 페이지네이션 초기화
     if (typeof initializePaginationButtons === 'function') {
