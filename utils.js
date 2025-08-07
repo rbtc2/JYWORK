@@ -3,6 +3,11 @@
  * 국가/도시 자동완성, 필터링, 드롭다운 렌더링 등을 담당
  */
 
+// 도시 검색 세션 캐시
+const citySearchCache = new Map();
+const API_RATE_LIMIT = 1000; // 1초당 1회 요청
+let lastApiCall = 0;
+
 // 디바운싱 함수
 function debounce(func, wait) {
     let timeout;
@@ -31,19 +36,122 @@ function filterCountries(query) {
     return results.slice(0, 15); // 최대 15개 결과만 반환
 }
 
-// 도시 필터링 함수 (성능 최적화)
+// 도시 필터링 함수 (성능 최적화) - 정적 데이터 우선
 function filterCities(query, countryCode) {
-    if (!countryCode || !cities[countryCode]) return [];
-    if (!query || query.length < 2) return cities[countryCode].slice(0, 10); // 최소 2글자, 최대 10개
+    if (!countryCode) return [];
+    if (!query || query.length < 2) return (cities[countryCode] || []).slice(0, 10); // 최소 2글자, 최대 10개
     
     const lowerQuery = query.toLowerCase();
-    const results = cities[countryCode].filter(city => 
+    const staticCities = cities[countryCode] || [];
+    const results = staticCities.filter(city => 
         city.name.toLowerCase().includes(lowerQuery) ||
         city.enName.toLowerCase().includes(lowerQuery) ||
         city.aliases.some(alias => alias.toLowerCase().includes(lowerQuery))
     );
     
     return results.slice(0, 10); // 최대 10개 결과만 반환
+}
+
+// 실시간 도시 검색 함수 (Nominatim API 사용)
+async function searchCitiesOnline(query, countryCode) {
+    if (!query || query.length < 3) return []; // 최소 3글자
+    if (!countryCode) return [];
+    
+    // 캐시 키 생성
+    const cacheKey = `${countryCode}:${query.toLowerCase()}`;
+    
+    // 캐시된 결과가 있으면 반환
+    if (citySearchCache.has(cacheKey)) {
+        return citySearchCache.get(cacheKey);
+    }
+    
+    // API 호출 제한 확인
+    const now = Date.now();
+    if (now - lastApiCall < API_RATE_LIMIT) {
+        console.log('API 호출 제한 대기 중...');
+        return [];
+    }
+    
+    try {
+        lastApiCall = now;
+        
+        // Nominatim API 호출
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&countrycodes=${countryCode}&format=json&limit=5&featureType=city`;
+        
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'TravelApp/1.0'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API 호출 실패: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // API 응답을 기존 도시 데이터 구조에 맞게 변환
+        const onlineCities = data
+            .filter(item => item.type === 'city' || item.type === 'administrative')
+            .map(item => ({
+                name: item.display_name.split(',')[0], // 첫 번째 부분을 도시명으로 사용
+                enName: item.name,
+                aliases: [item.name, item.display_name.split(',')[0]]
+            }))
+            .slice(0, 5); // 최대 5개 결과
+        
+        // 캐시에 저장
+        citySearchCache.set(cacheKey, onlineCities);
+        
+        return onlineCities;
+        
+    } catch (error) {
+        console.error('온라인 도시 검색 실패:', error);
+        return [];
+    }
+}
+
+// 하이브리드 도시 검색 함수 (정적 데이터 + 온라인 검색)
+async function searchCitiesHybrid(query, countryCode) {
+    if (!countryCode) return [];
+    
+    // 1. 정적 데이터에서 먼저 검색
+    const staticResults = filterCities(query, countryCode);
+    
+    // 2. 정적 결과가 3개 미만이면 온라인 검색 추가
+    if (staticResults.length < 3 && query.length >= 3) {
+        try {
+            const onlineResults = await searchCitiesOnline(query, countryCode);
+            
+            // 중복 제거하여 합치기
+            const combinedResults = [...staticResults];
+            const staticNames = new Set(staticResults.map(city => city.name.toLowerCase()));
+            
+            onlineResults.forEach(onlineCity => {
+                if (!staticNames.has(onlineCity.name.toLowerCase())) {
+                    combinedResults.push(onlineCity);
+                }
+            });
+            
+            return combinedResults.slice(0, 10); // 최대 10개
+        } catch (error) {
+            console.error('하이브리드 검색 실패:', error);
+            return staticResults;
+        }
+    }
+    
+    return staticResults;
+}
+
+// 로딩 인디케이터 표시 함수
+function showCityLoadingIndicator(show = true) {
+    const cityDropdown = document.getElementById('city-dropdown');
+    const loadingHtml = '<li class="px-3 py-2 text-gray-500 text-sm flex items-center"><svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>도시 검색 중...</li>';
+    
+    if (show) {
+        cityDropdown.innerHTML = loadingHtml;
+        cityDropdown.classList.remove('hidden');
+    }
 }
 
 // 국가 드롭다운 렌더링
@@ -67,7 +175,7 @@ function renderCountryDropdown(filteredCountries) {
     countryDropdown.classList.remove('hidden');
 }
 
-// 도시 드롭다운 렌더링
+// 도시 드롭다운 렌더링 (하이브리드 결과 지원)
 function renderCityDropdown(filteredCities) {
     const cityDropdown = document.getElementById('city-dropdown');
     if (filteredCities.length === 0) {
@@ -297,16 +405,23 @@ function initializeAutocompleteEventListeners() {
     const cityInput = document.getElementById('city-input');
     const cityDropdown = document.getElementById('city-dropdown');
     
-    // 디바운싱된 도시 필터링 함수
-    const debouncedCityFilter = debounce(function(query, countryCode) {
-        const filteredCities = filterCities(query, countryCode);
-        renderCityDropdown(filteredCities);
-    }, 300);
+    // 디바운싱된 하이브리드 도시 검색 함수
+    const debouncedCitySearch = debounce(async function(query, countryCode) {
+        if (query.length >= 3) {
+            showCityLoadingIndicator(true);
+            const filteredCities = await searchCitiesHybrid(query, countryCode);
+            showCityLoadingIndicator(false);
+            renderCityDropdown(filteredCities);
+        } else {
+            const filteredCities = filterCities(query, countryCode);
+            renderCityDropdown(filteredCities);
+        }
+    }, 500); // 500ms 디바운싱
 
     cityInput.addEventListener('input', function() {
         const query = this.value;
         const selectedCountryCode = document.getElementById('country-code').value;
-        debouncedCityFilter(query, selectedCountryCode);
+        debouncedCitySearch(query, selectedCountryCode);
     });
     
     cityInput.addEventListener('focus', function() {
@@ -412,16 +527,23 @@ function initializeAutocompleteEventListeners() {
     });
     
     // 거주지 도시 자동완성 이벤트 리스너들
-    // 디바운싱된 거주지 도시 필터링 함수
-    const debouncedResidenceCityFilter = debounce(function(query, countryCode) {
-        const filteredCities = filterCities(query, countryCode);
-        renderResidenceCityDropdown(filteredCities);
-    }, 300);
+    // 디바운싱된 하이브리드 거주지 도시 검색 함수
+    const debouncedResidenceCitySearch = debounce(async function(query, countryCode) {
+        if (query.length >= 3) {
+            showCityLoadingIndicator(true);
+            const filteredCities = await searchCitiesHybrid(query, countryCode);
+            showCityLoadingIndicator(false);
+            renderResidenceCityDropdown(filteredCities);
+        } else {
+            const filteredCities = filterCities(query, countryCode);
+            renderResidenceCityDropdown(filteredCities);
+        }
+    }, 500); // 500ms 디바운싱
 
     residenceCityInput.addEventListener('input', function() {
         const query = this.value;
         const selectedCountryCode = document.getElementById('residence-country-code').value;
-        debouncedResidenceCityFilter(query, selectedCountryCode);
+        debouncedResidenceCitySearch(query, selectedCountryCode);
     });
     
     residenceCityInput.addEventListener('focus', function() {

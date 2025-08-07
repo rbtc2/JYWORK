@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도시 데이터 확장 테스트</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen p-4">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-4">🌍 도시 데이터 확장 테스트</h1>
+            <p class="text-gray-600 mb-4">하이브리드 도시 검색 기능 (정적 데이터 + 실시간 API)을 테스트합니다.</p>
+            
+            <!-- 테스트 통계 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <div class="text-2xl font-bold text-blue-600" id="country-count">-</div>
+                    <div class="text-sm text-blue-700">지원 국가 수</div>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <div class="text-2xl font-bold text-green-600" id="city-count">-</div>
+                    <div class="text-sm text-green-700">정적 도시 수</div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <div class="text-2xl font-bold text-purple-600" id="cache-count">0</div>
+                    <div class="text-sm text-purple-700">API 캐시 수</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 검색 테스트 섹션 -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">🔍 도시 검색 테스트</h2>
+            
+            <!-- 국가 선택 -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">국가 선택</label>
+                <div class="relative">
+                    <input type="text" id="country-input" placeholder="국가명을 입력하세요" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <ul id="country-dropdown" class="hidden absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"></ul>
+                </div>
+                <input type="hidden" id="country-code">
+            </div>
+
+            <!-- 도시 검색 -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">도시 검색</label>
+                <div class="relative">
+                    <input type="text" id="city-input" placeholder="도시명을 입력하세요 (3글자 이상에서 API 검색)" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" disabled>
+                    <ul id="city-dropdown" class="hidden absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"></ul>
+                </div>
+                <input type="hidden" id="city-name">
+            </div>
+
+            <!-- 검색 결과 -->
+            <div class="mt-4">
+                <h3 class="text-lg font-medium text-gray-800 mb-2">검색 결과</h3>
+                <div id="search-results" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <!-- API 테스트 섹션 -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">🌐 API 테스트</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">국가 코드</label>
+                    <input type="text" id="api-country" placeholder="예: KR, US, JP" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">도시명</label>
+                    <input type="text" id="api-city" placeholder="예: 서울, Tokyo, New York" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+            
+            <button id="test-api-btn" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                API 직접 테스트
+            </button>
+            
+            <div id="api-results" class="mt-4 p-4 bg-gray-50 rounded-lg hidden">
+                <h4 class="font-medium text-gray-800 mb-2">API 응답:</h4>
+                <pre id="api-response" class="text-sm text-gray-700 bg-white p-3 rounded border overflow-x-auto"></pre>
+            </div>
+        </div>
+
+        <!-- 성능 테스트 섹션 -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">⚡ 성능 테스트</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <button id="test-static-btn" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                    정적 데이터 성능 테스트
+                </button>
+                <button id="test-hybrid-btn" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
+                    하이브리드 검색 성능 테스트
+                </button>
+            </div>
+            
+            <div id="performance-results" class="mt-4 p-4 bg-gray-50 rounded-lg hidden">
+                <h4 class="font-medium text-gray-800 mb-2">성능 결과:</h4>
+                <div id="performance-data" class="text-sm text-gray-700"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 파일들 -->
+    <script src="data.js"></script>
+    <script src="cityData.js"></script>
+    <script src="utils.js"></script>
+
+    <script>
+        // 테스트용 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            // 통계 업데이트
+            updateStats();
+            
+            // 이벤트 리스너 설정
+            setupEventListeners();
+            
+            // 자동완성 초기화
+            initializeAutocompleteEventListeners();
+        });
+
+        function updateStats() {
+            const countryCount = window.countries ? window.countries.length : 0;
+            const cityCount = window.cities ? Object.values(window.cities).flat().length : 0;
+            const cacheCount = window.citySearchCache ? window.citySearchCache.size : 0;
+            
+            document.getElementById('country-count').textContent = countryCount;
+            document.getElementById('city-count').textContent = cityCount;
+            document.getElementById('cache-count').textContent = cacheCount;
+        }
+
+        function setupEventListeners() {
+            // API 테스트 버튼
+            document.getElementById('test-api-btn').addEventListener('click', async function() {
+                const countryCode = document.getElementById('api-country').value;
+                const cityQuery = document.getElementById('api-city').value;
+                
+                if (!countryCode || !cityQuery) {
+                    alert('국가 코드와 도시명을 입력해주세요.');
+                    return;
+                }
+                
+                const resultsDiv = document.getElementById('api-results');
+                const responseDiv = document.getElementById('api-response');
+                
+                resultsDiv.classList.remove('hidden');
+                responseDiv.textContent = 'API 호출 중...';
+                
+                try {
+                    const results = await window.searchCitiesOnline(cityQuery, countryCode);
+                    responseDiv.textContent = JSON.stringify(results, null, 2);
+                } catch (error) {
+                    responseDiv.textContent = `에러: ${error.message}`;
+                }
+            });
+
+            // 성능 테스트 버튼들
+            document.getElementById('test-static-btn').addEventListener('click', function() {
+                testStaticPerformance();
+            });
+
+            document.getElementById('test-hybrid-btn').addEventListener('click', function() {
+                testHybridPerformance();
+            });
+        }
+
+        function testStaticPerformance() {
+            const startTime = performance.now();
+            const testQueries = ['서울', '도쿄', '뉴욕', '런던', '파리'];
+            const countryCode = 'KR';
+            
+            let totalResults = 0;
+            for (let i = 0; i < 100; i++) {
+                const query = testQueries[i % testQueries.length];
+                const results = window.filterCities(query, countryCode);
+                totalResults += results.length;
+            }
+            
+            const endTime = performance.now();
+            const duration = endTime - startTime;
+            
+            showPerformanceResults('정적 데이터', duration, totalResults);
+        }
+
+        async function testHybridPerformance() {
+            const startTime = performance.now();
+            const testQueries = ['서울', '도쿄', '뉴욕', '런던', '파리'];
+            const countryCode = 'KR';
+            
+            let totalResults = 0;
+            for (let i = 0; i < 10; i++) {
+                const query = testQueries[i % testQueries.length];
+                const results = await window.searchCitiesHybrid(query, countryCode);
+                totalResults += results.length;
+            }
+            
+            const endTime = performance.now();
+            const duration = endTime - startTime;
+            
+            showPerformanceResults('하이브리드 검색', duration, totalResults);
+        }
+
+        function showPerformanceResults(type, duration, totalResults) {
+            const resultsDiv = document.getElementById('performance-results');
+            const dataDiv = document.getElementById('performance-data');
+            
+            resultsDiv.classList.remove('hidden');
+            dataDiv.innerHTML = `
+                <div class="mb-2"><strong>테스트 유형:</strong> ${type}</div>
+                <div class="mb-2"><strong>소요 시간:</strong> ${duration.toFixed(2)}ms</div>
+                <div class="mb-2"><strong>총 결과 수:</strong> ${totalResults}</div>
+                <div class="mb-2"><strong>평균 응답 시간:</strong> ${(duration / 10).toFixed(2)}ms</div>
+            `;
+        }
+
+        // 검색 결과 표시 함수
+        function displaySearchResults(results, query) {
+            const resultsDiv = document.getElementById('search-results');
+            
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<p class="text-gray-500">검색 결과가 없습니다.</p>';
+                return;
+            }
+            
+            const resultsHtml = results.map(city => `
+                <div class="p-3 bg-gray-50 rounded-lg border">
+                    <div class="font-medium">${city.name}</div>
+                    <div class="text-sm text-gray-600">${city.enName}</div>
+                    <div class="text-xs text-gray-500">별칭: ${city.aliases.join(', ')}</div>
+                </div>
+            `).join('');
+            
+            resultsDiv.innerHTML = `
+                <div class="mb-2 text-sm text-gray-600">"${query}" 검색 결과 (${results.length}개)</div>
+                ${resultsHtml}
+            `;
+        }
+
+        // 도시 선택 시 결과 표시
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.city-option')) {
+                const option = e.target.closest('.city-option');
+                const name = option.dataset.name;
+                const enName = option.dataset.enName;
+                
+                displaySearchResults([{ name, enName, aliases: [name, enName] }], name);
+            }
+        });
+    </script>
+</body>
+</html>
