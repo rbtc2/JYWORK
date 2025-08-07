@@ -74,8 +74,8 @@
                 </div>
                 
                 <!-- 지도 컨테이너 -->
-                <div id="map-container" class="w-full h-[60vh] sm:h-[80vh] max-h-[400px] sm:max-h-[600px] rounded-xl shadow-md mb-8 sm:mb-16 overflow-hidden">
-                    <div id="world-map" class="w-full h-full"></div>
+                <div id="map-container" class="relative w-full h-[60vh] sm:h-[70vh] min-h-[600px] max-h-[800px] rounded-xl shadow-md mb-8 sm:mb-16 overflow-hidden border border-gray-200">
+                    <div id="map-render" class="w-full h-full"></div>
                 </div>
                 
                 <!-- 지도 컨트롤 -->
@@ -83,19 +83,18 @@
                     <button id="fit-bounds-btn" class="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-xs sm:text-sm min-h-[40px]">
                         전체 보기
                     </button>
-                    <button id="clear-markers-btn" class="px-3 sm:px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-xs sm:text-sm min-h-[40px]">
-                        마커 숨기기
-                    </button>
-                    <button id="show-markers-btn" class="px-3 sm:px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-xs sm:text-sm min-h-[40px]">
-                        마커 보기
+                    <button id="reset-map-btn" class="px-3 sm:px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-xs sm:text-sm min-h-[40px]">
+                        지도 리셋
                     </button>
                 </div>
                 
-                <!-- 마커 정보 패널 -->
-                <div id="marker-info-panel" class="mt-4 bg-gray-50 rounded-lg p-3 sm:p-4 hidden">
-                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-2">방문 도시 정보</h3>
-                    <div id="marker-info-content" class="text-sm text-gray-600">
-                        <!-- 여기에 마커 정보가 동적으로 추가됩니다 -->
+                <!-- 지도 상태 정보 -->
+                <div class="mt-4 bg-gray-50 rounded-lg p-3 sm:p-4">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-2">지도 정보</h3>
+                    <div class="text-sm text-gray-600 space-y-1">
+                        <div>📍 중심점: <span id="map-center">적도 중심 (위도: 20°, 경도: 0°)</span></div>
+                        <div>🔍 줌 레벨: <span id="map-zoom">2.5</span></div>
+                        <div>🌍 표시 범위: <span id="map-bounds">전 세계</span></div>
                     </div>
                 </div>
             </div>

@@ -152,9 +152,9 @@ function initializeTabNavigation() {
             // 세계지도 섹션으로 이동할 때 지도 업데이트
             if (targetSection === 'world-map') {
                 setTimeout(() => {
-                    if (map) {
+                    if (map && mapInitialized) {
                         map.invalidateSize();
-                        createMarkers();
+                        updateMapInfo();
                     }
                 }, 100);
             }
@@ -559,9 +559,18 @@ function initializeApp() {
     
     // 지도 초기화 (약간의 지연을 두어 DOM이 완전히 로드된 후 실행)
     setTimeout(() => {
-        initializeMap();
-        createMarkers();
-    }, 100);
+        if (typeof initializeMap === 'function') {
+            initializeMap();
+        } else {
+            console.error('initializeMap 함수를 찾을 수 없습니다.');
+        }
+        
+        if (typeof createMarkers === 'function') {
+            createMarkers();
+        } else {
+            console.warn('createMarkers 함수를 찾을 수 없습니다. 마커 기능은 향후 구현 예정입니다.');
+        }
+    }, 200);
     
     // 이벤트 리스너 초기화
     initializeTabNavigation();

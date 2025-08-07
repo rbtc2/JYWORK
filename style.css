@@ -173,58 +173,141 @@ body {
     }
 }
 
-/* 지도 마커 스타일 */
-.custom-marker {
-    background: none;
-    border: none;
-}
-
-.marker-pin {
-    font-size: 24px;
-    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-.marker-pin:hover {
-    transform: scale(1.2);
-}
-
-/* 거주지 마커 스타일 */
-.marker-pin.text-red-500 {
-    color: #ef4444;
-    filter: drop-shadow(2px 2px 2px rgba(239, 68, 68, 0.3));
-}
-
-/* 팝업 스타일 */
-.custom-popup .leaflet-popup-content-wrapper {
-    background: white;
-    border-radius: 8px;
+/* 지도 컨테이너 스타일 */
+#map-container {
+    position: relative;
+    width: 100%;
+    height: 60vh;
+    min-height: 600px;
+    max-height: 800px;
+    border-radius: 12px;
+    overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    box-sizing: border-box;
 }
 
-.custom-popup .leaflet-popup-content {
-    margin: 0;
-    padding: 0;
+/* 지도 내부 스타일 */
+#map-render {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    min-height: 600px;
 }
 
-.popup-content {
-    padding: 12px;
+/* Leaflet 컨테이너 기본 설정 */
+#map-render .leaflet-container {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* 지도 컨테이너 내부 스크롤 방지 */
+#map-container,
+#map-render,
+#map-render .leaflet-container {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: auto;
+}
+
+/* 지도 컨트롤 버튼 스타일 */
+#fit-bounds-btn,
+#reset-map-btn {
+    min-height: 40px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+#fit-bounds-btn:hover,
+#reset-map-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 지도 정보 패널 스타일 */
+#map-center,
+#map-zoom,
+#map-bounds {
+    font-weight: 500;
+    color: #374151;
+}
+
+/* 지도 오류 상태 스타일 */
+.map-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: #f9fafb;
+    border-radius: 12px;
+    text-align: center;
+}
+
+/* 지도 로딩 상태 스타일 */
+.map-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: #f9fafb;
+    border-radius: 12px;
+}
+
+.map-loading::after {
+    content: '';
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e5e7eb;
+    border-top: 4px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* 지도 컨테이너 반응형 */
 @media (max-width: 768px) {
     #map-container {
-        height: 60vh !important;
-        max-height: 400px !important;
+        height: 60vh;
+        min-height: 500px;
+        max-height: 600px;
+    }
+    
+    #map-render .leaflet-container {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
     }
     
     /* 모바일에서 지도 컨트롤 버튼 크기 조정 */
     #fit-bounds-btn,
-    #clear-markers-btn,
-    #show-markers-btn {
-        min-height: 40px;
+    #reset-map-btn {
+        min-height: 44px;
         font-size: 0.875rem;
+        padding: 0.75rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #map-container {
+        height: 50vh;
+        min-height: 400px;
+        max-height: 500px;
+    }
+    
+    #map-render .leaflet-container {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
     }
 }
 

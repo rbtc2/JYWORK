@@ -1,337 +1,345 @@
 /**
- * map.js - 세계지도 생성, 마커 렌더링, 거주지 강조
- * Leaflet 지도 초기화, 마커 생성, 팝업 표시 등을 담당
+ * map.js - 안정적인 세계지도 구현
+ * Leaflet 지도 초기화 및 기본 설정을 담당
+ * 향후 마커 기능 확장을 고려한 구조로 설계
  */
 
 // 지도 관련 변수들
 let map = null;
-let markers = [];
-let markerLayer = null;
+let mapInitialized = false;
 
-// 지도 초기화
+// 지도 컨테이너 테스트 함수
+function testMapContainer() {
+    const mapContainer = document.getElementById('map-container');
+    const mapRender = document.getElementById('map-render');
+    
+    if (!mapContainer || !mapRender) {
+        console.error('지도 컨테이너를 찾을 수 없습니다.');
+        return false;
+    }
+    
+    const containerRect = mapContainer.getBoundingClientRect();
+    const renderRect = mapRender.getBoundingClientRect();
+    
+    console.log('지도 컨테이너 정보:');
+    console.log('- 컨테이너 크기:', containerRect.width, 'x', containerRect.height);
+    console.log('- 렌더 크기:', renderRect.width, 'x', renderRect.height);
+    console.log('- 컨테이너 표시:', mapContainer.style.display, mapContainer.style.visibility);
+    console.log('- 렌더 표시:', mapRender.style.display, mapRender.style.visibility);
+    
+    return containerRect.width > 0 && containerRect.height > 0;
+}
+
+// 지도 초기화 함수
 function initializeMap() {
+    // 이미 초기화된 경우 제거 후 재생성
     if (map) {
         map.remove();
+        map = null;
     }
 
-    // 초기 뷰 설정 (거주지가 있으면 거주지 중심, 없으면 기본)
-    let initialView = [20, 0];
-    let initialZoom = 2;
+    // 지도 컨테이너 확인
+    const mapContainer = document.getElementById('map-container');
+    const mapRender = document.getElementById('map-render');
     
-    if (userResidence.coordinates) {
-        initialView = [userResidence.coordinates.lat, userResidence.coordinates.lng];
-        initialZoom = 8; // 거주지가 있으면 더 확대된 뷰
+    if (!mapContainer || !mapRender) {
+        console.error('지도 컨테이너를 찾을 수 없습니다.');
+        return;
     }
 
-    // 지도 생성
-    map = L.map('world-map').setView(initialView, initialZoom);
-
-    // OpenStreetMap 타일 레이어 추가
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 18
-    }).addTo(map);
-
-    // 마커 레이어 생성
-    markerLayer = L.layerGroup().addTo(map);
-
-    // 지도 크기 재계산 (리사이징 문제 방지)
-    setTimeout(() => {
-        if (map) {
-            map.invalidateSize();
-        }
-    }, 100);
-
-    // 지도 컨트롤 이벤트 리스너
-    document.getElementById('fit-bounds-btn').addEventListener('click', fitBounds);
-    document.getElementById('clear-markers-btn').addEventListener('click', hideMarkers);
-    document.getElementById('show-markers-btn').addEventListener('click', showMarkers);
-}
-
-// 마커 생성 및 추가
-function createMarkers() {
-    // 기존 마커 제거
-    if (markerLayer) {
-        markerLayer.clearLayers();
+    // 컨테이너 테스트
+    if (!testMapContainer()) {
+        console.error('지도 컨테이너가 올바르게 설정되지 않았습니다.');
+        return;
     }
-    markers = [];
 
-    // 중복 제거된 도시 목록 생성
-    const uniqueCities = new Map();
-    
-    entries.forEach(entry => {
-        const cityKey = `${entry.country}-${entry.city}`;
-        if (!uniqueCities.has(cityKey)) {
-            uniqueCities.set(cityKey, {
-                country: entry.country,
-                city: entry.city,
-                entries: []
+    try {
+        // 지도 생성 - 요구사항에 따른 설정
+        map = L.map('map-render', {
+            center: [20, 0],           // 적도 중심
+            zoom: 2.5,                 // 기본 줌 레벨
+            minZoom: 2,                // 최소 줌 레벨
+            maxZoom: 5,                // 최대 줌 레벨
+            worldCopyJump: false,      // 지도 반복 방지
+            noWrap: true,              // 경도 래핑 방지
+            maxBounds: [[-85, -180], [85, 180]], // 최대 경계 설정
+            maxBoundsViscosity: 1.0,   // 경계 고정 강도
+            zoomControl: true,         // 줌 컨트롤 표시
+            attributionControl: true,  // 속성 컨트롤 표시
+            dragging: true,            // 드래그 허용
+            touchZoom: true,           // 터치 줌 허용
+            scrollWheelZoom: true,     // 스크롤 휠 줌 허용
+            doubleClickZoom: true,     // 더블클릭 줌 허용
+            boxZoom: false,            // 박스 줌 비활성화
+            keyboard: true,            // 키보드 컨트롤 허용
+            tap: true,                 // 탭 허용
+            tapTolerance: 15          // 탭 허용 오차
+        });
+
+        // OpenStreetMap 타일 레이어 추가
+        const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18,
+            subdomains: 'abc'
+        });
+
+        tileLayer.addTo(map);
+
+        // 타일 로딩 이벤트 리스너 추가
+        tileLayer.on('loading', function() {
+            console.log('타일 로딩 시작...');
+        });
+
+        tileLayer.on('load', function() {
+            console.log('타일 로딩 완료');
+        });
+
+        tileLayer.on('tileerror', function(e) {
+            console.error('타일 로딩 오류:', e);
+            // 대체 타일 서버 시도
+            console.log('대체 타일 서버를 시도합니다...');
+            const fallbackTileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 18
             });
-        }
-        uniqueCities.get(cityKey).entries.push(entry);
-    });
+            fallbackTileLayer.addTo(map);
+        });
 
-    // 각 도시에 대해 마커 생성
-    uniqueCities.forEach((cityData, cityKey) => {
-        const coordinates = cityCoordinates[cityData.city];
-        if (coordinates) {
-            // 거주지 여부 확인
-            const isResidence = userResidence.city && userResidence.city === cityData.city;
-            
-            // 마커 아이콘 설정 (거주지는 다른 색상)
-            const markerIcon = L.divIcon({
-                className: 'custom-marker',
-                html: `<div class="marker-pin ${isResidence ? 'text-red-500' : ''}">${isResidence ? '🏠' : '📍'}</div>`,
-                iconSize: [30, 30],
-                iconAnchor: [15, 30]
-            });
+        // 지도 로딩 완료 이벤트
+        map.on('load', function() {
+            console.log('지도 로딩 완료');
+        });
 
-            const marker = L.marker([coordinates.lat, coordinates.lng], {
-                icon: markerIcon
-            });
+        // 지도 타일 로딩 완료 이벤트
+        map.on('tileload', function() {
+            console.log('타일 로딩됨');
+        });
 
-            // 팝업 내용 생성
-            const popupContent = createPopupContent(cityData);
-            marker.bindPopup(popupContent, {
-                maxWidth: 300,
-                className: 'custom-popup'
-            });
+        // 지도 타일 로딩 오류 이벤트
+        map.on('tileerror', function(e) {
+            console.error('지도 타일 오류:', e);
+        });
 
-            // 마커 클릭 이벤트
-            marker.on('click', function() {
-                showMarkerInfo(cityData);
-            });
-
-            marker.addTo(markerLayer);
-            markers.push(marker);
-        }
-    });
-}
-
-// 국가 코드를 한글명으로 변환하는 함수
-function getCountryNameByCode(countryCode) {
-    const countryMap = {
-        'KR': '대한민국',
-        'JP': '일본',
-        'US': '미국',
-        'GB': '영국',
-        'FR': '프랑스',
-        'DE': '독일'
-    };
-    return countryMap[countryCode] || countryCode;
-}
-
-// 도시명을 정확한 한글명으로 변환하는 함수
-function getCityNameByCode(countryCode, cityName) {
-    // 도시명이 이미 한글이거나 영어인 경우 그대로 반환
-    if (cityName && typeof cityName === 'string') {
-        // 한글 도시명 패턴 확인
-        const koreanCityPattern = /[가-힣]/;
-        if (koreanCityPattern.test(cityName)) {
-            return cityName;
-        }
+        // 지도 이벤트 리스너 등록
+        setupMapEventListeners();
         
-        // 영어 도시명을 한글로 변환
-        const cityMap = {
-            'KR': {
-                'Seoul': '서울',
-                'Busan': '부산',
-                'Daegu': '대구',
-                'Incheon': '인천',
-                'Gwangju': '광주',
-                'Daejeon': '대전',
-                'Ulsan': '울산',
-                'Jeju': '제주'
-            },
-            'JP': {
-                'Tokyo': '도쿄',
-                'Osaka': '오사카',
-                'Kyoto': '교토',
-                'Yokohama': '요코하마',
-                'Nagoya': '나고야',
-                'Sapporo': '삿포로'
-            },
-            'US': {
-                'New York': '뉴욕',
-                'Los Angeles': '로스앤젤레스',
-                'Chicago': '시카고',
-                'Houston': '휴스턴',
-                'Phoenix': '피닉스',
-                'Philadelphia': '필라델피아'
-            },
-            'GB': {
-                'London': '런던',
-                'Birmingham': '버밍엄',
-                'Leeds': '리즈',
-                'Glasgow': '글래스고',
-                'Sheffield': '셰필드',
-                'Bradford': '브래드포드'
-            },
-            'FR': {
-                'Paris': '파리',
-                'Marseille': '마르세유',
-                'Lyon': '리옹',
-                'Toulouse': '툴루즈',
-                'Nice': '니스',
-                'Nantes': '낭트'
-            },
-            'DE': {
-                'Berlin': '베를린',
-                'Hamburg': '함부르크',
-                'Munich': '뮌헨',
-                'Cologne': '쾰른',
-                'Frankfurt': '프랑크푸르트',
-                'Stuttgart': '슈투트가르트'
+        // 지도 크기 재계산 (리사이징 문제 방지)
+        setTimeout(() => {
+            if (map) {
+                map.invalidateSize();
+                updateMapInfo();
             }
-        };
-        
-        const countryCities = cityMap[countryCode];
-        if (countryCities && countryCities[cityName]) {
-            return countryCities[cityName];
+        }, 100);
+
+        mapInitialized = true;
+        console.log('지도가 성공적으로 초기화되었습니다.');
+
+    } catch (error) {
+        console.error('지도 초기화 중 오류 발생:', error);
+        showMapError('지도를 불러오는 중 오류가 발생했습니다.');
+    }
+}
+
+// 지도 이벤트 리스너 설정
+function setupMapEventListeners() {
+    if (!map) return;
+
+    // 지도 이동 이벤트
+    map.on('moveend', function() {
+        updateMapInfo();
+    });
+
+    // 지도 줌 이벤트
+    map.on('zoomend', function() {
+        updateMapInfo();
+    });
+
+    // 지도 로드 완료 이벤트
+    map.on('load', function() {
+        console.log('지도 로드 완료');
+        updateMapInfo();
+    });
+
+    // 지도 오류 이벤트
+    map.on('error', function(error) {
+        console.error('지도 오류:', error);
+        showMapError('지도 로딩 중 오류가 발생했습니다.');
+    });
+    
+    // 지도 리사이즈 이벤트
+    map.on('resize', function() {
+        console.log('지도 리사이즈 이벤트 발생');
+        updateMapInfo();
+    });
+    
+    // 지도 뷰 리셋 이벤트
+    map.on('viewreset', function() {
+        console.log('지도 뷰 리셋 이벤트 발생');
+        updateMapInfo();
+    });
+}
+
+// 지도 정보 업데이트
+function updateMapInfo() {
+    if (!map) return;
+
+    try {
+        const center = map.getCenter();
+        const zoom = map.getZoom();
+        const bounds = map.getBounds();
+
+        // 중심점 정보 업데이트
+        const centerElement = document.getElementById('map-center');
+        if (centerElement) {
+            centerElement.textContent = `위도: ${center.lat.toFixed(2)}°, 경도: ${center.lng.toFixed(2)}°`;
         }
+
+        // 줌 레벨 정보 업데이트
+        const zoomElement = document.getElementById('map-zoom');
+        if (zoomElement) {
+            zoomElement.textContent = zoom.toFixed(1);
+        }
+
+        // 표시 범위 정보 업데이트
+        const boundsElement = document.getElementById('map-bounds');
+        if (boundsElement) {
+            const north = bounds.getNorth().toFixed(1);
+            const south = bounds.getSouth().toFixed(1);
+            const east = bounds.getEast().toFixed(1);
+            const west = bounds.getWest().toFixed(1);
+            boundsElement.textContent = `북: ${north}°, 남: ${south}°, 동: ${east}°, 서: ${west}°`;
+        }
+
+    } catch (error) {
+        console.error('지도 정보 업데이트 중 오류:', error);
     }
-    
-    return cityName;
 }
 
-// 팝업 내용 생성
-function createPopupContent(cityData) {
-    const purposeText = {
-        'travel': '여행',
-        'business': '출장',
-        'study': '유학',
-        'working-holiday': '워킹 홀리데이',
-        'family-visit': '가족 방문',
-        'dispatch': '파견',
-        'exchange': '교환학생',
-        'volunteer': '봉사활동',
-        'medical': '의료',
-        'language': '어학 연수',
-        'transit': '비행 경유'
-    };
-
-    // 국가명과 도시명을 정확한 한글명으로 변환
-    const countryName = getCountryNameByCode(cityData.countryCode) || cityData.country;
-    const cityName = getCityNameByCode(cityData.countryCode, cityData.city) || cityData.city;
-
-    let content = `
-        <div class="popup-content">
-            <h3 class="font-bold text-lg mb-2">
-                ${cityName}, ${countryName}
-                ${userResidence.city && userResidence.city === cityData.city ? '<span class="text-red-500 ml-2">🏠 거주지</span>' : ''}
-            </h3>
-            <div class="text-sm space-y-1">
-    `;
-
-    cityData.entries.forEach((entry, index) => {
-        const purpose = purposeText[entry.purpose] || entry.purpose;
-        const days = calculateDays(entry.startDate, entry.endDate);
-        
-        content += `
-            <div class="border-l-2 border-blue-500 pl-2 mb-2">
-                <div class="font-medium">${purpose}</div>
-                <div class="text-gray-600">📅 ${entry.startDate} ~ ${entry.endDate}</div>
-                <div class="text-gray-600">⏱️ ${days}일</div>
-                ${entry.memo ? `<div class="text-gray-600">📝 ${entry.memo}</div>` : ''}
+// 지도 오류 표시
+function showMapError(message) {
+    const mapContainer = document.getElementById('map-container');
+    if (mapContainer) {
+        mapContainer.innerHTML = `
+            <div class="flex items-center justify-center h-full bg-gray-100 rounded-xl">
+                <div class="text-center p-8">
+                    <div class="text-4xl mb-4">🗺️</div>
+                    <p class="text-gray-600 text-lg mb-2">지도 로딩 실패</p>
+                    <p class="text-gray-500 text-sm">${message}</p>
+                    <button onclick="initializeMap()" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                        다시 시도
+                    </button>
+                </div>
             </div>
         `;
-    });
-
-    content += `
-            </div>
-            <div class="text-xs text-gray-500 mt-2">
-                총 ${cityData.entries.length}회 방문
-            </div>
-        </div>
-    `;
-
-    return content;
+    }
 }
 
-// 마커 정보 패널 표시
-function showMarkerInfo(cityData) {
-    const panel = document.getElementById('marker-info-panel');
-    const content = document.getElementById('marker-info-content');
-    
-    const purposeText = {
-        'travel': '여행',
-        'business': '출장',
-        'study': '유학',
-        'working-holiday': '워킹 홀리데이',
-        'family-visit': '가족 방문',
-        'dispatch': '파견',
-        'exchange': '교환학생',
-        'volunteer': '봉사활동',
-        'medical': '의료',
-        'language': '어학 연수',
-        'transit': '비행 경유'
-    };
-
-    // 국가명과 도시명을 정확한 한글명으로 변환
-    const countryName = getCountryNameByCode(cityData.countryCode) || cityData.country;
-    const cityName = getCityNameByCode(cityData.countryCode, cityData.city) || cityData.city;
-
-    let infoContent = `
-        <div class="space-y-3">
-            <div class="font-semibold text-lg">
-                ${cityName}, ${countryName}
-                ${userResidence.city && userResidence.city === cityData.city ? '<span class="text-red-500 ml-2">🏠 거주지</span>' : ''}
-            </div>
-            <div class="text-sm space-y-2">
-    `;
-
-    cityData.entries.forEach((entry, index) => {
-        const purpose = purposeText[entry.purpose] || entry.purpose;
-        const days = calculateDays(entry.startDate, entry.endDate);
-        
-        infoContent += `
-            <div class="bg-white p-3 rounded border">
-                <div class="font-medium text-blue-600">${purpose}</div>
-                <div class="text-gray-600">📅 ${entry.startDate} ~ ${entry.endDate}</div>
-                <div class="text-gray-600">⏱️ ${days}일</div>
-                ${entry.memo ? `<div class="text-gray-600 mt-1">📝 ${entry.memo}</div>` : ''}
-            </div>
-        `;
-    });
-
-    infoContent += `
-            </div>
-            <div class="text-sm text-gray-500 border-t pt-2">
-                총 ${cityData.entries.length}회 방문
-            </div>
-        </div>
-    `;
-
-    content.innerHTML = infoContent;
-    panel.classList.remove('hidden');
-}
-
-// 지도 범위에 맞춰 보기
+// 지도 범위에 맞춰 보기 (전체 보기)
 function fitBounds() {
-    if (markers.length > 0) {
-        const group = new L.featureGroup(markers);
-        map.fitBounds(group.getBounds().pad(0.1));
-    } else {
-        map.setView([20, 0], 2);
+    if (!map) return;
+
+    try {
+        // 기본 세계 뷰로 설정
+        map.setView([20, 0], 2.5);
+        updateMapInfo();
+        console.log('지도를 전체 보기로 설정했습니다.');
+    } catch (error) {
+        console.error('지도 범위 설정 중 오류:', error);
     }
 }
 
-// 마커 숨기기
-function hideMarkers() {
-    if (markerLayer) {
-        markerLayer.clearLayers();
+// 지도 리셋
+function resetMap() {
+    if (!map) return;
+
+    try {
+        // 기본 설정으로 리셋
+        map.setView([20, 0], 2.5);
+        updateMapInfo();
+        console.log('지도를 기본 설정으로 리셋했습니다.');
+    } catch (error) {
+        console.error('지도 리셋 중 오류:', error);
     }
-    document.getElementById('marker-info-panel').classList.add('hidden');
 }
 
-// 마커 보기
-function showMarkers() {
-    createMarkers();
-}
-
-// 지도 업데이트
+// 지도 업데이트 (향후 마커 기능을 위한 준비)
 function updateMap() {
-    if (map) {
-        createMarkers();
+    if (!map || !mapInitialized) {
+        initializeMap();
+        return;
     }
+
+    try {
+        // 현재는 기본 업데이트만 수행
+        updateMapInfo();
+        
+        // 향후 마커 기능 추가 시 여기에 마커 생성 로직 추가
+        // createMarkers();
+        
+    } catch (error) {
+        console.error('지도 업데이트 중 오류:', error);
+    }
+}
+
+// 지도 컨트롤 버튼 이벤트 리스너 설정
+function setupMapControls() {
+    // 전체 보기 버튼
+    const fitBoundsBtn = document.getElementById('fit-bounds-btn');
+    if (fitBoundsBtn) {
+        fitBoundsBtn.addEventListener('click', fitBounds);
+    }
+
+    // 지도 리셋 버튼
+    const resetMapBtn = document.getElementById('reset-map-btn');
+    if (resetMapBtn) {
+        resetMapBtn.addEventListener('click', resetMap);
+    }
+}
+
+// 페이지 로드 시 지도 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    // 지도 컨트롤 설정
+    setupMapControls();
+    
+    // 지도 초기화
+    initializeMap();
+});
+
+// 탭 전환 시 지도 리사이징
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('nav-tab') && e.target.dataset.section === 'world-map') {
+        // 지도 탭이 활성화된 후 지도 크기 재계산
+        setTimeout(() => {
+            if (map && mapInitialized) {
+                map.invalidateSize();
+                updateMapInfo();
+            }
+        }, 100);
+    }
+});
+
+// 창 크기 변경 시 지도 리사이징
+window.addEventListener('resize', function() {
+    if (map && mapInitialized) {
+        setTimeout(() => {
+            map.invalidateSize();
+            updateMapInfo();
+        }, 100);
+    }
+});
+
+// 향후 마커 기능을 위한 준비 함수들 (현재는 비활성화)
+function createMarkers() {
+    // 향후 마커 생성 로직
+    console.log('마커 생성 기능은 향후 구현 예정입니다.');
+}
+
+function showMarkers() {
+    // 향후 마커 표시 로직
+    console.log('마커 표시 기능은 향후 구현 예정입니다.');
+}
+
+function hideMarkers() {
+    // 향후 마커 숨김 로직
+    console.log('마커 숨김 기능은 향후 구현 예정입니다.');
 } 
