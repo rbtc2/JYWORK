@@ -255,6 +255,69 @@ body {
     #calendar-table td {
         font-size: 0.875rem;
     }
+    
+    /* 모바일에서 국가 배지 컬렉션 모달 최적화 */
+    #countries-modal-overlay {
+        padding: 0.5rem;
+    }
+    
+    #countries-modal-overlay .bg-white {
+        width: 100%;
+        max-height: 95vh;
+        margin: 0;
+    }
+    
+    /* 모바일에서 정렬 버튼 최적화 */
+    .sort-btn {
+        min-height: 36px;
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    /* 모바일에서 통계 카드 최적화 */
+    .grid.grid-cols-1.sm\\:grid-cols-2.md\\:grid-cols-4 {
+        gap: 0.5rem;
+    }
+    
+    /* 모바일에서 국가 배지 카드 최적화 */
+    .country-badge {
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .country-badge .text-3xl {
+        font-size: 1.875rem;
+    }
+    
+    .country-badge h3 {
+        font-size: 0.875rem;
+        line-height: 1.25;
+    }
+    
+    /* 모바일에서 터치 인터랙션 최적화 */
+    .country-badge:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+    }
+    
+    /* 모바일에서 스크롤 성능 최적화 */
+    #countries-collection {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+    
+    /* 모바일에서 텍스트 오버플로우 처리 */
+    .country-badge .truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    /* 모바일에서 그리드 레이아웃 최적화 */
+    #countries-collection {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
 }
 
 /* 지도 컨테이너 스타일 */
@@ -940,6 +1003,7 @@ nav {
 .line-clamp-1 {
     display: -webkit-box;
     -webkit-line-clamp: 1;
+    line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -949,6 +1013,7 @@ nav {
 .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -957,6 +1022,7 @@ nav {
 .line-clamp-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
