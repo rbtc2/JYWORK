@@ -23,7 +23,7 @@ module.exports = {
         }
       },
       fontFamily: {
-        'sans': ['Inter', 'system-ui', 'sans-serif'],
+        'sans': ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
       },
       spacing: {
         '18': '4.5rem',
