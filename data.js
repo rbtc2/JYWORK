@@ -376,8 +376,12 @@ let cityCoordinates = {};
 
 // 도시 좌표 데이터 초기화 함수
 function initializeCityCoordinates() {
-    // 확장된 도시 좌표 데이터가 있으면 사용, 없으면 기본 데이터 사용
-    if (window.expandedCityCoordinates) {
+    // Tier 1 도시 좌표 데이터가 있으면 사용
+    if (window.tier1CityCoordinates) {
+        cityCoordinates = { ...window.tier1CityCoordinates };
+        console.log('Tier 1 도시 좌표 데이터 로드 완료');
+    } else if (window.expandedCityCoordinates) {
+        // 기존 확장된 도시 좌표 데이터가 있으면 사용
         cityCoordinates = { ...window.expandedCityCoordinates };
         console.log('확장된 도시 좌표 데이터 로드 완료');
     } else {
@@ -442,8 +446,18 @@ let cities = {};
 
 // 도시 데이터 초기화 함수
 function initializeCityData() {
-    // 확장된 도시 데이터가 있으면 사용, 없으면 기본 데이터 사용
-    if (window.expandedCities) {
+    // Tier 1 도시 데이터가 있으면 사용
+    if (window.tier1Cities) {
+        cities = { ...window.tier1Cities };
+        console.log('Tier 1 도시 데이터 로드 완료 (30개 국가)');
+        
+        // Part 2 데이터가 있으면 추가
+        if (window.tier1CitiesPart2) {
+            cities = { ...cities, ...window.tier1CitiesPart2 };
+            console.log('Tier 1 Part 2 도시 데이터 로드 완료 (8개 국가 추가)');
+        }
+    } else if (window.expandedCities) {
+        // 기존 확장된 도시 데이터가 있으면 사용
         cities = { ...window.expandedCities };
         console.log('확장된 도시 데이터 로드 완료');
     } else {
