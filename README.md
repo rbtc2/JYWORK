@@ -9,6 +9,9 @@
 - 📚 **콜렉션**: 여행 일정 관리 및 타임라인
 - 📅 **캘린더**: 월별 여행 일정 보기
 - ⚙️ **설정**: 사용자 설정 및 데이터 관리
+- 🌍 **195개 국가 지원**: ISO 3166-1 표준 기반 전 세계 국가 데이터
+- 🔍 **고급 검색**: 다국어 이름, 코드, 별칭으로 국가 검색
+- 🏳️ **국기 이모지**: 각 국가별 국기 이모지 표시
 
 ## 🚀 시작하기
 
@@ -85,6 +88,9 @@ JYWORK/
 - **로컬 스토리지**: 브라우저 기반 데이터 저장
 - **JSON 형식**: 구조화된 데이터 관리
 - **백업/복원**: 데이터 내보내기/가져오기
+- **국가 데이터**: 195개 국가 지원 (ISO 3166-1 표준)
+- **다국어 지원**: 한국어/영어 국가명 및 별칭
+- **성능 최적화**: 디바운싱 및 결과 제한으로 빠른 검색
 
 ## 🔧 기술 스택
 
@@ -93,6 +99,8 @@ JYWORK/
 - **JavaScript**: ES6+ 모듈 시스템
 - **Leaflet**: 지도 라이브러리
 - **PostCSS**: CSS 전처리기
+- **Countries-list**: 국가 데이터 라이브러리 (CDN)
+- **ISO 3166-1**: 국가 코드 표준
 
 ## 📱 반응형 디자인
 
@@ -128,4 +136,6 @@ JYWORK/
 
 - [TailwindCSS](https://tailwindcss.com/) - CSS 프레임워크
 - [Leaflet](https://leafletjs.com/) - 지도 라이브러리
-- [OpenStreetMap](https://www.openstreetmap.org/) - 지도 데이터 
+- [OpenStreetMap](https://www.openstreetmap.org/) - 지도 데이터
+- [Countries-list](https://github.com/annexare/Countries) - 국가 데이터 라이브러리
+- [ISO 3166-1](https://www.iso.org/iso-3166-country-codes.html) - 국가 코드 표준 

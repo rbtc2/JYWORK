@@ -130,7 +130,7 @@ function createCountryBadge(country) {
     return `
         <div class="country-badge bg-white rounded-xl shadow-md border border-gray-200 p-3 sm:p-4 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
             <div class="text-center mb-2 sm:mb-3">
-                <div class="text-3xl sm:text-4xl mb-1 sm:mb-2">🏳️</div>
+                <div class="text-3xl sm:text-4xl mb-1 sm:mb-2">${countryFlags[country.code] || '🏳️'}</div>
                 <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-1">${country.name}</h3>
                 <div class="text-sm sm:text-base text-gray-600">${country.code}</div>
             </div>
@@ -176,7 +176,7 @@ function createCountryBadge(country) {
             </div>
             
             <!-- Unlocked 애니메이션 효과 (데스크톱에서만 표시) -->
-            <div class="mt-2 sm:mt-3 flex justify-center hidden sm:block">
+            <div class="mt-2 sm:mt-3 hidden sm:flex sm:justify-center">
                 <div class="unlocked-badge bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-bold animate-pulse">
                     🔓 Unlocked
                 </div>

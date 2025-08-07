@@ -12,15 +12,15 @@ const ITEMS_PER_PAGE = 10;
 let timelineSortType = 'newest'; // 'newest' 또는 'oldest'
 let ratingSortType = 'rating-high'; // 'rating-high' 또는 'rating-low'
 
-// 국가별 국기 이모지 매핑
-const countryFlags = {
-    'KR': '🇰🇷',
-    'JP': '🇯🇵',
-    'US': '🇺🇸',
-    'GB': '🇬🇧',
-    'FR': '🇫🇷',
-    'DE': '🇩🇪'
-};
+// 국가별 국기 이모지 매핑 (data.js에서 제공하는 전역 countryFlags 사용)
+// const countryFlags = {
+//     'KR': '🇰🇷',
+//     'JP': '🇯🇵',
+//     'US': '🇺🇸',
+//     'GB': '🇬🇧',
+//     'FR': '🇫🇷',
+//     'DE': '🇩🇪'
+// };
 
 // 국가 코드를 한글명으로 변환하는 함수
 function getCountryNameByCode(countryCode) {

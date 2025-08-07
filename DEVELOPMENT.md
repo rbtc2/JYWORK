@@ -11,6 +11,7 @@
 5. [성능 최적화](#성능-최적화)
 6. [테스트 전략](#테스트-전략)
 7. [배포 가이드](#배포-가이드)
+8. [국가 데이터 확장](#국가-데이터-확장)
 
 ## 🚀 개발 환경 설정
 
@@ -466,6 +467,91 @@ function handleFormSubmit() {
 }
 ```
 
+## 🌍 국가 데이터 확장
+
+### 개요
+
+프로젝트는 6개 국가에서 195개 국가로 확장되었습니다. ISO 3166-1 표준을 기반으로 검증된 라이브러리를 활용하여 구현되었습니다.
+
+### 구현 세부사항
+
+#### 1. 라이브러리 선택
+- **Countries-list**: CDN을 통한 클라이언트 사이드 로딩
+- **ISO 3166-1 alpha-2**: 표준 국가 코드 사용
+- **하위 호환성**: 기존 6개국 데이터 유지
+
+#### 2. 데이터 구조
+```javascript
+// 국가 데이터 구조
+{
+  code: 'KR',           // ISO 3166-1 alpha-2 코드
+  label: '대한민국',     // 한국어 이름
+  enLabel: 'South Korea', // 영어 이름
+  aliases: ['Korea', 'South Korea', '한국', '대한민국'] // 별칭들
+}
+
+// 국기 이모지 매핑
+countryFlags: {
+  'KR': '🇰🇷',
+  'US': '🇺🇸',
+  // ... 195개 국가
+}
+```
+
+#### 3. 성능 최적화
+- **디바운싱**: 300ms 지연으로 과도한 필터링 방지
+- **결과 제한**: 최대 15개 국가, 10개 도시만 표시
+- **최소 글자 수**: 2글자 이상 입력 시 검색 시작
+
+#### 4. 검색 기능
+```javascript
+// 다국어 검색 지원
+function filterCountries(query) {
+  return countries.filter(country => 
+    country.label.toLowerCase().includes(query) ||      // 한국어
+    country.enLabel.toLowerCase().includes(query) ||    // 영어
+    country.code.toLowerCase().includes(query) ||       // 코드
+    country.aliases.some(alias => alias.toLowerCase().includes(query)) // 별칭
+  );
+}
+```
+
+### 테스트 방법
+
+1. **테스트 파일 실행**
+   ```bash
+   # 브라우저에서 test-countries.html 열기
+   open test-countries.html
+   ```
+
+2. **확장 기능 확인**
+   - 195개 국가 로딩 확인
+   - 검색 기능 테스트
+   - 국기 이모지 표시 확인
+   - 성능 최적화 확인
+
+3. **호환성 테스트**
+   - 기존 6개국 데이터 정상 작동
+   - 자동완성 기능 정상 작동
+   - 기존 저장된 데이터 영향 없음
+
+### 향후 확장 계획
+
+1. **도시 데이터 확장**
+   - 국가별 주요 도시 추가
+   - 도시 좌표 데이터 확장
+   - 도시별 별칭 지원
+
+2. **서버 사이드 검색**
+   - 대용량 데이터 처리
+   - 실시간 검색 API
+   - 캐싱 시스템
+
+3. **다국어 지원 확장**
+   - 더 많은 언어 지원
+   - 현지화 시스템
+   - 언어별 검색 최적화
+
 ## 📚 추가 리소스
 
 - [ESLint 규칙](https://eslint.org/docs/rules/)
@@ -473,6 +559,8 @@ function handleFormSubmit() {
 - [TailwindCSS 문서](https://tailwindcss.com/docs)
 - [Leaflet 문서](https://leafletjs.com/reference.html)
 - [Git 가이드](https://git-scm.com/book/ko/v2)
+- [Countries-list 라이브러리](https://github.com/annexare/Countries)
+- [ISO 3166-1 표준](https://www.iso.org/iso-3166-country-codes.html)
 
 ---
 

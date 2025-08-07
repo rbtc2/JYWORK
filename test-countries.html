@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>국가 데이터 테스트</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .countries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .country-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            transition: transform 0.2s;
+        }
+        .country-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .country-flag {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .country-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .country-code {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .country-aliases {
+            margin-top: 10px;
+            font-size: 0.8em;
+            color: #888;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌍 국가 데이터 테스트</h1>
+        
+        <div id="loading" class="loading">
+            국가 데이터를 로딩 중입니다...
+        </div>
+        
+        <div id="error" class="error" style="display: none;">
+            국가 데이터 로딩에 실패했습니다. 기본 데이터를 사용합니다.
+        </div>
+        
+        <div id="content" style="display: none;">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-countries">0</div>
+                    <div class="stat-label">총 국가 수</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="original-countries">6</div>
+                    <div class="stat-label">기존 국가</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="new-countries">0</div>
+                    <div class="stat-label">새로 추가된 국가</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="flags-count">0</div>
+                    <div class="stat-label">국기 이모지</div>
+                </div>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="국가명, 코드, 별칭으로 검색...">
+            </div>
+            
+            <div class="countries-grid" id="countries-grid">
+                <!-- 국가 카드들이 여기에 동적으로 추가됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script>
+        // 테스트용 함수들
+        function updateStats() {
+            document.getElementById('total-countries').textContent = countries.length;
+            document.getElementById('original-countries').textContent = 6;
+            document.getElementById('new-countries').textContent = countries.length - 6;
+            document.getElementById('flags-count').textContent = Object.keys(countryFlags).length;
+        }
+
+        function renderCountries(filteredCountries = countries) {
+            const grid = document.getElementById('countries-grid');
+            grid.innerHTML = '';
+            
+            filteredCountries.forEach(country => {
+                const card = document.createElement('div');
+                card.className = 'country-card';
+                card.innerHTML = `
+                    <div class="country-flag">${countryFlags[country.code] || '🏳️'}</div>
+                    <div class="country-name">${country.label}</div>
+                    <div class="country-code">${country.code} - ${country.enLabel}</div>
+                    <div class="country-aliases">별칭: ${country.aliases.slice(0, 3).join(', ')}${country.aliases.length > 3 ? '...' : ''}</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function initializeSearch() {
+            const searchInput = document.getElementById('search-input');
+            let debounceTimer;
+            
+            searchInput.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    const query = this.value.toLowerCase();
+                    const filtered = countries.filter(country => 
+                        country.label.toLowerCase().includes(query) ||
+                        country.enLabel.toLowerCase().includes(query) ||
+                        country.code.toLowerCase().includes(query) ||
+                        country.aliases.some(alias => alias.toLowerCase().includes(query))
+                    );
+                    renderCountries(filtered);
+                }, 300);
+            });
+        }
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // 국가 데이터 초기화 대기
+                await new Promise(resolve => {
+                    const checkData = () => {
+                        if (countries && countries.length > 6) {
+                            resolve();
+                        } else {
+                            setTimeout(checkData, 100);
+                        }
+                    };
+                    checkData();
+                });
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                
+                updateStats();
+                renderCountries();
+                initializeSearch();
+                
+                console.log('국가 데이터 로딩 완료:', countries.length, '개 국가');
+                
+            } catch (error) {
+                console.error('국가 데이터 로딩 실패:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('content').style.display = 'block';
+                
+                updateStats();
+                renderCountries();
+                initializeSearch();
+            }
+        });
+    </script>
+</body>
+</html>

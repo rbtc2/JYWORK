@@ -3,29 +3,47 @@
  * 국가/도시 자동완성, 필터링, 드롭다운 렌더링 등을 담당
  */
 
-// 국가 필터링 함수
+// 디바운싱 함수
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// 국가 필터링 함수 (성능 최적화)
 function filterCountries(query) {
-    if (!query) return countries;
+    if (!query || query.length < 2) return countries.slice(0, 15); // 최소 2글자, 최대 15개
+    
     const lowerQuery = query.toLowerCase();
-    return countries.filter(country => 
+    const results = countries.filter(country => 
         country.label.toLowerCase().includes(lowerQuery) ||
         country.enLabel.toLowerCase().includes(lowerQuery) ||
         country.code.toLowerCase().includes(lowerQuery) ||
         country.aliases.some(alias => alias.toLowerCase().includes(lowerQuery))
     );
+    
+    return results.slice(0, 15); // 최대 15개 결과만 반환
 }
 
-// 도시 필터링 함수
+// 도시 필터링 함수 (성능 최적화)
 function filterCities(query, countryCode) {
     if (!countryCode || !cities[countryCode]) return [];
-    if (!query) return cities[countryCode];
+    if (!query || query.length < 2) return cities[countryCode].slice(0, 10); // 최소 2글자, 최대 10개
     
     const lowerQuery = query.toLowerCase();
-    return cities[countryCode].filter(city => 
+    const results = cities[countryCode].filter(city => 
         city.name.toLowerCase().includes(lowerQuery) ||
         city.enName.toLowerCase().includes(lowerQuery) ||
         city.aliases.some(alias => alias.toLowerCase().includes(lowerQuery))
     );
+    
+    return results.slice(0, 10); // 최대 10개 결과만 반환
 }
 
 // 국가 드롭다운 렌더링
@@ -226,10 +244,15 @@ function initializeAutocompleteEventListeners() {
     const countryInput = document.getElementById('country-input');
     const countryDropdown = document.getElementById('country-dropdown');
     
-    countryInput.addEventListener('input', function() {
-        const query = this.value;
+    // 디바운싱된 국가 필터링 함수
+    const debouncedCountryFilter = debounce(function(query) {
         const filteredCountries = filterCountries(query);
         renderCountryDropdown(filteredCountries);
+    }, 300);
+
+    countryInput.addEventListener('input', function() {
+        const query = this.value;
+        debouncedCountryFilter(query);
     });
     
     countryInput.addEventListener('focus', function() {
@@ -274,11 +297,16 @@ function initializeAutocompleteEventListeners() {
     const cityInput = document.getElementById('city-input');
     const cityDropdown = document.getElementById('city-dropdown');
     
+    // 디바운싱된 도시 필터링 함수
+    const debouncedCityFilter = debounce(function(query, countryCode) {
+        const filteredCities = filterCities(query, countryCode);
+        renderCityDropdown(filteredCities);
+    }, 300);
+
     cityInput.addEventListener('input', function() {
         const query = this.value;
         const selectedCountryCode = document.getElementById('country-code').value;
-        const filteredCities = filterCities(query, selectedCountryCode);
-        renderCityDropdown(filteredCities);
+        debouncedCityFilter(query, selectedCountryCode);
     });
     
     cityInput.addEventListener('focus', function() {
@@ -334,10 +362,15 @@ function initializeAutocompleteEventListeners() {
     const residenceCityDropdown = document.getElementById('residence-city-dropdown');
     
     // 거주지 국가 자동완성 이벤트 리스너들
-    residenceCountryInput.addEventListener('input', function() {
-        const query = this.value;
+    // 디바운싱된 거주지 국가 필터링 함수
+    const debouncedResidenceCountryFilter = debounce(function(query) {
         const filteredCountries = filterCountries(query);
         renderResidenceCountryDropdown(filteredCountries);
+    }, 300);
+
+    residenceCountryInput.addEventListener('input', function() {
+        const query = this.value;
+        debouncedResidenceCountryFilter(query);
     });
     
     residenceCountryInput.addEventListener('focus', function() {
@@ -379,11 +412,16 @@ function initializeAutocompleteEventListeners() {
     });
     
     // 거주지 도시 자동완성 이벤트 리스너들
+    // 디바운싱된 거주지 도시 필터링 함수
+    const debouncedResidenceCityFilter = debounce(function(query, countryCode) {
+        const filteredCities = filterCities(query, countryCode);
+        renderResidenceCityDropdown(filteredCities);
+    }, 300);
+
     residenceCityInput.addEventListener('input', function() {
         const query = this.value;
         const selectedCountryCode = document.getElementById('residence-country-code').value;
-        const filteredCities = filterCities(query, selectedCountryCode);
-        renderResidenceCityDropdown(filteredCities);
+        debouncedResidenceCityFilter(query, selectedCountryCode);
     });
     
     residenceCityInput.addEventListener('focus', function() {
