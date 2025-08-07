@@ -553,7 +553,14 @@ function initializeRatingSystem() {
 
         // 터치 이벤트 (모바일 지원)
         star.addEventListener('touchstart', function(e) {
+            // 스크롤 중이 아닐 때만 preventDefault 호출
+            if (!e.cancelable) {
+                return;
+            }
             e.preventDefault();
+        });
+
+        star.addEventListener('touchend', function(e) {
             currentRating = starRating;
             ratingInput.value = currentRating;
             updateStars(currentRating);
@@ -579,6 +586,15 @@ function initializeRatingSystem() {
         hoverRating = 0;
         updateStars(currentRating);
     });
+
+    // 별점 컨테이너에 터치 이벤트 추가 (모바일 지원)
+    ratingContainer.addEventListener('touchstart', function(e) {
+        // 스크롤 중이 아닐 때만 preventDefault 호출
+        if (!e.cancelable) {
+            return;
+        }
+        e.preventDefault();
+    }, { passive: false });
 
     // 별점 초기화 함수를 전역에서 접근 가능하도록 설정
     window.resetRating = resetRating;
