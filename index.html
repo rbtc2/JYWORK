@@ -13,7 +13,7 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- 네비게이션 바 -->
-    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0">
         <div class="nav-container max-w-4xl mx-auto px-2 sm:px-4">
             <div class="flex justify-between items-center">
                 <div class="text-lg sm:text-xl font-bold text-gray-800 py-3 sm:py-4">
@@ -392,7 +392,7 @@
                                     <input type="hidden" id="residence-country-label">
                                     
                                     <!-- 거주 국가 드롭다운 목록 -->
-                                    <ul id="residence-country-dropdown" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
+                                    <ul id="residence-country-dropdown" class="absolute w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
                                         <!-- 여기에 필터링된 국가 목록이 동적으로 추가됩니다 -->
                                     </ul>
                                 </div>
@@ -412,7 +412,7 @@
                                     <input type="hidden" id="residence-city-name">
                                     
                                     <!-- 거주 도시 드롭다운 목록 -->
-                                    <ul id="residence-city-dropdown" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
+                                    <ul id="residence-city-dropdown" class="absolute w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
                                         <!-- 여기에 필터링된 도시 목록이 동적으로 추가됩니다 -->
                                     </ul>
                                 </div>
@@ -495,14 +495,14 @@
     </main>
 
     <!-- 플로팅 + 버튼 -->
-    <button id="floating-btn" class="fixed bottom-4 right-4 w-12 h-12 sm:w-14 sm:h-14 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 z-50">
+    <button id="floating-btn" class="fixed bottom-4 right-4 w-12 h-12 sm:w-14 sm:h-14 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110">
         <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
     </button>
 
     <!-- 여행 추가 모달 오버레이 -->
-    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-3 sm:p-4">
+    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-3 sm:p-4">
         <!-- 모달 창 -->
         <div class="bg-white rounded-xl shadow-xl w-[95%] max-w-md max-h-[90vh] overflow-y-auto">
             <!-- 모달 헤더 -->
@@ -533,7 +533,7 @@
                     <input type="hidden" id="country-label" name="countryLabel">
                     
                     <!-- 국가 드롭다운 목록 -->
-                    <ul id="country-dropdown" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
+                    <ul id="country-dropdown" class="absolute w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
                         <!-- 여기에 필터링된 국가 목록이 동적으로 추가됩니다 -->
                     </ul>
                 </div>
@@ -554,7 +554,7 @@
                     <input type="hidden" id="city-name" name="cityName">
                     
                     <!-- 도시 드롭다운 목록 -->
-                    <ul id="city-dropdown" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
+                    <ul id="city-dropdown" class="absolute w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
                         <!-- 여기에 필터링된 도시 목록이 동적으로 추가됩니다 -->
                     </ul>
                 </div>
@@ -648,7 +648,7 @@
     </div>
 
     <!-- 방문 국가 배지 컬렉션 모달 오버레이 -->
-    <div id="countries-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-3 sm:p-4">
+    <div id="countries-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-3 sm:p-4">
         <!-- 모달 창 -->
         <div class="bg-white rounded-xl shadow-xl w-[95%] max-w-4xl max-h-[90vh] overflow-y-auto">
             <!-- 모달 헤더 -->

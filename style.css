@@ -795,3 +795,134 @@ body {
 .star-icon.selected {
     animation: starPulse 0.3s ease;
 } 
+
+/* z-index 레이어링 최적화 */
+/* 모달류 (1050+) */
+#modal-overlay,
+#countries-modal-overlay,
+#entry-detail-modal {
+    z-index: 1050 !important;
+}
+
+/* 네비게이션 (1000) */
+nav {
+    z-index: 1000 !important;
+}
+
+/* 플로팅버튼 (999) */
+#floating-btn {
+    z-index: 999 !important;
+}
+
+/* 툴팁 (500) */
+.calendar-tooltip,
+.leaflet-tooltip {
+    z-index: 500 !important;
+}
+
+/* 드롭다운 (100) */
+#country-dropdown,
+#city-dropdown,
+#residence-country-dropdown,
+#residence-city-dropdown {
+    z-index: 100 !important;
+}
+
+/* Leaflet 지도 z-index 강제 제어 */
+.leaflet-container,
+.leaflet-container *,
+.leaflet-pane,
+.leaflet-pane *,
+.leaflet-control,
+.leaflet-control * {
+    z-index: 1 !important;
+}
+
+/* Leaflet 컨테이너 자체의 z-index 제어 */
+#map-render .leaflet-container {
+    z-index: 1 !important;
+    position: relative !important;
+}
+
+/* Leaflet 타일 레이어 */
+.leaflet-tile-pane {
+    z-index: 1 !important;
+}
+
+/* Leaflet 오버레이 레이어 */
+.leaflet-overlay-pane {
+    z-index: 2 !important;
+}
+
+/* Leaflet 마커 레이어 */
+.leaflet-marker-pane {
+    z-index: 3 !important;
+}
+
+/* Leaflet 툴팁 레이어 */
+.leaflet-tooltip-pane {
+    z-index: 4 !important;
+}
+
+/* Leaflet 팝업 레이어 */
+.leaflet-popup-pane {
+    z-index: 5 !important;
+}
+
+/* Leaflet 컨트롤 레이어 */
+.leaflet-control-pane {
+    z-index: 10 !important;
+}
+
+/* Leaflet 특정 컨트롤들 */
+.leaflet-control-zoom,
+.leaflet-control-attribution,
+.leaflet-control-layers {
+    z-index: 10 !important;
+}
+
+/* Leaflet 팝업 관련 요소들 */
+.leaflet-popup,
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+    z-index: 5 !important;
+}
+
+/* Leaflet 마커 */
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+    z-index: 3 !important;
+}
+
+/* 네비게이션 바가 지도를 덮도록 보장 */
+nav {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    background-color: white !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+/* 지도 컨테이너가 네비게이션 바 아래에 위치하도록 */
+#map-container {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* 모바일에서 z-index 최적화 */
+@media (max-width: 768px) {
+    /* 모바일에서 드롭다운이 더 높은 우선순위를 가지도록 */
+    #country-dropdown,
+    #city-dropdown,
+    #residence-country-dropdown,
+    #residence-city-dropdown {
+        z-index: 150 !important;
+    }
+    
+    /* 모바일에서 툴팁 우선순위 증가 */
+    .calendar-tooltip,
+    .leaflet-tooltip {
+        z-index: 550 !important;
+    }
+} 
