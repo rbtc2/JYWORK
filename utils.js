@@ -697,7 +697,8 @@ function initializeAutoCleanup() {
                 const listenersToRemove = [];
                 
                 globalEventManager.listeners.forEach((listener, key) => {
-                    if (!document.contains(listener.element)) {
+                    // window 객체나 다른 non-Element 노드들은 제외하고 실제 DOM Element만 체크
+                    if (listener.element && listener.element.nodeType === Node.ELEMENT_NODE && !document.contains(listener.element)) {
                         listenersToRemove.push(key);
                     }
                 });
