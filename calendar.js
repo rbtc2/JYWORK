@@ -238,7 +238,7 @@ function renderCalendar() {
                 const purposeText = getPurposeText(event.purpose);
                 
                 // 툴팁 내용을 안전하게 생성
-                const tooltipText = `${event.country} / ${event.city}\\n${purposeText}\\n📅 ${event.startDate} ~ ${event.endDate}${event.memo ? '\\n📝 ' + event.memo : ''}`;
+                const tooltipText = `${event.country} / ${event.city}\\n${purposeText}\\n📅 ${event.startDate} ~ ${event.endDate}${event.memo ? '\\n📝 ' + sanitizeMemo(event.memo) : ''}`;
                 
                 // 대륙별 색상 결정
                 const continent = getContinentFromCountryCode(event.countryCode);

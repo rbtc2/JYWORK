@@ -352,6 +352,16 @@ function initializeModal() {
             return;
         }
         
+        // 보안 검증 - 입력 길이 및 내용 검증
+        const companions = document.getElementById('companions').value;
+        const memo = document.getElementById('memo').value;
+        
+        const validation = validateTravelForm({ companions, memo });
+        if (!validation.isValid) {
+            alert(validation.errors.join('\n'));
+            return;
+        }
+        
         const formData = {
             country: document.getElementById('country-input').value,
             countryCode: document.getElementById('country-code').value,

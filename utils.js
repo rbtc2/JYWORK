@@ -432,3 +432,103 @@ function initializeAutocompleteEventListeners() {
         }
     });
 } 
+
+/**
+ * 보안 유틸리티 함수들 - XSS 방지 및 사용자 입력 정제
+ */
+
+/**
+ * HTML 이스케이핑 함수 - 기본 XSS 방지
+ */
+function escapeHTML(str) {
+    if (typeof str !== 'string') return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+/**
+ * 사용자 입력 정제 함수 - 향후 확장성 고려
+ */
+function sanitizeUserInput(input, options = {}) {
+    if (typeof input !== 'string') return '';
+    
+    let sanitized = input.trim();
+    
+    // 기본 HTML 이스케이핑
+    sanitized = escapeHTML(sanitized);
+    
+    // 옵션별 추가 처리
+    if (options.maxLength) {
+        sanitized = sanitized.substring(0, options.maxLength);
+    }
+    
+    if (options.allowedTags && options.allowedTags.length > 0) {
+        // 향후 허용된 태그만 남기는 로직 (DOMPurify 등 라이브러리 고려)
+        // 현재는 모든 HTML 태그 제거
+    }
+    
+    return sanitized;
+}
+
+/**
+ * 동행자 입력 처리 함수 - 향후 사용자 ID 연동 대비
+ */
+function sanitizeCompanions(companionsString) {
+    if (!companionsString) return '';
+    
+    // 현재: 단순 텍스트 정제
+    let sanitized = sanitizeUserInput(companionsString, { maxLength: 200 });
+    
+    // 향후 확장 대비: 사용자 ID 패턴 감지 및 처리 준비
+    // 예: @username 형태나 ID:숫자 형태 감지
+    // const userIdPattern = /@[\w\d]+|ID:\d+/g;
+    // 현재는 일반 텍스트로만 처리
+    
+    return sanitized;
+}
+
+/**
+ * 메모 입력 처리 함수
+ */
+function sanitizeMemo(memoString) {
+    if (!memoString) return '';
+    
+    return sanitizeUserInput(memoString, { 
+        maxLength: 1000  // 메모 최대 길이 제한
+    });
+}
+
+/**
+ * 폼 검증 함수 - 클라이언트 측 검증 강화
+ */
+function validateTravelForm(formData) {
+    const errors = [];
+    
+    // 메모 길이 체크
+    if (formData.memo && formData.memo.length > 1000) {
+        errors.push('메모는 1000자를 초과할 수 없습니다.');
+    }
+    
+    // 동행자 길이 체크
+    if (formData.companions && formData.companions.length > 200) {
+        errors.push('동행자 정보는 200자를 초과할 수 없습니다.');
+    }
+    
+    return { isValid: errors.length === 0, errors };
+}
+
+/**
+ * 향후 동행자 기능 확장을 위한 데이터 구조 설계
+ */
+const companionDataStructure = {
+    // 현재: 단순 문자열
+    companions: "김철수, 이영희",
+    
+    // 향후: 객체 배열로 확장 예정
+    companionsList: [
+        { type: 'text', value: '김철수' },
+        { type: 'user_id', value: 'user123', displayName: '이영희' },
+        { type: 'email', value: 'friend@example.com', displayName: '박민수' }
+    ]
+}; 

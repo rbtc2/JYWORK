@@ -309,7 +309,7 @@ function renderCollectionTimeline() {
                     📅 ${entry.startDate} ~ ${entry.endDate}
                 </div>
                 ${ratingDisplay}
-                ${entry.memo ? `<p class="text-xs sm:text-sm text-gray-600 bg-gray-50 p-2 sm:p-3 rounded break-words mt-3">📝 ${entry.memo}</p>` : ''}
+                ${entry.memo ? `<p class="text-xs sm:text-sm text-gray-600 bg-gray-50 p-2 sm:p-3 rounded break-words mt-3">📝 ${sanitizeMemo(entry.memo)}</p>` : ''}
             </div>
         `;
     }).join('');
@@ -492,7 +492,7 @@ function showEntryDetail(entryId) {
                             <span class="text-2xl mt-1">👥</span>
                             <div class="flex-1">
                                 <p class="text-sm text-gray-500">동행자</p>
-                                <p class="text-lg font-semibold text-gray-800">${entry.companions || '없음'}</p>
+                                <p class="text-lg font-semibold text-gray-800">${sanitizeCompanions(entry.companions) || '없음'}</p>
                             </div>
                         </div>
                         
@@ -500,7 +500,7 @@ function showEntryDetail(entryId) {
                             <span class="text-2xl mt-1">📝</span>
                             <div class="flex-1">
                                 <p class="text-sm text-gray-500">메모</p>
-                                <p class="text-lg font-semibold text-gray-800">${entry.memo || '없음'}</p>
+                                <p class="text-lg font-semibold text-gray-800">${sanitizeMemo(entry.memo) || '없음'}</p>
                             </div>
                         </div>
                     </div>
@@ -784,7 +784,7 @@ function renderRatingTimeline() {
                     📅 ${entry.startDate} ~ ${entry.endDate}
                 </div>
                 ${ratingDisplay}
-                ${entry.memo ? `<p class="text-xs sm:text-sm text-gray-600 bg-gray-50 p-2 sm:p-3 rounded break-words mt-3">📝 ${entry.memo}</p>` : ''}
+                ${entry.memo ? `<p class="text-xs sm:text-sm text-gray-600 bg-gray-50 p-2 sm:p-3 rounded break-words mt-3">📝 ${sanitizeMemo(entry.memo)}</p>` : ''}
             </div>
         `;
     }).join('');
