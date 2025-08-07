@@ -332,6 +332,9 @@ function removeTooltip() {
     if (tooltip) {
         tooltip.remove();
     }
+    // 관련 타이머들 정리
+    globalEventManager.clearTimeout('tooltip-outside-click-delay');
+    globalEventManager.clearTimeout('touch-tooltip-delay');
 }
 
 // 툴팁 관련 변수
@@ -382,19 +385,36 @@ function updateDropdownsFromCurrentDate() {
 // 캘린더 이벤트 리스너 초기화
 function initializeCalendarEventListeners() {
     // 캘린더 네비게이션
-    document.getElementById('prev-month').addEventListener('click', function() {
-        currentDate.setMonth(currentDate.getMonth() - 1);
-        updateDropdownsFromCurrentDate();
-        renderCalendar();
-    });
+    globalEventManager.addEventListener(
+        document.getElementById('prev-month'),
+        'click',
+        function() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            updateDropdownsFromCurrentDate();
+            renderCalendar();
+        }
+    );
 
-    document.getElementById('next-month').addEventListener('click', function() {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        updateDropdownsFromCurrentDate();
-        renderCalendar();
-    });
+    globalEventManager.addEventListener(
+        document.getElementById('next-month'),
+        'click',
+        function() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            updateDropdownsFromCurrentDate();
+            renderCalendar();
+        }
+    );
 
     // 드롭다운 값 변경 이벤트 리스너
-    document.getElementById('year-select').addEventListener('change', updateCalendarFromDropdowns);
-    document.getElementById('month-select').addEventListener('change', updateCalendarFromDropdowns);
+    globalEventManager.addEventListener(
+        document.getElementById('year-select'),
+        'change',
+        updateCalendarFromDropdowns
+    );
+    
+    globalEventManager.addEventListener(
+        document.getElementById('month-select'),
+        'change',
+        updateCalendarFromDropdowns
+    );
 } 

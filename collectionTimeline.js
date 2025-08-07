@@ -407,6 +407,13 @@ function showEntryDetail(entryId) {
     const entry = entries.find(e => e.id === entryId);
     if (!entry) return;
 
+    // 기존 모달이 있다면 정리하고 제거
+    const existingModal = document.getElementById('entry-detail-modal');
+    if (existingModal) {
+        cleanupEntryDetailModal();
+        existingModal.remove();
+    }
+
     const days = calculateDays(entry.startDate, entry.endDate);
     const purposeText = getPurposeText(entry.purpose);
     const flag = countryFlags[entry.countryCode] || '🏳️';
@@ -556,35 +563,40 @@ function showEntryDetail(entryId) {
         </div>
     `;
 
-    // 기존 모달이 있다면 제거
-    const existingModal = document.getElementById('entry-detail-modal');
-    if (existingModal) {
-        existingModal.remove();
-    }
-
     // 새 모달 추가
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-    // ESC 키로 모달 닫기
-    document.addEventListener('keydown', function closeOnEsc(e) {
-        if (e.key === 'Escape') {
-            closeEntryDetail();
-            document.removeEventListener('keydown', closeOnEsc);
+    // 안전한 이벤트 등록
+    const escKeyListener = globalEventManager.addEventListener(
+        document,
+        'keydown',
+        function(e) {
+            if (e.key === 'Escape') {
+                closeEntryDetail();
+            }
         }
-    });
+    );
 
-    // 모달 외부 클릭으로 닫기
-    document.getElementById('entry-detail-modal').addEventListener('click', function(e) {
-        if (e.target.id === 'entry-detail-modal') {
-            closeEntryDetail();
+    // 모달 외부 클릭 이벤트
+    const outsideClickListener = globalEventManager.addEventListener(
+        document.getElementById('entry-detail-modal'),
+        'click',
+        function(e) {
+            if (e.target.id === 'entry-detail-modal') {
+                closeEntryDetail();
+            }
         }
-    });
+    );
+
+    // 모달에 정리 함수 정보 저장
+    const modal = document.getElementById('entry-detail-modal');
+    modal._cleanupListeners = [escKeyListener, outsideClickListener];
 
     // 지도 초기화 (좌표가 있는 경우)
     if (hasMap) {
-        setTimeout(() => {
+        globalEventManager.setTimeout(() => {
             initializeMiniMap(entry.id, cityCoord.lat, cityCoord.lng, entry.city);
-        }, 100);
+        }, 100, 'mini-map-init-delay');
     }
 }
 
@@ -898,8 +910,21 @@ function resetPagination() {
     ratingSortType = 'rating-high';
 }
 
+// 모달 이벤트 리스너 정리 함수
+function cleanupEntryDetailModal() {
+    const modal = document.getElementById('entry-detail-modal');
+    if (modal && modal._cleanupListeners) {
+        // 등록된 리스너들 정리
+        modal._cleanupListeners.forEach(listenerKey => {
+            globalEventManager.removeEventListener(listenerKey);
+        });
+        delete modal._cleanupListeners;
+    }
+}
+
 // 일정 상세 정보 모달 닫기
 function closeEntryDetail() {
+    cleanupEntryDetailModal();
     const modal = document.getElementById('entry-detail-modal');
     if (modal) {
         modal.remove();

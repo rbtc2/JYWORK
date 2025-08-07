@@ -205,7 +205,7 @@ function initializeSortButtons() {
     const sortButtons = document.querySelectorAll('.sort-btn');
     
     sortButtons.forEach(button => {
-        button.addEventListener('click', () => {
+        globalEventManager.addEventListener(button, 'click', () => {
             // 모든 버튼에서 active 클래스 제거
             sortButtons.forEach(btn => {
                 btn.classList.remove('active', 'bg-blue-500', 'text-white');
@@ -246,31 +246,38 @@ function initializeCountriesModal() {
     // 방문 국가 카드 클릭 이벤트
     const countriesCard = document.getElementById('countries-card');
     if (countriesCard) {
-        countriesCard.addEventListener('click', openCountriesModal);
+        globalEventManager.addEventListener(countriesCard, 'click', openCountriesModal);
     }
     
     // 모달 닫기 버튼 이벤트
     const closeButton = document.getElementById('close-countries-modal');
     if (closeButton) {
-        closeButton.addEventListener('click', closeCountriesModal);
+        globalEventManager.addEventListener(closeButton, 'click', closeCountriesModal);
     }
     
     // 모달 외부 클릭 시 닫기
     const modalOverlay = document.getElementById('countries-modal-overlay');
     if (modalOverlay) {
-        modalOverlay.addEventListener('click', (e) => {
+        globalEventManager.addEventListener(modalOverlay, 'click', (e) => {
             if (e.target === modalOverlay) {
                 closeCountriesModal();
             }
         });
     }
     
-    // ESC 키로 모달 닫기
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            closeCountriesModal();
+    // ESC 키 이벤트 - 전역에서 관리
+    globalEventManager.addEventListener(
+        document,
+        'keydown',
+        (e) => {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('countries-modal-overlay');
+                if (modal && !modal.classList.contains('hidden')) {
+                    closeCountriesModal();
+                }
+            }
         }
-    });
+    );
     
     // 정렬 버튼 초기화
     initializeSortButtons();

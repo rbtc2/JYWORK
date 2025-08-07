@@ -531,4 +531,188 @@ const companionDataStructure = {
         { type: 'user_id', value: 'user123', displayName: '이영희' },
         { type: 'email', value: 'friend@example.com', displayName: '박민수' }
     ]
-}; 
+};
+
+/**
+ * 이벤트 리스너 중앙 관리 클래스
+ * 메모리 누수 방지 및 이벤트 생명주기 관리
+ */
+class EventManager {
+    constructor() {
+        this.listeners = new Map();
+        this.timers = new Map();
+        this.abortController = new AbortController();
+    }
+
+    /**
+     * 이벤트 리스너 등록 (자동 정리 지원)
+     */
+    addEventListener(element, event, handler, options = {}) {
+        const elementId = element.id || `anonymous-${Date.now()}-${Math.random()}`;
+        const key = `${elementId}-${event}`;
+        
+        // 기존 리스너가 있으면 제거
+        this.removeEventListener(key);
+        
+        // AbortController를 사용한 자동 정리 지원
+        const finalOptions = {
+            ...options,
+            signal: this.abortController.signal
+        };
+        
+        element.addEventListener(event, handler, finalOptions);
+        
+        // 리스너 정보 저장
+        this.listeners.set(key, {
+            element,
+            event,
+            handler,
+            options: finalOptions
+        });
+        
+        return key; // 수동 제거를 위한 키 반환
+    }
+
+    /**
+     * 특정 이벤트 리스너 제거
+     */
+    removeEventListener(key) {
+        if (this.listeners.has(key)) {
+            const { element, event, handler } = this.listeners.get(key);
+            element.removeEventListener(event, handler);
+            this.listeners.delete(key);
+        }
+    }
+
+    /**
+     * 타이머 관리 (메모리 누수 방지)
+     */
+    setTimeout(callback, delay, timerName = null) {
+        const key = timerName || `timer-${Date.now()}-${Math.random()}`;
+        
+        // 기존 타이머가 있으면 제거
+        this.clearTimeout(key);
+        
+        const timerId = setTimeout(() => {
+            callback();
+            this.timers.delete(key); // 완료된 타이머 정리
+        }, delay);
+        
+        this.timers.set(key, timerId);
+        return key;
+    }
+
+    /**
+     * 특정 타이머 제거
+     */
+    clearTimeout(key) {
+        if (this.timers.has(key)) {
+            clearTimeout(this.timers.get(key));
+            this.timers.delete(key);
+        }
+    }
+
+    /**
+     * 일회성 이벤트 리스너 등록
+     */
+    addEventListenerOnce(element, event, handler, options = {}) {
+        const onceHandler = (e) => {
+            handler(e);
+            // 자동으로 리스너 제거는 브라우저가 처리
+        };
+        
+        return this.addEventListener(element, event, onceHandler, {
+            ...options,
+            once: true
+        });
+    }
+
+    /**
+     * 모든 이벤트 리스너 및 타이머 정리
+     */
+    cleanup() {
+        // 모든 타이머 정리
+        this.timers.forEach((timerId, key) => {
+            clearTimeout(timerId);
+        });
+        this.timers.clear();
+        
+        // AbortController로 모든 이벤트 리스너 일괄 정리
+        this.abortController.abort();
+        this.listeners.clear();
+        
+        // 새로운 AbortController 생성
+        this.abortController = new AbortController();
+    }
+
+    /**
+     * 현재 등록된 리스너 수 반환 (디버깅용)
+     */
+    getActiveListenersCount() {
+        return this.listeners.size;
+    }
+
+    /**
+     * 현재 활성 타이머 수 반환 (디버깅용)
+     */
+    getActiveTimersCount() {
+        return this.timers.size;
+    }
+}
+
+// 전역 이벤트 관리자 인스턴스
+window.globalEventManager = new EventManager();
+
+/**
+ * 개발 환경용 메모리 사용량 체크 함수
+ */
+function checkMemoryUsage() {
+    if (window.performance && window.performance.memory) {
+        const memory = window.performance.memory;
+        console.log({
+            used: Math.round(memory.usedJSHeapSize / 1048576) + ' MB',
+            total: Math.round(memory.totalJSHeapSize / 1048576) + ' MB',
+            limit: Math.round(memory.jsHeapSizeLimit / 1048576) + ' MB',
+            activeListeners: globalEventManager.getActiveListenersCount(),
+            activeTimers: globalEventManager.getActiveTimersCount()
+        });
+    }
+}
+
+// 전역으로 노출 (개발 환경에서만)
+if (typeof window !== 'undefined') {
+    window.checkMemoryUsage = checkMemoryUsage;
+}
+
+/**
+ * 자동 정리 장치 - 일정 시간마다 불필요한 리스너 정리
+ */
+function initializeAutoCleanup() {
+    globalEventManager.addEventListener(
+        window,
+        'load',
+        () => {
+            setInterval(() => {
+                // DOM에서 제거된 요소들의 이벤트 리스너 정리
+                const listenersToRemove = [];
+                
+                globalEventManager.listeners.forEach((listener, key) => {
+                    if (!document.contains(listener.element)) {
+                        listenersToRemove.push(key);
+                    }
+                });
+                
+                listenersToRemove.forEach(key => {
+                    globalEventManager.removeEventListener(key);
+                });
+                
+                if (listenersToRemove.length > 0) {
+                    console.log(`Cleaned up ${listenersToRemove.length} orphaned listeners`);
+                }
+            }, 30000); // 30초마다 정리
+        }
+    );
+}
+
+// 자동 정리 장치 초기화
+initializeAutoCleanup(); 

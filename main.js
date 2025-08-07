@@ -118,8 +118,11 @@ function updateAllSections() {
 // 탭 클릭 이벤트 처리
 function initializeTabNavigation() {
     document.querySelectorAll('.nav-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
+        globalEventManager.addEventListener(tab, 'click', function() {
             const targetSection = this.getAttribute('data-section');
+            
+            // 이전 섹션 정리 (필요한 경우)
+            cleanupPreviousSection();
             
             // 모든 탭에서 active 클래스 제거
             document.querySelectorAll('.nav-tab').forEach(t => {
@@ -151,12 +154,12 @@ function initializeTabNavigation() {
             
             // 세계지도 섹션으로 이동할 때 지도 업데이트
             if (targetSection === 'world-map') {
-                setTimeout(() => {
+                globalEventManager.setTimeout(() => {
                     if (map && mapInitialized) {
                         map.invalidateSize();
                         updateMapInfo();
                     }
-                }, 100);
+                }, 100, 'map-update-delay');
             }
             
             // 콜렉션 섹션으로 이동할 때 기본 탭 설정
@@ -620,6 +623,28 @@ function initializeMobileZoomPrevention() {
     });
 }
 
+// 이전 섹션 정리 함수
+function cleanupPreviousSection() {
+    // 활성화된 툴팁들 정리
+    if (typeof removeTooltip === 'function') {
+        removeTooltip();
+    }
+    
+    // 열린 모달들 정리
+    if (typeof closeEntryDetail === 'function') {
+        closeEntryDetail();
+    }
+    
+    if (typeof closeCountriesModal === 'function') {
+        closeCountriesModal();
+    }
+    
+    // 임시 타이머들 정리
+    globalEventManager.clearTimeout('touch-tooltip-delay');
+    globalEventManager.clearTimeout('tooltip-outside-click-delay');
+    globalEventManager.clearTimeout('map-update-delay');
+}
+
 // 애플리케이션 초기화
 function initializeApp() {
     // 모바일 더블탭 줌 방지 초기화
@@ -643,7 +668,7 @@ function initializeApp() {
     initializeCalendarDropdowns();
     
     // 지도 초기화 (약간의 지연을 두어 DOM이 완전히 로드된 후 실행)
-    setTimeout(() => {
+    globalEventManager.setTimeout(() => {
         if (typeof initializeMap === 'function') {
             initializeMap();
         } else {
@@ -655,7 +680,7 @@ function initializeApp() {
         } else {
             console.warn('createMarkers 함수를 찾을 수 없습니다. 마커 기능은 향후 구현 예정입니다.');
         }
-    }, 200);
+    }, 200, 'map-init-delay');
     
     // 이벤트 리스너 초기화
     initializeTabNavigation();
@@ -675,6 +700,29 @@ function initializeApp() {
     // Countries 모듈 초기화
     if (typeof initializeCountriesModule === 'function') {
         initializeCountriesModule();
+    }
+    
+    // 페이지 언로드 시 정리
+    globalEventManager.addEventListener(
+        window,
+        'beforeunload',
+        () => {
+            globalEventManager.cleanup();
+        }
+    );
+    
+    // 개발 환경에서 메모리 사용량 모니터링
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+        globalEventManager.addEventListener(
+            window,
+            'load',
+            () => {
+                setInterval(() => {
+                    console.log('Active listeners:', globalEventManager.getActiveListenersCount());
+                    console.log('Active timers:', globalEventManager.getActiveTimersCount());
+                }, 10000); // 10초마다 체크
+            }
+        );
     }
 }
 
