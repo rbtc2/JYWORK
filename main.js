@@ -83,6 +83,7 @@ function calculateStats() {
         document.getElementById('total-countries').textContent = '0';
         document.getElementById('total-cities').textContent = '0';
         document.getElementById('total-days').textContent = '0';
+        document.getElementById('total-visits').textContent = '0';
         document.getElementById('travel-summary').innerHTML = '<p class="text-gray-500">아직 등록된 여행이 없습니다.</p>';
         return;
     }
@@ -113,6 +114,7 @@ function calculateStats() {
     document.getElementById('total-countries').textContent = countries.length;
     document.getElementById('total-cities').textContent = cities.length;
     document.getElementById('total-days').textContent = totalDays;
+    document.getElementById('total-visits').textContent = entries.length;
 
     // 요약 정보 생성
     let summaryHTML = `

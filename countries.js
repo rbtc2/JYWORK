@@ -131,12 +131,12 @@ function createCountryBadge(country) {
         <div class="country-badge bg-white rounded-xl shadow-md border border-gray-200 p-3 sm:p-4 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
             <div class="text-center mb-2 sm:mb-3">
                 <div class="text-3xl sm:text-4xl mb-1 sm:mb-2">🏳️</div>
-                <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-1">${country.name}</h3>
-                <div class="text-xs sm:text-sm text-gray-600">${country.code}</div>
+                <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-1">${country.name}</h3>
+                <div class="text-sm sm:text-base text-gray-600">${country.code}</div>
             </div>
             
             <!-- 모바일 최적화된 정보 레이아웃 -->
-            <div class="grid grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm mb-2 sm:mb-3">
+            <div class="grid grid-cols-2 gap-2 sm:gap-3 text-sm sm:text-base mb-2 sm:mb-3">
                 <div class="flex items-center justify-between bg-blue-50 rounded-lg p-2">
                     <span class="text-gray-600">방문:</span>
                     <span class="font-semibold text-blue-600">${country.visitCount}회</span>
@@ -157,13 +157,13 @@ function createCountryBadge(country) {
             
             <!-- 상세 정보 (모바일에서는 축약) -->
             <div class="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-200">
-                <div class="text-xs text-gray-500 mb-1">
+                <div class="text-sm text-gray-500 mb-1">
                     <strong>도시:</strong> <span class="truncate block">${citiesList}</span>
                 </div>
-                <div class="text-xs text-gray-500 mb-1">
+                <div class="text-sm text-gray-500 mb-1">
                     <strong>목적:</strong> <span class="truncate block">${purposesList}</span>
                 </div>
-                <div class="grid grid-cols-2 gap-2 text-xs text-gray-500">
+                <div class="grid grid-cols-2 gap-2 text-sm text-gray-500">
                     <div>
                         <strong>첫 방문:</strong><br>
                         <span class="text-gray-600">${firstVisitDate}</span>
@@ -175,8 +175,8 @@ function createCountryBadge(country) {
                 </div>
             </div>
             
-            <!-- Unlocked 애니메이션 효과 -->
-            <div class="mt-2 sm:mt-3 flex justify-center">
+            <!-- Unlocked 애니메이션 효과 (데스크톱에서만 표시) -->
+            <div class="mt-2 sm:mt-3 flex justify-center hidden sm:block">
                 <div class="unlocked-badge bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-bold animate-pulse">
                     🔓 Unlocked
                 </div>
