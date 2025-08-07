@@ -22,6 +22,92 @@ const countryFlags = {
     'DE': '🇩🇪'
 };
 
+// 국가 코드를 한글명으로 변환하는 함수
+function getCountryNameByCode(countryCode) {
+    const countryMap = {
+        'KR': '대한민국',
+        'JP': '일본',
+        'US': '미국',
+        'GB': '영국',
+        'FR': '프랑스',
+        'DE': '독일'
+    };
+    return countryMap[countryCode] || countryCode;
+}
+
+// 도시명을 정확한 한글명으로 변환하는 함수
+function getCityNameByCode(countryCode, cityName) {
+    // 도시명이 이미 한글이거나 영어인 경우 그대로 반환
+    if (cityName && typeof cityName === 'string') {
+        // 한글 도시명 패턴 확인
+        const koreanCityPattern = /[가-힣]/;
+        if (koreanCityPattern.test(cityName)) {
+            return cityName;
+        }
+        
+        // 영어 도시명을 한글로 변환
+        const cityMap = {
+            'KR': {
+                'Seoul': '서울',
+                'Busan': '부산',
+                'Daegu': '대구',
+                'Incheon': '인천',
+                'Gwangju': '광주',
+                'Daejeon': '대전',
+                'Ulsan': '울산',
+                'Jeju': '제주'
+            },
+            'JP': {
+                'Tokyo': '도쿄',
+                'Osaka': '오사카',
+                'Kyoto': '교토',
+                'Yokohama': '요코하마',
+                'Nagoya': '나고야',
+                'Sapporo': '삿포로'
+            },
+            'US': {
+                'New York': '뉴욕',
+                'Los Angeles': '로스앤젤레스',
+                'Chicago': '시카고',
+                'Houston': '휴스턴',
+                'Phoenix': '피닉스',
+                'Philadelphia': '필라델피아'
+            },
+            'GB': {
+                'London': '런던',
+                'Birmingham': '버밍엄',
+                'Leeds': '리즈',
+                'Glasgow': '글래스고',
+                'Sheffield': '셰필드',
+                'Bradford': '브래드포드'
+            },
+            'FR': {
+                'Paris': '파리',
+                'Marseille': '마르세유',
+                'Lyon': '리옹',
+                'Toulouse': '툴루즈',
+                'Nice': '니스',
+                'Nantes': '낭트'
+            },
+            'DE': {
+                'Berlin': '베를린',
+                'Hamburg': '함부르크',
+                'Munich': '뮌헨',
+                'Cologne': '쾰른',
+                'Frankfurt': '프랑크푸르트',
+                'Stuttgart': '슈투트가르트'
+            }
+        };
+        
+        const countryCities = cityMap[countryCode];
+        if (countryCities && countryCities[cityName]) {
+            return countryCities[cityName];
+        }
+    }
+    
+    return cityName;
+}
+
 // 페이지네이션 유틸리티 함수들
 function getPaginatedItems(items, currentPage, itemsPerPage) {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -196,6 +282,10 @@ function renderCollectionTimeline() {
     const paginatedEntries = getPaginatedItems(sortedEntries, timelineCurrentPage, ITEMS_PER_PAGE);
 
     collectionTimelineList.innerHTML = paginatedEntries.map(entry => {
+        // 국가명과 도시명을 정확한 한글명으로 변환
+        const countryName = getCountryNameByCode(entry.countryCode) || entry.country;
+        const cityName = getCityNameByCode(entry.countryCode, entry.city) || entry.city;
+        
         const days = calculateDays(entry.startDate, entry.endDate);
         const purposeText = getPurposeText(entry.purpose);
         const flag = countryFlags[entry.countryCode] || '🏳️';
@@ -206,7 +296,7 @@ function renderCollectionTimeline() {
                  onclick="showEntryDetail('${entry.id}')">
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                     <div class="flex-1">
-                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 break-words">${flag} ${entry.country} > ${entry.city}</h3>
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 break-words">${flag} ${cityName}, ${countryName}</h3>
                         <p class="text-xs sm:text-sm text-gray-600 mt-1">${purposeText}</p>
                     </div>
                     <div class="flex items-center justify-end sm:justify-start">
@@ -321,6 +411,10 @@ function showEntryDetail(entryId) {
     const purposeText = getPurposeText(entry.purpose);
     const flag = countryFlags[entry.countryCode] || '🏳️';
     
+    // 국가명과 도시명을 정확한 한글명으로 변환
+    const countryName = getCountryNameByCode(entry.countryCode) || entry.country;
+    const cityName = getCityNameByCode(entry.countryCode, entry.city) || entry.city;
+    
     // 도시 좌표 가져오기
     const cityCoord = cityCoordinates[entry.city];
     const hasMap = cityCoord && cityCoord.lat && cityCoord.lng;
@@ -330,27 +424,23 @@ function showEntryDetail(entryId) {
         <div id="entry-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <!-- 헤더 -->
-                <div class="flex justify-between items-start sm:items-center p-4 sm:p-6 border-b border-gray-100">
-                    <div class="flex items-start sm:items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
-                        <span class="text-3xl sm:text-4xl flex-shrink-0" aria-label="${entry.country} 국기">${flag}</span>
+                <div class="flex justify-between items-start sm:items-center p-4 sm:p-6 border-b border-gray-100 relative">
+                    <div class="flex items-start sm:items-center space-x-3 sm:space-x-4 flex-1 min-w-0 pr-12">
+                        <span class="text-3xl sm:text-4xl flex-shrink-0" aria-label="${countryName} 국기">${flag}</span>
                         <div class="flex-1 min-w-0">
                             <!-- 모바일: 상하 구조 -->
                             <div class="block sm:hidden">
-                                <div class="flex items-center space-x-2 mb-1">
-                                    <span class="text-xs text-gray-500 font-medium">${entry.countryCode}</span>
-                                    <h2 class="text-sm text-gray-600 truncate">${entry.country}</h2>
-                                </div>
-                                <h3 class="text-xl font-bold text-gray-800 truncate">${entry.city}</h3>
+                                <h2 class="text-lg font-bold text-gray-800 truncate">${cityName}, ${countryName}</h2>
                             </div>
                             <!-- 데스크탑: 한 줄 구조 -->
                             <div class="hidden sm:block">
-                                <h2 class="text-xl sm:text-2xl font-bold text-gray-800 truncate">${entry.country} > ${entry.city}</h2>
+                                <h2 class="text-xl sm:text-2xl font-bold text-gray-800 truncate">${cityName}, ${countryName}</h2>
                             </div>
                             <p class="text-sm sm:text-lg text-gray-600 mt-1 truncate">${entry.startDate} ~ ${entry.endDate}</p>
                         </div>
                     </div>
                     <button onclick="closeEntryDetail()" 
-                            class="text-gray-400 hover:text-gray-600 text-xl sm:text-2xl font-bold flex-shrink-0 ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                            class="absolute top-4 right-4 sm:relative sm:top-auto sm:right-auto text-gray-400 hover:text-gray-600 text-xl sm:text-2xl font-bold flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
                             aria-label="모달 닫기">
                         ×
                     </button>
@@ -422,7 +512,7 @@ function showEntryDetail(entryId) {
                             <span class="text-2xl">🗺️</span>
                             <div>
                                 <p class="text-sm text-gray-500">위치</p>
-                                <p class="text-lg font-semibold text-gray-800">${entry.city}</p>
+                                <p class="text-lg font-semibold text-gray-800">${cityName}, ${countryName}</p>
                             </div>
                         </div>
                         <div id="mini-map-${entry.id}" class="mini-map-container rounded-lg overflow-hidden h-48"></div>
@@ -433,7 +523,7 @@ function showEntryDetail(entryId) {
                             <span class="text-2xl">🗺️</span>
                             <div>
                                 <p class="text-sm text-gray-500">위치</p>
-                                <p class="text-lg font-semibold text-gray-800">${entry.city}</p>
+                                <p class="text-lg font-semibold text-gray-800">${cityName}, ${countryName}</p>
                             </div>
                         </div>
                         <div class="bg-gray-100 rounded-lg overflow-hidden h-48 flex items-center justify-center">
@@ -667,6 +757,10 @@ function renderRatingTimeline() {
     const paginatedEntries = getPaginatedItems(sortedEntries, ratingCurrentPage, ITEMS_PER_PAGE);
 
     ratingTimelineList.innerHTML = paginatedEntries.map(entry => {
+        // 국가명과 도시명을 정확한 한글명으로 변환
+        const countryName = getCountryNameByCode(entry.countryCode) || entry.country;
+        const cityName = getCityNameByCode(entry.countryCode, entry.city) || entry.city;
+        
         const days = calculateDays(entry.startDate, entry.endDate);
         const purposeText = getPurposeText(entry.purpose);
         const flag = countryFlags[entry.countryCode] || '🏳️';
@@ -677,7 +771,7 @@ function renderRatingTimeline() {
                  onclick="showEntryDetail('${entry.id}')">
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                     <div class="flex-1">
-                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 break-words">${flag} ${entry.country} > ${entry.city}</h3>
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 break-words">${flag} ${cityName}, ${countryName}</h3>
                         <p class="text-xs sm:text-sm text-gray-600 mt-1">${purposeText}</p>
                     </div>
                     <div class="flex items-center justify-end sm:justify-start">
