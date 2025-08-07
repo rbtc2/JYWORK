@@ -32,28 +32,31 @@ function testMapContainer() {
 
 // 지도 초기화 함수
 function initializeMap() {
-    // 이미 초기화된 경우 제거 후 재생성
-    if (map) {
-        map.remove();
-        map = null;
-    }
-
-    // 지도 컨테이너 확인
-    const mapContainer = document.getElementById('map-container');
-    const mapRender = document.getElementById('map-render');
-    
-    if (!mapContainer || !mapRender) {
-        console.error('지도 컨테이너를 찾을 수 없습니다.');
-        return;
-    }
-
-    // 컨테이너 테스트
-    if (!testMapContainer()) {
-        console.error('지도 컨테이너가 올바르게 설정되지 않았습니다.');
-        return;
-    }
-
     try {
+        // 이미 초기화된 경우 제거 후 재생성
+        if (map) {
+            safeExecute(() => map.remove(), { function: 'map.remove' });
+            map = null;
+        }
+
+        // 지도 컨테이너 확인
+        const mapContainer = SafeDOM.getElement('#map-container');
+        const mapRender = SafeDOM.getElement('#map-render');
+        
+        if (!mapContainer || !mapRender) {
+            throw new Error('지도 컨테이너를 찾을 수 없습니다.');
+        }
+
+        // 컨테이너 테스트
+        if (!testMapContainer()) {
+            throw new Error('지도 컨테이너가 올바르게 설정되지 않았습니다.');
+        }
+
+        // Leaflet 라이브러리 확인
+        if (typeof L === 'undefined') {
+            throw new Error('Leaflet 라이브러리가 로드되지 않았습니다.');
+        }
+
         // 지도 생성 - 요구사항에 따른 설정
         map = L.map('map-render', {
             center: [20, 0],           // 적도 중심
@@ -95,7 +98,11 @@ function initializeMap() {
         });
 
         tileLayer.on('tileerror', function(e) {
-            console.error('타일 로딩 오류:', e);
+            errorHandler.handleError(new Error('Tile loading error'), { 
+                tileUrl: e.url,
+                tileCoords: e.coords 
+            }, ErrorSeverity.MEDIUM);
+            
             // 대체 타일 서버 시도
             console.log('대체 타일 서버를 시도합니다...');
             const fallbackTileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -117,66 +124,75 @@ function initializeMap() {
 
         // 지도 타일 로딩 오류 이벤트
         map.on('tileerror', function(e) {
-            console.error('지도 타일 오류:', e);
+            errorHandler.handleError(new Error('Map tile error'), { 
+                tileUrl: e.url,
+                tileCoords: e.coords 
+            }, ErrorSeverity.MEDIUM);
         });
 
         // 지도 이벤트 리스너 등록
-        setupMapEventListeners();
+        safeExecute(() => setupMapEventListeners(), { function: 'setupMapEventListeners' });
         
         // 지도 크기 재계산 (리사이징 문제 방지)
-        setTimeout(() => {
+        globalEventManager.setTimeout(() => {
             if (map) {
-                map.invalidateSize();
-                updateMapInfo();
+                safeExecute(() => map.invalidateSize(), { function: 'map.invalidateSize' });
+                safeExecute(() => updateMapInfo(), { function: 'updateMapInfo' });
             }
-        }, 100);
+        }, 100, 'map-resize-delay');
 
         mapInitialized = true;
         console.log('지도가 성공적으로 초기화되었습니다.');
 
     } catch (error) {
-        console.error('지도 초기화 중 오류 발생:', error);
+        errorHandler.handleError(error, { function: 'initializeMap' }, ErrorSeverity.HIGH);
         showMapError('지도를 불러오는 중 오류가 발생했습니다.');
     }
 }
 
 // 지도 이벤트 리스너 설정
 function setupMapEventListeners() {
-    if (!map) return;
+    try {
+        if (!map) {
+            throw new Error('Map is not initialized');
+        }
 
-    // 지도 이동 이벤트
-    map.on('moveend', function() {
-        updateMapInfo();
-    });
+        // 지도 이동 이벤트
+        map.on('moveend', function() {
+            safeExecute(() => updateMapInfo(), { function: 'updateMapInfo' });
+        });
 
-    // 지도 줌 이벤트
-    map.on('zoomend', function() {
-        updateMapInfo();
-    });
+        // 지도 줌 이벤트
+        map.on('zoomend', function() {
+            safeExecute(() => updateMapInfo(), { function: 'updateMapInfo' });
+        });
 
-    // 지도 로드 완료 이벤트
-    map.on('load', function() {
-        console.log('지도 로드 완료');
-        updateMapInfo();
-    });
+        // 지도 로드 완료 이벤트
+        map.on('load', function() {
+            console.log('지도 로드 완료');
+            safeExecute(() => updateMapInfo(), { function: 'updateMapInfo' });
+        });
 
-    // 지도 오류 이벤트
-    map.on('error', function(error) {
-        console.error('지도 오류:', error);
-        showMapError('지도 로딩 중 오류가 발생했습니다.');
-    });
-    
-    // 지도 리사이즈 이벤트
-    map.on('resize', function() {
-        console.log('지도 리사이즈 이벤트 발생');
-        updateMapInfo();
-    });
-    
-    // 지도 뷰 리셋 이벤트
-    map.on('viewreset', function() {
-        console.log('지도 뷰 리셋 이벤트 발생');
-        updateMapInfo();
-    });
+        // 지도 오류 이벤트
+        map.on('error', function(error) {
+            errorHandler.handleError(error, { function: 'map.error' }, ErrorSeverity.MEDIUM);
+            showMapError('지도 로딩 중 오류가 발생했습니다.');
+        });
+        
+        // 지도 리사이즈 이벤트
+        map.on('resize', function() {
+            console.log('지도 리사이즈 이벤트 발생');
+            safeExecute(() => updateMapInfo(), { function: 'updateMapInfo' });
+        });
+        
+        // 지도 뷰 리셋 이벤트
+        map.on('viewreset', function() {
+            console.log('지도 뷰 리셋 이벤트 발생');
+            safeExecute(() => updateMapInfo(), { function: 'updateMapInfo' });
+        });
+    } catch (error) {
+        errorHandler.handleError(error, { function: 'setupMapEventListeners' }, ErrorSeverity.MEDIUM);
+    }
 }
 
 // 지도 정보 업데이트

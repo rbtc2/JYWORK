@@ -717,3 +717,424 @@ function initializeAutoCleanup() {
 
 // 자동 정리 장치 초기화
 initializeAutoCleanup(); 
+
+/**
+ * 에러 처리 시스템 - 앱 안정성 강화
+ */
+
+/**
+ * 에러 타입 정의
+ */
+const ErrorTypes = {
+    STORAGE: 'storage',
+    DOM: 'dom',
+    NETWORK: 'network',
+    JSON: 'json',
+    VALIDATION: 'validation',
+    UNKNOWN: 'unknown'
+};
+
+/**
+ * 에러 심각도 정의
+ */
+const ErrorSeverity = {
+    LOW: 'low',
+    MEDIUM: 'medium',
+    HIGH: 'high',
+    CRITICAL: 'critical'
+};
+
+/**
+ * 중앙 에러 처리 클래스
+ */
+class ErrorHandler {
+    constructor() {
+        this.errorLog = [];
+        this.maxLogSize = 100;
+        this.notificationTimeout = 5000;
+        this.isNotificationVisible = false;
+    }
+
+    /**
+     * 에러 로깅 및 처리
+     */
+    handleError(error, context = {}, severity = ErrorSeverity.MEDIUM) {
+        const errorInfo = {
+            timestamp: new Date().toISOString(),
+            message: error.message || 'Unknown error',
+            stack: error.stack,
+            type: this.getErrorType(error),
+            severity,
+            context: this.sanitizeContext(context),
+            userAgent: navigator.userAgent
+        };
+
+        // 에러 로그에 추가
+        this.addToLog(errorInfo);
+
+        // 콘솔에 로깅 (개발 환경)
+        if (this.isDevelopment()) {
+            console.error('Error occurred:', errorInfo);
+        }
+
+        // 사용자에게 알림 (중요한 에러만)
+        if (severity === ErrorSeverity.HIGH || severity === ErrorSeverity.CRITICAL) {
+            this.showUserNotification(errorInfo);
+        }
+
+        return errorInfo;
+    }
+
+    /**
+     * 에러 타입 판별
+     */
+    getErrorType(error) {
+        if (error.name === 'QuotaExceededError' || error.message.includes('QuotaExceeded')) {
+            return ErrorTypes.STORAGE;
+        }
+        if (error.name === 'SyntaxError' && error.message.includes('JSON')) {
+            return ErrorTypes.JSON;
+        }
+        if (error.name === 'TypeError' && error.message.includes('DOM')) {
+            return ErrorTypes.DOM;
+        }
+        if (error.name === 'NetworkError' || error.message.includes('fetch')) {
+            return ErrorTypes.NETWORK;
+        }
+        return ErrorTypes.UNKNOWN;
+    }
+
+    /**
+     * 컨텍스트 정보 정제 (개인정보 보호)
+     */
+    sanitizeContext(context) {
+        const sanitized = {};
+        for (const [key, value] of Object.entries(context)) {
+            if (typeof value === 'string' && value.length > 50) {
+                sanitized[key] = value.substring(0, 50) + '...';
+            } else if (typeof value === 'object' && value !== null) {
+                sanitized[key] = '[Object]';
+            } else {
+                sanitized[key] = value;
+            }
+        }
+        return sanitized;
+    }
+
+    /**
+     * 에러 로그에 추가
+     */
+    addToLog(errorInfo) {
+        this.errorLog.push(errorInfo);
+        
+        // 로그 크기 제한
+        if (this.errorLog.length > this.maxLogSize) {
+            this.errorLog = this.errorLog.slice(-this.maxLogSize);
+        }
+    }
+
+    /**
+     * 사용자 알림 표시
+     */
+    showUserNotification(errorInfo) {
+        if (this.isNotificationVisible) return;
+
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50 max-w-sm';
+        notification.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="font-semibold">오류가 발생했습니다</div>
+                    <div class="text-sm opacity-90">${this.getUserFriendlyMessage(errorInfo)}</div>
+                </div>
+                <button class="ml-2 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">×</button>
+            </div>
+        `;
+
+        document.body.appendChild(notification);
+        this.isNotificationVisible = true;
+
+        // 자동 제거
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+                this.isNotificationVisible = false;
+            }
+        }, this.notificationTimeout);
+    }
+
+    /**
+     * 사용자 친화적 에러 메시지 생성
+     */
+    getUserFriendlyMessage(errorInfo) {
+        switch (errorInfo.type) {
+            case ErrorTypes.STORAGE:
+                return '저장 공간이 부족합니다. 브라우저 설정을 확인해주세요.';
+            case ErrorTypes.JSON:
+                return '데이터 형식에 문제가 있습니다. 페이지를 새로고침해주세요.';
+            case ErrorTypes.DOM:
+                return '페이지 요소를 찾을 수 없습니다. 페이지를 새로고침해주세요.';
+            case ErrorTypes.NETWORK:
+                return '네트워크 연결을 확인해주세요.';
+            default:
+                return '예상치 못한 오류가 발생했습니다. 페이지를 새로고침해주세요.';
+        }
+    }
+
+    /**
+     * 개발 환경 확인
+     */
+    isDevelopment() {
+        return window.location.hostname === 'localhost' || 
+               window.location.hostname === '127.0.0.1' ||
+               window.location.hostname.includes('dev');
+    }
+
+    /**
+     * 에러 로그 조회
+     */
+    getErrorLog() {
+        return [...this.errorLog];
+    }
+
+    /**
+     * 에러 로그 초기화
+     */
+    clearErrorLog() {
+        this.errorLog = [];
+    }
+}
+
+// 전역 에러 핸들러 인스턴스
+window.errorHandler = new ErrorHandler();
+
+/**
+ * 안전한 localStorage 래퍼 함수들
+ */
+const SafeStorage = {
+    /**
+     * 안전한 localStorage.getItem
+     */
+    getItem(key, defaultValue = null) {
+        try {
+            if (!this.isStorageAvailable()) {
+                throw new Error('localStorage is not available');
+            }
+            const value = localStorage.getItem(key);
+            return value !== null ? value : defaultValue;
+        } catch (error) {
+            errorHandler.handleError(error, { key }, ErrorSeverity.MEDIUM);
+            return defaultValue;
+        }
+    },
+
+    /**
+     * 안전한 localStorage.setItem
+     */
+    setItem(key, value) {
+        try {
+            if (!this.isStorageAvailable()) {
+                throw new Error('localStorage is not available');
+            }
+            localStorage.setItem(key, value);
+            return true;
+        } catch (error) {
+            errorHandler.handleError(error, { key, valueLength: String(value).length }, ErrorSeverity.HIGH);
+            return false;
+        }
+    },
+
+    /**
+     * 안전한 localStorage.removeItem
+     */
+    removeItem(key) {
+        try {
+            if (!this.isStorageAvailable()) {
+                throw new Error('localStorage is not available');
+            }
+            localStorage.removeItem(key);
+            return true;
+        } catch (error) {
+            errorHandler.handleError(error, { key }, ErrorSeverity.MEDIUM);
+            return false;
+        }
+    },
+
+    /**
+     * localStorage 사용 가능 여부 확인
+     */
+    isStorageAvailable() {
+        try {
+            const test = '__storage_test__';
+            localStorage.setItem(test, test);
+            localStorage.removeItem(test);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    },
+
+    /**
+     * 저장 공간 사용량 확인
+     */
+    getStorageUsage() {
+        try {
+            let total = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    total += localStorage[key].length + key.length;
+                }
+            }
+            return total;
+        } catch (error) {
+            errorHandler.handleError(error, {}, ErrorSeverity.LOW);
+            return 0;
+        }
+    }
+};
+
+/**
+ * 안전한 JSON 파싱/직렬화 함수들
+ */
+const SafeJSON = {
+    /**
+     * 안전한 JSON.parse
+     */
+    parse(str, defaultValue = null) {
+        try {
+            if (typeof str !== 'string') {
+                throw new Error('Input is not a string');
+            }
+            return JSON.parse(str);
+        } catch (error) {
+            errorHandler.handleError(error, { 
+                inputLength: str.length,
+                inputPreview: str.substring(0, 100)
+            }, ErrorSeverity.MEDIUM);
+            return defaultValue;
+        }
+    },
+
+    /**
+     * 안전한 JSON.stringify
+     */
+    stringify(obj, defaultValue = '{}') {
+        try {
+            return JSON.stringify(obj);
+        } catch (error) {
+            errorHandler.handleError(error, { 
+                objectType: typeof obj,
+                objectKeys: obj ? Object.keys(obj) : []
+            }, ErrorSeverity.MEDIUM);
+            return defaultValue;
+        }
+    }
+};
+
+/**
+ * 안전한 DOM 조작 함수들
+ */
+const SafeDOM = {
+    /**
+     * 안전한 요소 선택
+     */
+    getElement(selector, parent = document) {
+        try {
+            const element = parent.querySelector(selector);
+            if (!element) {
+                throw new Error(`Element not found: ${selector}`);
+            }
+            return element;
+        } catch (error) {
+            errorHandler.handleError(error, { selector }, ErrorSeverity.MEDIUM);
+            return null;
+        }
+    },
+
+    /**
+     * 안전한 innerHTML 설정
+     */
+    setInnerHTML(element, html) {
+        try {
+            if (!element || typeof element.innerHTML === 'undefined') {
+                throw new Error('Invalid element');
+            }
+            element.innerHTML = html;
+            return true;
+        } catch (error) {
+            errorHandler.handleError(error, { 
+                elementType: element ? element.tagName : 'null',
+                htmlLength: html.length
+            }, ErrorSeverity.MEDIUM);
+            return false;
+        }
+    },
+
+    /**
+     * 안전한 요소 생성
+     */
+    createElement(tagName, attributes = {}) {
+        try {
+            const element = document.createElement(tagName);
+            Object.entries(attributes).forEach(([key, value]) => {
+                element.setAttribute(key, value);
+            });
+            return element;
+        } catch (error) {
+            errorHandler.handleError(error, { tagName, attributes }, ErrorSeverity.MEDIUM);
+            return null;
+        }
+    },
+
+    /**
+     * 안전한 요소 추가
+     */
+    appendChild(parent, child) {
+        try {
+            if (!parent || !child) {
+                throw new Error('Invalid parent or child element');
+            }
+            parent.appendChild(child);
+            return true;
+        } catch (error) {
+            errorHandler.handleError(error, { 
+                parentType: parent ? parent.tagName : 'null',
+                childType: child ? child.tagName : 'null'
+            }, ErrorSeverity.MEDIUM);
+            return false;
+        }
+    }
+};
+
+/**
+ * 안전한 함수 실행 래퍼
+ */
+function safeExecute(fn, context = {}, fallback = null) {
+    try {
+        return fn();
+    } catch (error) {
+        errorHandler.handleError(error, context, ErrorSeverity.MEDIUM);
+        return fallback;
+    }
+}
+
+/**
+ * 비동기 함수 안전 실행 래퍼
+ */
+async function safeExecuteAsync(fn, context = {}, fallback = null) {
+    try {
+        return await fn();
+    } catch (error) {
+        errorHandler.handleError(error, context, ErrorSeverity.MEDIUM);
+        return fallback;
+    }
+}
+
+// 전역으로 노출
+if (typeof window !== 'undefined') {
+    window.SafeStorage = SafeStorage;
+    window.SafeJSON = SafeJSON;
+    window.SafeDOM = SafeDOM;
+    window.safeExecute = safeExecute;
+    window.safeExecuteAsync = safeExecuteAsync;
+} 

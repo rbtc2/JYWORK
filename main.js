@@ -687,83 +687,91 @@ function cleanupPreviousSection() {
 
 // 애플리케이션 초기화
 function initializeApp() {
-    // 모바일 더블탭 줌 방지 초기화
-    initializeMobileZoomPrevention();
-    
-    // 데이터 로드
-    loadUserData();
-    loadResidenceData();
-    
-    // 정렬 설정 로드
-    if (typeof loadSortSettings === 'function') {
-        loadSortSettings();
-    }
-    
-    // UI 업데이트
-    updateAllSections();
-    updateUserInterface();
-    updateResidenceUI();
-    
-    // 캘린더 드롭다운 초기화
-    initializeCalendarDropdowns();
-    
-    // 지도 초기화 (약간의 지연을 두어 DOM이 완전히 로드된 후 실행)
-    globalEventManager.setTimeout(() => {
-        if (typeof initializeMap === 'function') {
-            initializeMap();
-        } else {
-            console.error('initializeMap 함수를 찾을 수 없습니다.');
+    try {
+        // 모바일 더블탭 줌 방지 초기화
+        safeExecute(() => initializeMobileZoomPrevention(), { function: 'initializeMobileZoomPrevention' });
+        
+        // 데이터 로드
+        safeExecute(() => loadUserData(), { function: 'loadUserData' });
+        safeExecute(() => loadResidenceData(), { function: 'loadResidenceData' });
+        
+        // 정렬 설정 로드
+        if (typeof loadSortSettings === 'function') {
+            safeExecute(() => loadSortSettings(), { function: 'loadSortSettings' });
         }
         
-        if (typeof createMarkers === 'function') {
-            createMarkers();
-        } else {
-            console.warn('createMarkers 함수를 찾을 수 없습니다. 마커 기능은 향후 구현 예정입니다.');
+        // UI 업데이트
+        safeExecute(() => updateAllSections(), { function: 'updateAllSections' });
+        safeExecute(() => updateUserInterface(), { function: 'updateUserInterface' });
+        safeExecute(() => updateResidenceUI(), { function: 'updateResidenceUI' });
+        
+        // 캘린더 드롭다운 초기화
+        safeExecute(() => initializeCalendarDropdowns(), { function: 'initializeCalendarDropdowns' });
+        
+        // 지도 초기화 (약간의 지연을 두어 DOM이 완전히 로드된 후 실행)
+        globalEventManager.setTimeout(() => {
+            if (typeof initializeMap === 'function') {
+                safeExecute(() => initializeMap(), { function: 'initializeMap' });
+            } else {
+                errorHandler.handleError(new Error('initializeMap function not found'), {}, ErrorSeverity.LOW);
+            }
+            
+            if (typeof createMarkers === 'function') {
+                safeExecute(() => createMarkers(), { function: 'createMarkers' });
+            } else {
+                errorHandler.handleError(new Error('createMarkers function not found'), {}, ErrorSeverity.LOW);
+            }
+        }, 200, 'map-init-delay');
+        
+        // 이벤트 리스너 초기화
+        safeExecute(() => initializeTabNavigation(), { function: 'initializeTabNavigation' });
+        safeExecute(() => initializeCollectionTabs(), { function: 'initializeCollectionTabs' });
+        safeExecute(() => initializeModal(), { function: 'initializeModal' });
+        safeExecute(() => initializeDateValidation(), { function: 'initializeDateValidation' });
+        safeExecute(() => initializeRatingSystem(), { function: 'initializeRatingSystem' });
+        safeExecute(() => initializeCalendarEventListeners(), { function: 'initializeCalendarEventListeners' });
+        safeExecute(() => initializeSettingsEventListeners(), { function: 'initializeSettingsEventListeners' });
+        safeExecute(() => initializeAutocompleteEventListeners(), { function: 'initializeAutocompleteEventListeners' });
+        safeExecute(() => initializeMemoCounter(), { function: 'initializeMemoCounter' });
+        
+        // 페이지네이션 초기화
+        if (typeof initializePaginationButtons === 'function') {
+            safeExecute(() => initializePaginationButtons(), { function: 'initializePaginationButtons' });
         }
-    }, 200, 'map-init-delay');
-    
-    // 이벤트 리스너 초기화
-    initializeTabNavigation();
-    initializeCollectionTabs();
-    initializeModal();
-    initializeDateValidation();
-    initializeRatingSystem();
-    initializeCalendarEventListeners();
-    initializeSettingsEventListeners();
-    initializeAutocompleteEventListeners();
-    initializeMemoCounter();
-    
-    // 페이지네이션 초기화
-    if (typeof initializePaginationButtons === 'function') {
-        initializePaginationButtons();
-    }
-    
-    // Countries 모듈 초기화
-    if (typeof initializeCountriesModule === 'function') {
-        initializeCountriesModule();
-    }
-    
-    // 페이지 언로드 시 정리
-    globalEventManager.addEventListener(
-        window,
-        'beforeunload',
-        () => {
-            globalEventManager.cleanup();
+        
+        // Countries 모듈 초기화
+        if (typeof initializeCountriesModule === 'function') {
+            safeExecute(() => initializeCountriesModule(), { function: 'initializeCountriesModule' });
         }
-    );
-    
-    // 개발 환경에서 메모리 사용량 모니터링
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+        
+        // 페이지 언로드 시 정리
         globalEventManager.addEventListener(
             window,
-            'load',
+            'beforeunload',
             () => {
-                setInterval(() => {
-                    console.log('Active listeners:', globalEventManager.getActiveListenersCount());
-                    console.log('Active timers:', globalEventManager.getActiveTimersCount());
-                }, 10000); // 10초마다 체크
+                safeExecute(() => globalEventManager.cleanup(), { function: 'globalEventManager.cleanup' });
             }
         );
+        
+        // 개발 환경에서 메모리 사용량 모니터링
+        if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+            globalEventManager.addEventListener(
+                window,
+                'load',
+                () => {
+                    setInterval(() => {
+                        console.log('Active listeners:', globalEventManager.getActiveListenersCount());
+                        console.log('Active timers:', globalEventManager.getActiveTimersCount());
+                    }, 10000); // 10초마다 체크
+                }
+            );
+        }
+        
+        console.log('✅ 애플리케이션이 성공적으로 초기화되었습니다.');
+        
+    } catch (error) {
+        errorHandler.handleError(error, { function: 'initializeApp' }, ErrorSeverity.CRITICAL);
+        console.error('❌ 애플리케이션 초기화 중 오류가 발생했습니다.');
     }
 }
 

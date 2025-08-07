@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>에러 처리 시스템 테스트</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-center">에러 처리 시스템 테스트</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- localStorage 테스트 -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">localStorage 테스트</h2>
+                <div class="space-y-3">
+                    <button onclick="testStorageQuota()" class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                        저장 공간 부족 시뮬레이션
+                    </button>
+                    <button onclick="testStorageInvalidData()" class="w-full bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+                        잘못된 JSON 데이터 테스트
+                    </button>
+                    <button onclick="testStorageUnavailable()" class="w-full bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                        localStorage 비활성화 테스트
+                    </button>
+                </div>
+            </div>
+
+            <!-- DOM 조작 테스트 -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">DOM 조작 테스트</h2>
+                <div class="space-y-3">
+                    <button onclick="testDOMElementNotFound()" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        존재하지 않는 요소 접근
+                    </button>
+                    <button onclick="testDOMInvalidHTML()" class="w-full bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                        잘못된 HTML 설정
+                    </button>
+                    <button onclick="testDOMCreateElement()" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        요소 생성 테스트
+                    </button>
+                </div>
+            </div>
+
+            <!-- JSON 파싱 테스트 -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">JSON 파싱 테스트</h2>
+                <div class="space-y-3">
+                    <button onclick="testJSONInvalidParse()" class="w-full bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                        잘못된 JSON 파싱
+                    </button>
+                    <button onclick="testJSONCircularReference()" class="w-full bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600">
+                        순환 참조 객체
+                    </button>
+                    <button onclick="testJSONLargeObject()" class="w-full bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">
+                        대용량 객체 직렬화
+                    </button>
+                </div>
+            </div>
+
+            <!-- 함수 실행 테스트 -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">함수 실행 테스트</h2>
+                <div class="space-y-3">
+                    <button onclick="testFunctionError()" class="w-full bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600">
+                        함수 실행 에러
+                    </button>
+                    <button onclick="testAsyncFunctionError()" class="w-full bg-cyan-500 text-white px-4 py-2 rounded hover:bg-cyan-600">
+                        비동기 함수 에러
+                    </button>
+                    <button onclick="testFunctionTimeout()" class="w-full bg-lime-500 text-white px-4 py-2 rounded hover:bg-lime-600">
+                        함수 타임아웃
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 에러 로그 표시 -->
+        <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-4">에러 로그</h2>
+            <div id="error-log" class="bg-gray-100 p-4 rounded max-h-64 overflow-y-auto text-sm">
+                <p class="text-gray-500">에러가 발생하면 여기에 표시됩니다.</p>
+            </div>
+            <div class="mt-4 flex space-x-2">
+                <button onclick="clearErrorLog()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                    로그 초기화
+                </button>
+                <button onclick="exportErrorLog()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                    로그 내보내기
+                </button>
+            </div>
+        </div>
+
+        <!-- 메모리 사용량 -->
+        <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-4">시스템 상태</h2>
+            <div id="system-status" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-blue-600" id="memory-used">-</div>
+                    <div class="text-sm text-gray-600">메모리 사용량</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-green-600" id="active-listeners">-</div>
+                    <div class="text-sm text-gray-600">활성 리스너</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-orange-600" id="active-timers">-</div>
+                    <div class="text-sm text-gray-600">활성 타이머</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-red-600" id="error-count">-</div>
+                    <div class="text-sm text-gray-600">에러 수</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 스크립트 로드 -->
+    <script src="utils.js"></script>
+    <script src="storage.js"></script>
+    <script src="main.js"></script>
+    
+    <script>
+        // 에러 로그 표시 함수
+        function updateErrorLog() {
+            const errorLog = document.getElementById('error-log');
+            const errors = errorHandler.getErrorLog();
+            
+            if (errors.length === 0) {
+                errorLog.innerHTML = '<p class="text-gray-500">에러가 발생하지 않았습니다.</p>';
+                return;
+            }
+            
+            const logHTML = errors.map(error => `
+                <div class="border-b border-gray-200 pb-2 mb-2">
+                    <div class="font-semibold text-red-600">${error.type} - ${error.severity}</div>
+                    <div class="text-gray-700">${error.message}</div>
+                    <div class="text-xs text-gray-500">${error.timestamp}</div>
+                </div>
+            `).join('');
+            
+            errorLog.innerHTML = logHTML;
+        }
+
+        // 시스템 상태 업데이트
+        function updateSystemStatus() {
+            if (window.performance && window.performance.memory) {
+                const memory = window.performance.memory;
+                document.getElementById('memory-used').textContent = 
+                    Math.round(memory.usedJSHeapSize / 1048576) + ' MB';
+            }
+            
+            if (window.globalEventManager) {
+                document.getElementById('active-listeners').textContent = 
+                    globalEventManager.getActiveListenersCount();
+                document.getElementById('active-timers').textContent = 
+                    globalEventManager.getActiveTimersCount();
+            }
+            
+            document.getElementById('error-count').textContent = 
+                errorHandler.getErrorLog().length;
+        }
+
+        // 테스트 함수들
+        function testStorageQuota() {
+            try {
+                // localStorage 용량 초과 시뮬레이션
+                const largeData = 'x'.repeat(10 * 1024 * 1024); // 10MB
+                SafeStorage.setItem('test-large-data', largeData);
+            } catch (error) {
+                errorHandler.handleError(error, { test: 'storage-quota' }, ErrorSeverity.HIGH);
+            }
+        }
+
+        function testStorageInvalidData() {
+            try {
+                // 잘못된 JSON 데이터 저장 시도
+                const invalidData = { circular: null };
+                invalidData.circular = invalidData; // 순환 참조
+                SafeJSON.stringify(invalidData);
+            } catch (error) {
+                errorHandler.handleError(error, { test: 'invalid-json' }, ErrorSeverity.MEDIUM);
+            }
+        }
+
+        function testStorageUnavailable() {
+            try {
+                // localStorage 비활성화 시뮬레이션
+                const originalSetItem = localStorage.setItem;
+                localStorage.setItem = function() { throw new Error('localStorage not available'); };
+                SafeStorage.setItem('test', 'value');
+                localStorage.setItem = originalSetItem;
+            } catch (error) {
+                errorHandler.handleError(error, { test: 'storage-unavailable' }, ErrorSeverity.MEDIUM);
+            }
+        }
+
+        function testDOMElementNotFound() {
+            try {
+                SafeDOM.getElement('#non-existent-element');
+            } catch (error) {
+                errorHandler.handleError(error, { test: 'dom-element-not-found' }, ErrorSeverity.MEDIUM);
+            }
+        }
+
+        function testDOMInvalidHTML() {
+            try {
+                const element = document.createElement('div');
+                SafeDOM.setInnerHTML(element, '<script>alert("XSS")</script>');
+            } catch (error) {
+                errorHandler.handleError(error, { test: 'dom-invalid-html' }, ErrorSeverity.MEDIUM);
+            }
+        }
+
+        function testDOMCreateElement() {
+            try {
+                const element = SafeDOM.createElement('div', { class: 'test', 'data-test': 'value' });
+                if (element) {
+                    document.body.appendChild(element);
+                    setTimeout(() => element.remove(), 1000);
+                }
+            } catch (error) {
+                errorHandler.handleError(error, { test: 'dom-create-element' }, ErrorSeverity.MEDIUM);
+            }
+        }
+
+        function testJSONInvalidParse() {
+            try {
+                SafeJSON.parse('{"invalid": json}', null);
+            } catch (error) {
+                errorHandler.handleError(error, { test: 'json-invalid-parse' }, ErrorSeverity.MEDIUM);
+            }
+        }
+
+        function testJSONCircularReference() {
+            try {
+                const obj = { name: 'test' };
+                obj.self = obj; // 순환 참조
+                SafeJSON.stringify(obj);
+            } catch (error) {
+                errorHandler.handleError(error, { test: 'json-circular-reference' }, ErrorSeverity.MEDIUM);
+            }
+        }
+
+        function testJSONLargeObject() {
+            try {
+                const largeObj = {};
+                for (let i = 0; i < 10000; i++) {
+                    largeObj[`key${i}`] = 'value'.repeat(1000);
+                }
+                SafeJSON.stringify(largeObj);
+            } catch (error) {
+                errorHandler.handleError(error, { test: 'json-large-object' }, ErrorSeverity.MEDIUM);
+            }
+        }
+
+        function testFunctionError() {
+            try {
+                safeExecute(() => {
+                    throw new Error('테스트 함수 에러');
+                }, { test: 'function-error' });
+            } catch (error) {
+                errorHandler.handleError(error, { test: 'function-error' }, ErrorSeverity.MEDIUM);
+            }
+        }
+
+        async function testAsyncFunctionError() {
+            try {
+                await safeExecuteAsync(async () => {
+                    throw new Error('테스트 비동기 함수 에러');
+                }, { test: 'async-function-error' });
+            } catch (error) {
+                errorHandler.handleError(error, { test: 'async-function-error' }, ErrorSeverity.MEDIUM);
+            }
+        }
+
+        function testFunctionTimeout() {
+            try {
+                safeExecute(() => {
+                    // 무한 루프 시뮬레이션
+                    while(true) {}
+                }, { test: 'function-timeout' });
+            } catch (error) {
+                errorHandler.handleError(error, { test: 'function-timeout' }, ErrorSeverity.MEDIUM);
+            }
+        }
+
+        function clearErrorLog() {
+            errorHandler.clearErrorLog();
+            updateErrorLog();
+        }
+
+        function exportErrorLog() {
+            const errors = errorHandler.getErrorLog();
+            const dataStr = JSON.stringify(errors, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `error_log_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            URL.revokeObjectURL(url);
+        }
+
+        // 주기적 업데이트
+        setInterval(() => {
+            updateErrorLog();
+            updateSystemStatus();
+        }, 1000);
+
+        // 초기 로드
+        document.addEventListener('DOMContentLoaded', () => {
+            updateErrorLog();
+            updateSystemStatus();
+        });
+    </script>
+</body>
+</html>

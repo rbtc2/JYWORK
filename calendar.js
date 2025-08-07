@@ -179,151 +179,206 @@ function getEventDisplayText(entry) {
 
 // 캘린더 렌더링
 function renderCalendar() {
-    const calendarBody = document.getElementById('calendar-body');
-    const calendarEmpty = document.getElementById('calendar-empty');
-    const currentMonthElement = document.getElementById('current-month');
+    try {
+        const calendarBody = SafeDOM.getElement('#calendar-body');
+        const calendarEmpty = SafeDOM.getElement('#calendar-empty');
+        const currentMonthElement = SafeDOM.getElement('#current-month');
 
-    if (entries.length === 0) {
-        calendarBody.style.display = 'none';
-        calendarEmpty.style.display = 'block';
-        return;
-    }
-
-    calendarBody.style.display = 'table-row-group';
-    calendarEmpty.style.display = 'none';
-
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    
-    currentMonthElement.textContent = `${year}년 ${month + 1}월`;
-
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const startDate = new Date(firstDay);
-    startDate.setDate(startDate.getDate() - firstDay.getDay());
-
-    let calendarHTML = '';
-    let currentRow = '';
-
-    for (let i = 0; i < 42; i++) {
-        const currentDate = new Date(startDate);
-        currentDate.setDate(startDate.getDate() + i);
-
-        if (i % 7 === 0 && i > 0) {
-            calendarHTML += `<tr>${currentRow}</tr>`;
-            currentRow = '';
+        if (!calendarBody || !calendarEmpty || !currentMonthElement) {
+            throw new Error('캘린더 요소를 찾을 수 없습니다.');
         }
 
-        const isCurrentMonth = currentDate.getMonth() === month;
-        const isToday = currentDate.toDateString() === new Date().toDateString();
-        
-        // 해당 날짜의 일정 찾기
-        const dayEvents = entries.filter(entry => {
-            const eventStart = new Date(entry.startDate);
-            const eventEnd = new Date(entry.endDate);
-            
-            // 날짜 비교를 위해 시간을 제거하고 날짜만 비교
-            const currentDateOnly = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
-            const eventStartOnly = new Date(eventStart.getFullYear(), eventStart.getMonth(), eventStart.getDate());
-            const eventEndOnly = new Date(eventEnd.getFullYear(), eventEnd.getMonth(), eventEnd.getDate());
-            
-            return currentDateOnly >= eventStartOnly && currentDateOnly <= eventEndOnly;
-        });
+        if (entries.length === 0) {
+            safeExecute(() => {
+                calendarBody.style.display = 'none';
+                calendarEmpty.style.display = 'block';
+            }, { function: 'calendar.empty.display' });
+            return;
+        }
 
-        let dayContent = `<div class="text-xs sm:text-sm font-medium">${currentDate.getDate()}</div>`;
+        safeExecute(() => {
+            calendarBody.style.display = 'table-row-group';
+            calendarEmpty.style.display = 'none';
+        }, { function: 'calendar.body.display' });
+
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
         
-        if (dayEvents.length > 0) {
-            dayContent += `<div class="mt-1 space-y-0.5 sm:space-y-1">`;
-            dayEvents.forEach((event, index) => {
-                const purposeText = getPurposeText(event.purpose);
-                
-                // 툴팁 내용을 안전하게 생성
-                const tooltipText = `${event.country} / ${event.city}\\n${purposeText}\\n📅 ${event.startDate} ~ ${event.endDate}${event.memo ? '\\n📝 ' + sanitizeMemo(event.memo) : ''}`;
-                
-                // 대륙별 색상 결정
-                const continent = getContinentFromCountryCode(event.countryCode);
-                const continentColor = getContinentColor(continent);
-                
-                // 일정 표시 텍스트 생성
-                const displayText = getEventDisplayText(event);
-                
-                dayContent += `
-                    <div class="calendar-event text-xs overflow-hidden whitespace-nowrap"
-                         data-event-index="${index}"
-                         data-tooltip="${tooltipText.replace(/"/g, '&quot;')}"
-                         data-entry-id="${event.id}"
-                         data-continent="${continent}"
-                         onmouseenter="createTooltip(event, this.dataset.tooltip)"
-                         onmouseleave="removeTooltip()"
-                         onclick="showEntryDetail('${event.id}')"
-                         title="${event.country}"
-                         style="cursor: pointer; max-height: 1.2em; line-height: 1.2em; max-width: 100%; background-color: ${continentColor.bg}; border-left-color: ${continentColor.border}; color: ${continentColor.text};">
-                        <span class="truncate block w-full">${displayText}</span>
-                    </div>
-                `;
+        safeExecute(() => {
+            currentMonthElement.textContent = `${year}년 ${month + 1}월`;
+        }, { function: 'currentMonth.textContent' });
+
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const startDate = new Date(firstDay);
+        startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+        let calendarHTML = '';
+        let currentRow = '';
+
+        for (let i = 0; i < 42; i++) {
+            const currentDate = new Date(startDate);
+            currentDate.setDate(startDate.getDate() + i);
+
+            if (i % 7 === 0 && i > 0) {
+                calendarHTML += `<tr>${currentRow}</tr>`;
+                currentRow = '';
+            }
+
+            const isCurrentMonth = currentDate.getMonth() === month;
+            const isToday = currentDate.toDateString() === new Date().toDateString();
+            
+            // 해당 날짜의 일정 찾기
+            const dayEvents = entries.filter(entry => {
+                try {
+                    const eventStart = new Date(entry.startDate);
+                    const eventEnd = new Date(entry.endDate);
+                    
+                    // 날짜 비교를 위해 시간을 제거하고 날짜만 비교
+                    const currentDateOnly = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+                    const eventStartOnly = new Date(eventStart.getFullYear(), eventStart.getMonth(), eventStart.getDate());
+                    const eventEndOnly = new Date(eventEnd.getFullYear(), eventEnd.getMonth(), eventEnd.getDate());
+                    
+                    return currentDateOnly >= eventStartOnly && currentDateOnly <= eventEndOnly;
+                } catch (error) {
+                    errorHandler.handleError(error, { 
+                        entryId: entry.id,
+                        startDate: entry.startDate,
+                        endDate: entry.endDate
+                    }, ErrorSeverity.LOW);
+                    return false;
+                }
             });
-            dayContent += `</div>`;
+
+            let dayContent = `<div class="text-xs sm:text-sm font-medium">${currentDate.getDate()}</div>`;
+            
+            if (dayEvents.length > 0) {
+                dayContent += `<div class="mt-1 space-y-0.5 sm:space-y-1">`;
+                dayEvents.forEach((event, index) => {
+                    try {
+                        const purposeText = safeExecute(() => getPurposeText(event.purpose), { purpose: event.purpose });
+                        
+                        // 툴팁 내용을 안전하게 생성
+                        const tooltipText = `${sanitizeMemo(event.country)} / ${sanitizeMemo(event.city)}\\n${purposeText}\\n📅 ${event.startDate} ~ ${event.endDate}${event.memo ? '\\n📝 ' + sanitizeMemo(event.memo) : ''}`;
+                        
+                        // 대륙별 색상 결정
+                        const continent = safeExecute(() => getContinentFromCountryCode(event.countryCode), { countryCode: event.countryCode });
+                        const continentColor = safeExecute(() => getContinentColor(continent), { continent });
+                        
+                        // 일정 표시 텍스트 생성
+                        const displayText = safeExecute(() => getEventDisplayText(event), { entryId: event.id });
+                        
+                        if (continentColor && displayText) {
+                            dayContent += `
+                                <div class="calendar-event text-xs overflow-hidden whitespace-nowrap"
+                                     data-event-index="${index}"
+                                     data-tooltip="${tooltipText.replace(/"/g, '&quot;')}"
+                                     data-entry-id="${event.id}"
+                                     data-continent="${continent}"
+                                     onmouseenter="createTooltip(event, this.dataset.tooltip)"
+                                     onmouseleave="removeTooltip()"
+                                     onclick="showEntryDetail('${event.id}')"
+                                     title="${sanitizeMemo(event.country)}"
+                                     style="cursor: pointer; max-height: 1.2em; line-height: 1.2em; max-width: 100%; background-color: ${continentColor.bg}; border-left-color: ${continentColor.border}; color: ${continentColor.text};">
+                                    <span class="truncate block w-full">${sanitizeMemo(displayText)}</span>
+                                </div>
+                            `;
+                        }
+                    } catch (error) {
+                        errorHandler.handleError(error, { 
+                            entryId: event.id,
+                            index: index
+                        }, ErrorSeverity.LOW);
+                    }
+                });
+                dayContent += `</div>`;
+            }
+
+            const cellClass = `
+                border border-gray-200 p-1 sm:p-2 h-20 sm:h-28 align-top overflow-hidden
+                ${isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'}
+                ${isToday ? 'bg-blue-50 border-blue-200' : ''}
+            `;
+
+            currentRow += `<td class="${cellClass}">${dayContent}</td>`;
         }
 
-        const cellClass = `
-            border border-gray-200 p-1 sm:p-2 h-20 sm:h-28 align-top overflow-hidden
-            ${isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'}
-            ${isToday ? 'bg-blue-50 border-blue-200' : ''}
-        `;
+        if (currentRow) {
+            calendarHTML += `<tr>${currentRow}</tr>`;
+        }
 
-        currentRow += `<td class="${cellClass}">${dayContent}</td>`;
+        const success = SafeDOM.setInnerHTML(calendarBody, calendarHTML);
+        if (!success) {
+            throw new Error('캘린더 HTML 설정에 실패했습니다.');
+        }
+        
+    } catch (error) {
+        errorHandler.handleError(error, { function: 'renderCalendar' }, ErrorSeverity.MEDIUM);
     }
-
-    if (currentRow) {
-        calendarHTML += `<tr>${currentRow}</tr>`;
-    }
-
-    calendarBody.innerHTML = calendarHTML;
 }
 
 // 툴팁 생성 함수
 function createTooltip(event, tooltipContent) {
-    // 기존 툴팁 제거
-    const existingTooltip = document.querySelector('.calendar-tooltip');
-    if (existingTooltip) {
-        existingTooltip.remove();
-    }
-
-    const tooltip = document.createElement('div');
-    tooltip.className = 'calendar-tooltip fixed z-50 bg-gray-900 text-white text-sm rounded-lg px-3 py-2 shadow-lg max-w-xs pointer-events-none space-y-1';
-    
-    // 텍스트를 줄바꿈으로 분리하여 HTML로 변환
-    const lines = tooltipContent.split('\\n');
-    const htmlContent = lines.map((line, index) => {
-        const escapedLine = line.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        if (index === 0) {
-            return `<div class="font-semibold">${escapedLine}</div>`;
-        } else {
-            return `<div class="text-gray-300">${escapedLine}</div>`;
+    try {
+        // 기존 툴팁 제거
+        const existingTooltip = SafeDOM.getElement('.calendar-tooltip');
+        if (existingTooltip) {
+            safeExecute(() => existingTooltip.remove(), { function: 'existingTooltip.remove' });
         }
-    }).join('');
-    tooltip.innerHTML = htmlContent;
-    
-    document.body.appendChild(tooltip);
 
-    // 툴팁 위치 계산
-    const rect = event.target.getBoundingClientRect();
-    const tooltipRect = tooltip.getBoundingClientRect();
-    
-    let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
-    let top = rect.bottom + 8;
+        const tooltip = SafeDOM.createElement('div', {
+            class: 'calendar-tooltip fixed z-50 bg-gray-900 text-white text-sm rounded-lg px-3 py-2 shadow-lg max-w-xs pointer-events-none space-y-1'
+        });
+        
+        if (!tooltip) {
+            throw new Error('툴팁 요소 생성에 실패했습니다.');
+        }
+        
+        // 텍스트를 줄바꿈으로 분리하여 HTML로 변환
+        const lines = tooltipContent.split('\\n');
+        const htmlContent = lines.map((line, index) => {
+            const escapedLine = line.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            if (index === 0) {
+                return `<div class="font-semibold">${escapedLine}</div>`;
+            } else {
+                return `<div class="text-gray-300">${escapedLine}</div>`;
+            }
+        }).join('');
+        
+        const success = SafeDOM.setInnerHTML(tooltip, htmlContent);
+        if (!success) {
+            throw new Error('툴팁 HTML 설정에 실패했습니다.');
+        }
+        
+        const bodyAppendSuccess = SafeDOM.appendChild(document.body, tooltip);
+        if (!bodyAppendSuccess) {
+            throw new Error('툴팁을 body에 추가하는데 실패했습니다.');
+        }
 
-    // 화면 경계 체크
-    if (left < 8) left = 8;
-    if (left + tooltipRect.width > window.innerWidth - 8) {
-        left = window.innerWidth - tooltipRect.width - 8;
+        // 툴팁 위치 계산
+        const rect = event.target.getBoundingClientRect();
+        const tooltipRect = tooltip.getBoundingClientRect();
+        
+        let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+        let top = rect.bottom + 8;
+
+        // 화면 경계 체크
+        if (left < 8) left = 8;
+        if (left + tooltipRect.width > window.innerWidth - 8) {
+            left = window.innerWidth - tooltipRect.width - 8;
+        }
+        if (top + tooltipRect.height > window.innerHeight - 8) {
+            top = rect.top - tooltipRect.height - 8;
+        }
+
+        safeExecute(() => {
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }, { function: 'tooltip.position' });
+        
+    } catch (error) {
+        errorHandler.handleError(error, { function: 'createTooltip' }, ErrorSeverity.MEDIUM);
     }
-    if (top + tooltipRect.height > window.innerHeight - 8) {
-        top = rect.top - tooltipRect.height - 8;
-    }
-
-    tooltip.style.left = left + 'px';
-    tooltip.style.top = top + 'px';
 }
 
 // 툴팁 제거 함수
