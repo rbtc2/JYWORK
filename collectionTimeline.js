@@ -514,29 +514,31 @@ function showEntryDetail(entryId) {
                         </div>
                     </div>
 
-                    <!-- 별점, 메모, 동행자 정보 -->
+                    <!-- 별점 평가 -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-2xl">⭐</span>
+                            <div>
+                                <p class="text-sm text-gray-500">별점 평가</p>
+                                <p class="text-lg font-semibold text-gray-800">${entry.rating || 0}점</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            ${generateStarRating(entry.rating || 0)}
+                        </div>
+                    </div>
+                    
+                    <!-- 동행자 -->
+                    <div class="flex items-start space-x-3">
+                        <span class="text-2xl mt-1">👥</span>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-500">동행자</p>
+                            <p class="text-lg font-semibold text-gray-800">${sanitizeCompanions(entry.companions) || '없음'}</p>
+                        </div>
+                    </div>
+
+                    <!-- 메모 정보 -->
                     <div class="bg-gray-50 rounded-lg p-6 space-y-4">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-3">
-                                <span class="text-2xl">⭐</span>
-                                <div>
-                                    <p class="text-sm text-gray-500">별점 평가</p>
-                                    <p class="text-lg font-semibold text-gray-800">${entry.rating || 0}점</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center space-x-1">
-                                ${generateStarRating(entry.rating || 0)}
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-start space-x-3">
-                            <span class="text-2xl mt-1">👥</span>
-                            <div class="flex-1">
-                                <p class="text-sm text-gray-500">동행자</p>
-                                <p class="text-lg font-semibold text-gray-800">${sanitizeCompanions(entry.companions) || '없음'}</p>
-                            </div>
-                        </div>
-                        
                         <div class="flex items-start space-x-3">
                             <span class="text-2xl mt-1">📝</span>
                             <div class="flex-1">
