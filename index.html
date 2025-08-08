@@ -39,6 +39,11 @@
                             로그아웃
                         </button>
                     </div>
+                    
+                    <!-- 설정 버튼 -->
+                    <button id="settings-btn" class="text-xs sm:text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors px-2 py-1">
+                        ⚙️
+                    </button>
                 </div>
             </div>
             
@@ -50,14 +55,14 @@
                 <button class="nav-tab flex-1 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg text-xs sm:text-sm font-medium text-center transition-colors text-gray-600 min-h-[44px]" data-section="dashboard">
                     📊 대시보드
                 </button>
+                <button class="nav-tab flex-1 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg text-xs sm:text-sm font-medium text-center transition-colors text-gray-600 min-h-[44px]" data-section="search">
+                    🔍 검색
+                </button>
                 <button class="nav-tab flex-1 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg text-xs sm:text-sm font-medium text-center transition-colors text-gray-600 min-h-[44px]" data-section="collection">
                     📚 콜렉션
                 </button>
                 <button class="nav-tab flex-1 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg text-xs sm:text-sm font-medium text-center transition-colors text-gray-600 min-h-[44px]" data-section="calendar">
                     📅 캘린더
-                </button>
-                <button class="nav-tab flex-1 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg text-xs sm:text-sm font-medium text-center transition-colors text-gray-600 min-h-[44px]" data-section="settings">
-                    ⚙️ 설정
                 </button>
             </div>
         </div>
@@ -233,6 +238,23 @@
                         <p class="text-gray-500 text-base sm:text-lg">아직 등록된 여행 일정이 없습니다.</p>
                         <p class="text-gray-400 text-sm mt-2">우측 하단의 + 버튼을 눌러 첫 여행을 추가해보세요!</p>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 검색 섹션 -->
+        <section id="search" class="content-section hidden">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-8">
+                <div class="text-center mb-6 sm:mb-8">
+                    <div class="text-4xl sm:text-6xl mb-4 sm:mb-6">🔍</div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">검색</h1>
+                </div>
+                
+                <!-- 준비중 메시지 -->
+                <div class="text-center py-8 sm:py-12">
+                    <div class="text-3xl sm:text-4xl mb-4">🚧</div>
+                    <p class="text-gray-500 text-base sm:text-lg">검색 기능이 준비 중입니다.</p>
+                    <p class="text-gray-400 text-sm mt-2">곧 도시, 국가, 여행 기록을 빠르게 찾을 수 있는 기능이 추가될 예정입니다.</p>
                 </div>
             </div>
         </section>

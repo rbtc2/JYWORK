@@ -703,6 +703,35 @@ function cleanupPreviousSection() {
     globalEventManager.clearTimeout('map-update-delay');
 }
 
+// 설정 버튼 이벤트 리스너 초기화
+function initializeSettingsButton() {
+    const settingsBtn = document.getElementById('settings-btn');
+    if (settingsBtn) {
+        globalEventManager.addEventListener(settingsBtn, 'click', function() {
+            // 이전 섹션 정리 (필요한 경우)
+            cleanupPreviousSection();
+            
+            // 모든 탭에서 active 클래스 제거
+            document.querySelectorAll('.nav-tab').forEach(t => {
+                t.classList.remove('active');
+                t.classList.add('text-gray-600');
+            });
+            
+            // 모든 섹션 숨기기
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // 설정 섹션 보이기
+            const settingsSection = document.getElementById('settings');
+            if (settingsSection) {
+                settingsSection.classList.remove('hidden');
+                settingsSection.classList.add('block');
+            }
+        });
+    }
+}
+
 // 애플리케이션 초기화
 function initializeApp() {
     try {
@@ -751,6 +780,7 @@ function initializeApp() {
         safeExecute(() => initializeSettingsEventListeners(), { function: 'initializeSettingsEventListeners' });
         safeExecute(() => initializeAutocompleteEventListeners(), { function: 'initializeAutocompleteEventListeners' });
         safeExecute(() => initializeMemoCounter(), { function: 'initializeMemoCounter' });
+        safeExecute(() => initializeSettingsButton(), { function: 'initializeSettingsButton' });
         
         // 페이지네이션 초기화
         if (typeof initializePaginationButtons === 'function') {
