@@ -354,6 +354,15 @@ function initializeModal() {
             window.resetRating();
         }
         
+        // 동행자 타입 초기화
+        const companionTypeBtns = document.querySelectorAll('.companion-type-btn');
+        companionTypeBtns.forEach(btn => {
+            btn.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
+            btn.classList.add('border-gray-300', 'text-gray-700');
+        });
+        document.getElementById('companion-type').value = '';
+        document.getElementById('companion-detail-container').classList.add('hidden');
+        
         // 수정 모드 리셋
         isEditMode = false;
         editingEntryId = null;
@@ -397,8 +406,19 @@ function initializeModal() {
             return;
         }
         
+        // 동행자 정보 처리
+        const companionType = document.getElementById('companion-type').value;
+        const companionsDetail = document.getElementById('companions').value;
+        
+        // 동행자 객체 생성
+        let companions = '';
+        if (companionType === 'solo') {
+            companions = '';
+        } else if (companionType && companionsDetail) {
+            companions = companionsDetail;
+        }
+        
         // 보안 검증 - 입력 길이 및 내용 검증
-        const companions = document.getElementById('companions').value;
         const memo = document.getElementById('memo').value;
         
         const validation = validateTravelForm({ companions, memo });
@@ -417,7 +437,8 @@ function initializeModal() {
             endDate: document.getElementById('end-date').value,
             purpose: document.getElementById('purpose').value,
             rating: document.getElementById('rating').value,
-            companions: document.getElementById('companions').value,
+            companions: companions,
+            companionType: companionType,
             memo: document.getElementById('memo').value
         };
 
@@ -478,6 +499,52 @@ function initializeDateValidation() {
                 endDateInput.value = startDate;
             }
         }
+    });
+}
+
+// 동행자 타입 선택 시스템 초기화
+function initializeCompanionTypeSystem() {
+    const companionTypeBtns = document.querySelectorAll('.companion-type-btn');
+    const companionTypeInput = document.getElementById('companion-type');
+    const companionDetailContainer = document.getElementById('companion-detail-container');
+    const companionsInput = document.getElementById('companions');
+    
+    // 동행 타입별 placeholder 설정
+    const placeholders = {
+        'family': '가족 구성원을 입력하세요 (예: 부모님, 형제, 자녀)',
+        'couple': '연인/배우자 이름을 입력하세요',
+        'friends': '친구 이름들을 입력하세요 (예: 김철수, 이영희)',
+        'colleagues': '동료 이름들을 입력하세요 (예: 팀원들, 사장님)',
+        'custom': '동행자를 입력하세요'
+    };
+    
+    companionTypeBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const selectedType = this.getAttribute('data-type');
+            
+            // 모든 버튼 스타일 초기화
+            companionTypeBtns.forEach(b => {
+                b.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
+                b.classList.add('border-gray-300', 'text-gray-700');
+            });
+            
+            // 선택된 버튼 스타일 적용
+            this.classList.remove('border-gray-300', 'text-gray-700');
+            this.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
+            
+            // 숨겨진 필드에 값 설정
+            companionTypeInput.value = selectedType;
+            
+            // 상세 입력창 표시/숨김 처리
+            if (selectedType === 'solo') {
+                companionDetailContainer.classList.add('hidden');
+                companionsInput.value = '';
+            } else {
+                companionDetailContainer.classList.remove('hidden');
+                companionsInput.placeholder = placeholders[selectedType] || '동행자를 입력하세요';
+                companionsInput.focus();
+            }
+        });
     });
 }
 
@@ -775,6 +842,7 @@ function initializeApp() {
         safeExecute(() => initializeCollectionTabs(), { function: 'initializeCollectionTabs' });
         safeExecute(() => initializeModal(), { function: 'initializeModal' });
         safeExecute(() => initializeDateValidation(), { function: 'initializeDateValidation' });
+        safeExecute(() => initializeCompanionTypeSystem(), { function: 'initializeCompanionTypeSystem' });
         safeExecute(() => initializeRatingSystem(), { function: 'initializeRatingSystem' });
         safeExecute(() => initializeCalendarEventListeners(), { function: 'initializeCalendarEventListeners' });
         safeExecute(() => initializeSettingsEventListeners(), { function: 'initializeSettingsEventListeners' });

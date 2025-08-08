@@ -16,16 +16,37 @@ function loadUserData() {
             entries = SafeJSON.parse(savedEntries, []);
         }
         
-        // 기존 entries에 ID가 없는 경우 ID 추가
+        // 기존 entries에 ID가 없는 경우 ID 추가 및 companions 구조 마이그레이션
         if (Array.isArray(entries)) {
+            let needsUpdate = false;
+            
             entries.forEach(entry => {
                 if (!entry.id) {
                     entry.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+                    needsUpdate = true;
+                }
+                
+                // companions 구조 마이그레이션
+                if (entry.companions && typeof entry.companions === 'string') {
+                    // 기존 string companions를 새 구조로 변환
+                    if (entry.companions.trim() === '') {
+                        entry.companionType = 'solo';
+                        entry.companions = '';
+                    } else {
+                        entry.companionType = 'custom';
+                        // 기존 companions 문자열 유지
+                    }
+                    needsUpdate = true;
+                } else if (!entry.companionType) {
+                    // companions가 없거나 이미 객체인 경우 기본값 설정
+                    entry.companionType = 'solo';
+                    entry.companions = entry.companions || '';
+                    needsUpdate = true;
                 }
             });
             
-            // ID가 추가된 경우 localStorage 업데이트
-            if (entries.length > 0) {
+            // 업데이트가 필요한 경우 localStorage 업데이트
+            if (needsUpdate && entries.length > 0) {
                 saveUserData();
             }
         } else {

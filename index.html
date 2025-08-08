@@ -697,14 +697,43 @@
 
                 <!-- 동행자 -->
                 <div>
-                    <label for="companions" class="block text-sm font-medium text-gray-700 mb-2">동행자</label>
-                    <input 
-                        type="text" 
-                        id="companions" 
-                        name="companions" 
-                        placeholder="동행자 이름을 입력하세요 (예: 김철수, 이영희) (선택사항)" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px]"
-                    >
+                    <label class="block text-sm font-medium text-gray-700 mb-2">동행자</label>
+                    
+                    <!-- 동행 타입 선택 버튼들 -->
+                    <div class="grid grid-cols-3 gap-2 mb-3">
+                        <button type="button" class="companion-type-btn px-3 py-2 border border-gray-300 rounded-lg text-xs font-medium transition-colors min-h-[44px] hover:bg-gray-50" data-type="solo">
+                            🚶‍♂️ 혼자
+                        </button>
+                        <button type="button" class="companion-type-btn px-3 py-2 border border-gray-300 rounded-lg text-xs font-medium transition-colors min-h-[44px] hover:bg-gray-50" data-type="family">
+                            👨‍👩‍👧‍👦 가족
+                        </button>
+                        <button type="button" class="companion-type-btn px-3 py-2 border border-gray-300 rounded-lg text-xs font-medium transition-colors min-h-[44px] hover:bg-gray-50" data-type="couple">
+                            👫 연인
+                        </button>
+                        <button type="button" class="companion-type-btn px-3 py-2 border border-gray-300 rounded-lg text-xs font-medium transition-colors min-h-[44px] hover:bg-gray-50" data-type="friends">
+                            👥 친구
+                        </button>
+                        <button type="button" class="companion-type-btn px-3 py-2 border border-gray-300 rounded-lg text-xs font-medium transition-colors min-h-[44px] hover:bg-gray-50" data-type="colleagues">
+                            🏢 동료
+                        </button>
+                        <button type="button" class="companion-type-btn px-3 py-2 border border-gray-300 rounded-lg text-xs font-medium transition-colors min-h-[44px] hover:bg-gray-50" data-type="custom">
+                            ✏️ 직접입력
+                        </button>
+                    </div>
+                    
+                    <!-- 동행자 상세 입력창 -->
+                    <div id="companion-detail-container" class="hidden">
+                        <input 
+                            type="text" 
+                            id="companions" 
+                            name="companions" 
+                            placeholder="동행자를 입력하세요" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px]"
+                        >
+                    </div>
+                    
+                    <!-- 숨겨진 필드들 -->
+                    <input type="hidden" id="companion-type" name="companionType" value="">
                 </div>
 
                 <!-- 메모 -->

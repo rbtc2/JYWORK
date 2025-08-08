@@ -99,6 +99,46 @@ const continentColors = {
     'oceania': { bg: '#EAB308', border: '#CA8A04', text: 'white' }        // Yellow
 };
 
+// 목적 텍스트 변환 함수
+function getPurposeText(purpose) {
+    const textMap = {
+        'travel': '여행',
+        'business': '출장',
+        'study': '유학',
+        'working-holiday': '워킹 홀리데이',
+        'family-visit': '가족 방문',
+        'dispatch': '파견',
+        'exchange': '교환학생',
+        'volunteer': '봉사활동',
+        'medical': '의료',
+        'language': '어학 연수',
+        'transit': '비행 경유'
+    };
+    return textMap[purpose] || purpose;
+}
+
+// 동행자 텍스트 변환 함수
+function getCompanionText(entry) {
+    // 기존 string companions와 새 객체 구조 모두 지원
+    const companions = entry.companions || '';
+    const companionType = entry.companionType || 'solo';
+    
+    if (companionType === 'solo' || !companions) {
+        return '혼자';
+    }
+    
+    const typeTexts = {
+        'family': '가족',
+        'couple': '연인',
+        'friends': '친구',
+        'colleagues': '동료',
+        'custom': '동행자'
+    };
+    
+    const typeText = typeTexts[companionType] || '동행자';
+    return `${typeText}: ${companions}`;
+}
+
 // 국가 코드를 국기 이모지로 변환하는 함수
 function getCountryFlag(countryCode) {
     if (!countryCode) return null;
@@ -258,8 +298,11 @@ function renderCalendar() {
                     try {
                         const purposeText = safeExecute(() => getPurposeText(event.purpose), { purpose: event.purpose });
                         
+                        // 동행자 정보 가져오기
+                        const companionText = safeExecute(() => getCompanionText(event), { entryId: event.id });
+                        
                         // 툴팁 내용을 안전하게 생성
-                        const tooltipText = `${sanitizeMemo(event.country)} / ${sanitizeMemo(event.city)}\\n${purposeText}\\n📅 ${event.startDate} ~ ${event.endDate}${event.memo ? '\\n📝 ' + sanitizeMemo(event.memo) : ''}`;
+                        const tooltipText = `${sanitizeMemo(event.country)} / ${sanitizeMemo(event.city)}\\n${purposeText}\\n👥 ${companionText}\\n📅 ${event.startDate} ~ ${event.endDate}${event.memo ? '\\n📝 ' + sanitizeMemo(event.memo) : ''}`;
                         
                         // 대륙별 색상 결정
                         const continent = safeExecute(() => getContinentFromCountryCode(event.countryCode), { countryCode: event.countryCode });

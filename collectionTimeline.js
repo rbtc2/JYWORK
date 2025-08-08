@@ -373,7 +373,34 @@ function modifyEntry(entryId) {
     document.getElementById('start-date').value = entry.startDate;
     document.getElementById('end-date').value = entry.endDate;
     document.getElementById('purpose').value = entry.purpose;
-    document.getElementById('companions').value = entry.companions || '';
+    // 동행자 정보 설정 (기존 string과 새 객체 구조 모두 지원)
+    const companionsValue = entry.companions || '';
+    document.getElementById('companions').value = companionsValue;
+    
+    // 동행자 타입 설정
+    const companionType = entry.companionType || 'solo';
+    document.getElementById('companion-type').value = companionType;
+    
+    // 동행자 타입 버튼 상태 설정
+    const companionTypeBtns = document.querySelectorAll('.companion-type-btn');
+    companionTypeBtns.forEach(btn => {
+        btn.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
+        btn.classList.add('border-gray-300', 'text-gray-700');
+    });
+    
+    const selectedBtn = document.querySelector(`[data-type="${companionType}"]`);
+    if (selectedBtn) {
+        selectedBtn.classList.remove('border-gray-300', 'text-gray-700');
+        selectedBtn.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
+    }
+    
+    // 상세 입력창 표시/숨김 처리
+    const companionDetailContainer = document.getElementById('companion-detail-container');
+    if (companionType === 'solo') {
+        companionDetailContainer.classList.add('hidden');
+    } else {
+        companionDetailContainer.classList.remove('hidden');
+    }
     document.getElementById('memo').value = entry.memo || '';
 
     // 별점 설정
@@ -421,6 +448,28 @@ function getPurposeText(purpose) {
         'transit': '비행 경유'
     };
     return textMap[purpose] || purpose;
+}
+
+// 동행자 텍스트 변환 함수
+function getCompanionText(entry) {
+    // 기존 string companions와 새 객체 구조 모두 지원
+    const companions = entry.companions || '';
+    const companionType = entry.companionType || 'solo';
+    
+    if (companionType === 'solo' || !companions) {
+        return '혼자';
+    }
+    
+    const typeTexts = {
+        'family': '가족',
+        'couple': '연인',
+        'friends': '친구',
+        'colleagues': '동료',
+        'custom': '동행자'
+    };
+    
+    const typeText = typeTexts[companionType] || '동행자';
+    return `${typeText}: ${sanitizeCompanions(companions)}`;
 }
 
 // 별점 생성 함수
@@ -533,7 +582,7 @@ function showEntryDetail(entryId) {
                         <span class="text-2xl mt-1">👥</span>
                         <div class="flex-1">
                             <p class="text-sm text-gray-500">동행자</p>
-                            <p class="text-lg font-semibold text-gray-800">${sanitizeCompanions(entry.companions) || '없음'}</p>
+                            <p class="text-lg font-semibold text-gray-800">${getCompanionText(entry)}</p>
                         </div>
                     </div>
 

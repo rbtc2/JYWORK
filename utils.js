@@ -670,8 +670,8 @@ function validateTravelForm(formData) {
         errors.push('메모는 1000자를 초과할 수 없습니다.');
     }
     
-    // 동행자 길이 체크
-    if (formData.companions && formData.companions.length > 200) {
+    // 동행자 길이 체크 (기존 string과 새 객체 구조 모두 지원)
+    if (formData.companions && typeof formData.companions === 'string' && formData.companions.length > 200) {
         errors.push('동행자 정보는 200자를 초과할 수 없습니다.');
     }
     
