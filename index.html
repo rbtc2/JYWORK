@@ -32,11 +32,13 @@
                     
                     <!-- 로그인/로그아웃 버튼 -->
                     <div class="flex items-center space-x-2">
-                        <button id="login-btn" class="text-xs sm:text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors px-2 py-1">
-                            로그인
+                        <button id="login-btn" class="text-xs sm:text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors px-2 py-1 whitespace-nowrap">
+                            <span class="hidden sm:inline">로그인</span>
+                            <span class="sm:hidden">🔑</span>
                         </button>
-                        <button id="logout-btn" class="hidden text-xs sm:text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors px-2 py-1">
-                            로그아웃
+                        <button id="logout-btn" class="hidden text-xs sm:text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors px-2 py-1 whitespace-nowrap">
+                            <span class="hidden sm:inline">로그아웃</span>
+                            <span class="sm:hidden">🚪</span>
                         </button>
                     </div>
                     
@@ -250,11 +252,62 @@
                     <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">검색</h1>
                 </div>
                 
-                <!-- 준비중 메시지 -->
-                <div class="text-center py-8 sm:py-12">
-                    <div class="text-3xl sm:text-4xl mb-4">🚧</div>
-                    <p class="text-gray-500 text-base sm:text-lg">검색 기능이 준비 중입니다.</p>
-                    <p class="text-gray-400 text-sm mt-2">곧 도시, 국가, 여행 기록을 빠르게 찾을 수 있는 기능이 추가될 예정입니다.</p>
+                <!-- 1. 상단: 검색창 + 검색 버튼 -->
+                <div class="mb-6 sm:mb-8">
+                    <div class="flex gap-2 sm:gap-3">
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            placeholder="도시, 국가 검색..." 
+                            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm sm:text-base"
+                        >
+                        <button 
+                            id="search-btn" 
+                            class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm sm:text-base font-medium min-h-[48px] flex items-center justify-center"
+                        >
+                            검색
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 2. 중단: 최근 검색어 태그들 -->
+                <div class="mb-6 sm:mb-8">
+                    <h3 class="text-sm sm:text-base font-semibold text-gray-700 mb-3 sm:mb-4">최근 검색어</h3>
+                    <div class="overflow-x-auto">
+                        <div class="flex gap-2 sm:gap-3 whitespace-nowrap pb-2">
+                            <button class="search-tag px-3 py-2 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0">
+                                #다낭
+                            </button>
+                            <button class="search-tag px-3 py-2 bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0">
+                                #부산
+                            </button>
+                            <button class="search-tag px-3 py-2 bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0">
+                                #도쿄
+                            </button>
+                            <button class="search-tag px-3 py-2 bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0">
+                                #파리
+                            </button>
+                            <button class="search-tag px-3 py-2 bg-red-100 text-red-700 rounded-full hover:bg-red-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0">
+                                #뉴욕
+                            </button>
+                            <button class="search-tag px-3 py-2 bg-indigo-100 text-indigo-700 rounded-full hover:bg-indigo-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0">
+                                #런던
+                            </button>
+                            <button class="search-tag px-3 py-2 bg-pink-100 text-pink-700 rounded-full hover:bg-pink-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0">
+                                #시드니
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 3. 하단: 검색 결과 영역 -->
+                <div class="border-t border-gray-200 pt-6 sm:pt-8">
+                    <h3 class="text-sm sm:text-base font-semibold text-gray-700 mb-4 sm:mb-6">검색 결과</h3>
+                    <div id="search-results" class="text-center py-8 sm:py-12">
+                        <div class="text-3xl sm:text-4xl mb-4">🔍</div>
+                        <p class="text-gray-500 text-base sm:text-lg">검색어를 입력하세요</p>
+                        <p class="text-gray-400 text-sm mt-2">도시명, 국가명, 또는 여행 키워드를 검색해보세요</p>
+                    </div>
                 </div>
             </div>
         </section>
