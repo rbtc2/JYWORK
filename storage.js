@@ -32,15 +32,18 @@ function loadUserData() {
                     if (entry.companions.trim() === '') {
                         entry.companionType = 'solo';
                         entry.companions = '';
+                        console.log('마이그레이션: 빈 companions를 solo로 설정', entry.id);
                     } else {
                         entry.companionType = 'custom';
                         // 기존 companions 문자열 유지
+                        console.log('마이그레이션: 기존 companions를 custom으로 설정', entry.id, entry.companions);
                     }
                     needsUpdate = true;
                 } else if (!entry.companionType) {
                     // companions가 없거나 이미 객체인 경우 기본값 설정
                     entry.companionType = 'solo';
                     entry.companions = entry.companions || '';
+                    console.log('마이그레이션: companionType이 없어서 solo로 설정', entry.id);
                     needsUpdate = true;
                 }
             });

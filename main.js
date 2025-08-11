@@ -410,13 +410,24 @@ function initializeModal() {
         const companionType = document.getElementById('companion-type').value;
         const companionsDetail = document.getElementById('companions').value;
         
+        // 디버깅을 위한 로그
+        console.log('폼 제출 시 동행자 정보:', {
+            companionType: companionType,
+            companionsDetail: companionsDetail,
+            hasCompanionType: !!companionType,
+            hasCompanionsDetail: !!companionsDetail
+        });
+        
         // 동행자 객체 생성
         let companions = '';
         if (companionType === 'solo') {
             companions = '';
-        } else if (companionType && companionsDetail) {
-            companions = companionsDetail;
+        } else if (companionType && companionType !== 'solo') {
+            // solo가 아닌 경우 detail이 비어있어도 저장
+            companions = companionsDetail || '';
         }
+        
+        console.log('최종 companions 값:', companions);
         
         // 보안 검증 - 입력 길이 및 내용 검증
         const memo = document.getElementById('memo').value;

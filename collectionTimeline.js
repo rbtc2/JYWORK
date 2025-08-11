@@ -375,10 +375,17 @@ function modifyEntry(entryId) {
     document.getElementById('purpose').value = entry.purpose;
     // 동행자 정보 설정 (기존 string과 새 객체 구조 모두 지원)
     const companionsValue = entry.companions || '';
-    document.getElementById('companions').value = companionsValue;
-    
-    // 동행자 타입 설정
     const companionType = entry.companionType || 'solo';
+    
+    // 디버깅을 위한 로그
+    console.log('modifyEntry 동행자 정보:', {
+        entryId: entryId,
+        companions: companionsValue,
+        companionType: companionType,
+        companionsType: typeof companionsValue
+    });
+    
+    document.getElementById('companions').value = companionsValue;
     document.getElementById('companion-type').value = companionType;
     
     // 동행자 타입 버튼 상태 설정
@@ -394,12 +401,25 @@ function modifyEntry(entryId) {
         selectedBtn.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
     }
     
-    // 상세 입력창 표시/숨김 처리
+    // 상세 입력창 표시/숨김 처리 및 placeholder 업데이트
     const companionDetailContainer = document.getElementById('companion-detail-container');
+    const companionsInput = document.getElementById('companions');
+    
     if (companionType === 'solo') {
         companionDetailContainer.classList.add('hidden');
     } else {
         companionDetailContainer.classList.remove('hidden');
+        
+        // 동행 타입별 placeholder 설정
+        const placeholders = {
+            'family': '가족 구성원을 입력하세요 (예: 부모님, 형제, 자녀)',
+            'couple': '연인/배우자 이름을 입력하세요',
+            'friends': '친구 이름들을 입력하세요 (예: 김철수, 이영희)',
+            'colleagues': '동료 이름들을 입력하세요 (예: 팀원들, 사장님)',
+            'custom': '동행자를 입력하세요'
+        };
+        
+        companionsInput.placeholder = placeholders[companionType] || '동행자를 입력하세요';
     }
     document.getElementById('memo').value = entry.memo || '';
 
@@ -456,7 +476,15 @@ function getCompanionText(entry) {
     const companions = entry.companions || '';
     const companionType = entry.companionType || 'solo';
     
-    if (companionType === 'solo' || !companions) {
+    // 디버깅을 위한 로그
+    console.log('getCompanionText 호출:', {
+        entryId: entry.id,
+        companions: companions,
+        companionType: companionType,
+        companionsType: typeof companions
+    });
+    
+    if (companionType === 'solo') {
         return '혼자';
     }
     
@@ -469,7 +497,13 @@ function getCompanionText(entry) {
     };
     
     const typeText = typeTexts[companionType] || '동행자';
-    return `${typeText}: ${sanitizeCompanions(companions)}`;
+    
+    // 상세 정보가 있는 경우에만 추가
+    if (companions && companions.trim() !== '') {
+        return `${typeText}: ${sanitizeCompanions(companions)}`;
+    } else {
+        return typeText;
+    }
 }
 
 // 별점 생성 함수

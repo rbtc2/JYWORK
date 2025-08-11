@@ -123,7 +123,7 @@ function getCompanionText(entry) {
     const companions = entry.companions || '';
     const companionType = entry.companionType || 'solo';
     
-    if (companionType === 'solo' || !companions) {
+    if (companionType === 'solo') {
         return '혼자';
     }
     
@@ -136,7 +136,13 @@ function getCompanionText(entry) {
     };
     
     const typeText = typeTexts[companionType] || '동행자';
-    return `${typeText}: ${companions}`;
+    
+    // 상세 정보가 있는 경우에만 추가
+    if (companions && companions.trim() !== '') {
+        return `${typeText}: ${companions}`;
+    } else {
+        return typeText;
+    }
 }
 
 // 국가 코드를 국기 이모지로 변환하는 함수
