@@ -375,7 +375,7 @@ function modifyEntry(entryId) {
     document.getElementById('purpose').value = entry.purpose;
     // 동행자 정보 설정 (기존 string과 새 객체 구조 모두 지원)
     const companionsValue = entry.companions || '';
-    const companionType = entry.companionType || 'solo';
+    const companionType = entry.companionType || '';
     
     // 디버깅을 위한 로그
     console.log('modifyEntry 동행자 정보:', {
@@ -388,24 +388,27 @@ function modifyEntry(entryId) {
     document.getElementById('companions').value = companionsValue;
     document.getElementById('companion-type').value = companionType;
     
-    // 동행자 타입 버튼 상태 설정
+    // 동행자 타입 버튼 상태 설정 - 모든 버튼 초기화
     const companionTypeBtns = document.querySelectorAll('.companion-type-btn');
     companionTypeBtns.forEach(btn => {
         btn.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
         btn.classList.add('border-gray-300', 'text-gray-700');
     });
     
-    const selectedBtn = document.querySelector(`[data-type="${companionType}"]`);
-    if (selectedBtn) {
-        selectedBtn.classList.remove('border-gray-300', 'text-gray-700');
-        selectedBtn.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
+    // companionType이 있는 경우에만 해당 버튼 선택
+    if (companionType && companionType !== '') {
+        const selectedBtn = document.querySelector(`[data-type="${companionType}"]`);
+        if (selectedBtn) {
+            selectedBtn.classList.remove('border-gray-300', 'text-gray-700');
+            selectedBtn.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
+        }
     }
     
     // 상세 입력창 표시/숨김 처리 및 placeholder 업데이트
     const companionDetailContainer = document.getElementById('companion-detail-container');
     const companionsInput = document.getElementById('companions');
     
-    if (companionType === 'solo') {
+    if (companionType === 'solo' || !companionType || companionType === '') {
         companionDetailContainer.classList.add('hidden');
     } else {
         companionDetailContainer.classList.remove('hidden');
@@ -446,6 +449,12 @@ function modifyEntry(entryId) {
 function deleteEntry(entryId) {
     if (confirm('이 일정을 삭제하시겠습니까?')) {
         entries = entries.filter(entry => entry.id !== entryId);
+        
+        // 전역 변수 동기화
+        if (typeof window !== 'undefined') {
+            window.entries = entries;
+        }
+        
         saveUserData();
         updateAllSections();
         alert('일정이 삭제되었습니다.');
@@ -543,6 +552,14 @@ function showEntryDetail(entryId) {
     const cityCoord = cityCoordinates[entry.city];
     const hasMap = cityCoord && cityCoord.lat && cityCoord.lng;
 
+    // 스마트 컨텍스트 정보 계산
+    const cityHistory = getCityHistory(entry, entries, window.userResidence);
+    const hasCompanions = entry.companionType && entry.companionType !== '' && entry.companions && (
+        (typeof entry.companions === 'string' && entry.companions.trim()) ||
+        (typeof entry.companions === 'object' && entry.companions.type !== 'none')
+    );
+    const hasMemo = entry.memo && entry.memo.trim();
+
     // 모달 HTML 생성
     const modalHTML = `
         <div id="entry-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -572,8 +589,10 @@ function showEntryDetail(entryId) {
 
                 <!-- 카드 본문 -->
                 <div class="p-6 space-y-6">
-                    <!-- 체류 정보 섹션 -->
+                    <!-- 기본 정보 섹션 -->
                     <div class="space-y-4">
+                        <h3 class="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">📋 기본 정보</h3>
+                        
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-3">
                                 <span class="text-2xl">📅</span>
@@ -595,39 +614,92 @@ function showEntryDetail(entryId) {
                                 <p class="text-lg font-semibold text-gray-800">${purposeText}</p>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- 별점 평가 -->
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <span class="text-2xl">⭐</span>
-                            <div>
-                                <p class="text-sm text-gray-500">별점 평가</p>
-                                <p class="text-lg font-semibold text-gray-800">${entry.rating || 0}점</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">⭐</span>
+                                <div>
+                                    <p class="text-sm text-gray-500">별점 평가</p>
+                                    <p class="text-lg font-semibold text-gray-800">${entry.rating || 0}점</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                ${generateStarRating(entry.rating || 0)}
                             </div>
                         </div>
-                        <div class="flex items-center space-x-1">
-                            ${generateStarRating(entry.rating || 0)}
-                        </div>
                     </div>
-                    
-                    <!-- 동행자 -->
-                    <div class="flex items-start space-x-3">
-                        <span class="text-2xl mt-1">👥</span>
-                        <div class="flex-1">
-                            <p class="text-sm text-gray-500">동행자</p>
-                            <p class="text-lg font-semibold text-gray-800">${getCompanionText(entry)}</p>
+
+                    <!-- 스마트 컨텍스트 섹션 (항상 표시) -->
+                    <div class="bg-blue-50 rounded-lg p-6 space-y-4">
+                        <h3 class="text-lg font-semibold text-blue-800 border-b border-blue-200 pb-2">🧠 스마트 인사이트</h3>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">🔄</span>
+                                <div>
+                                    <p class="text-sm text-blue-600">방문 횟수</p>
+                                    <p class="text-lg font-semibold text-blue-800">
+                                        ${cityName} ${cityHistory.cityStats.visitCount}번째 방문
+                                        ${cityHistory.previousVisitText ? `(이전: ${cityHistory.previousVisitText})` : ''}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">💡</span>
+                                <div>
+                                    <p class="text-sm text-blue-600">국가 총 체류일</p>
+                                    <p class="text-lg font-semibold text-blue-800">
+                                        ${countryName} 총 ${cityHistory.countryStats.totalDays}일
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">🌍</span>
+                                <div>
+                                    <p class="text-sm text-blue-600">전체 해외 체류일</p>
+                                    <p class="text-lg font-semibold text-blue-800">
+                                        ${cityHistory.totalOverseasDays}일 중 ${cityHistory.overseasPercentage}%
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">🏆</span>
+                                <div>
+                                    <p class="text-sm text-blue-600">${cityHistory.countryName} 방문 기록</p>
+                                    <p class="text-lg font-semibold text-blue-800">
+                                        최장 체류: ${cityHistory.cityStats.longestStay}일
+                                        ${cityHistory.cityStats.highestRating > 0 ? `| 최고 별점: ${cityHistory.cityStats.highestRating}점` : ''}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- 메모 정보 -->
-                    <div class="bg-gray-50 rounded-lg p-6 space-y-4">
+                    <!-- 선택적 정보 섹션 (있을 때만 표시) -->
+                    ${hasCompanions || hasMemo ? `
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">📝 추가 정보</h3>
+                        
+                        ${hasCompanions ? `
                         <div class="flex items-start space-x-3">
-                            <span class="text-2xl mt-1">📝</span>
+                            <span class="text-2xl mt-1">👥</span>
                             <div class="flex-1">
-                                <p class="text-sm text-gray-500">메모</p>
-                                <div class="text-lg font-semibold text-gray-800">
-                                    ${entry.memo ? `
+                                <p class="text-sm text-gray-500">동행자</p>
+                                <p class="text-lg font-semibold text-gray-800">${getCompanionText(entry)}</p>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        ${hasMemo ? `
+                        <div class="bg-gray-50 rounded-lg p-6 space-y-4">
+                            <div class="flex items-start space-x-3">
+                                <span class="text-2xl mt-1">📝</span>
+                                <div class="flex-1">
+                                    <p class="text-sm text-gray-500">메모</p>
+                                    <div class="text-lg font-semibold text-gray-800">
                                         <div id="memo-content-${entry.id}" class="memo-content">
                                             <span id="memo-text-${entry.id}">${isMemoTruncated(entry.memo, 100) ? truncateMemoForDetail(entry.memo) : sanitizeMemo(entry.memo)}</span>
                                             ${isMemoTruncated(entry.memo, 100) ? `
@@ -636,28 +708,29 @@ function showEntryDetail(entryId) {
                                                 </button>
                                             ` : ''}
                                         </div>
-                                    ` : '없음'}
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        ` : ''}
                     </div>
+                    ` : ''}
 
                     <!-- 위치 지도 -->
-                    ${hasMap ? `
                     <div class="mt-6">
+                        <h3 class="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2 mb-4">🗺️ 위치 정보</h3>
+                        ${hasMap ? `
                         <div class="flex items-center space-x-3 mb-4">
-                            <span class="text-2xl">🗺️</span>
+                            <span class="text-2xl">📍</span>
                             <div>
                                 <p class="text-sm text-gray-500">위치</p>
                                 <p class="text-lg font-semibold text-gray-800">${cityName}, ${countryName}</p>
                             </div>
                         </div>
                         <div id="mini-map-${entry.id}" class="mini-map-container rounded-lg overflow-hidden h-48"></div>
-                    </div>
-                    ` : `
-                    <div class="mt-6">
+                        ` : `
                         <div class="flex items-center space-x-3 mb-4">
-                            <span class="text-2xl">🗺️</span>
+                            <span class="text-2xl">📍</span>
                             <div>
                                 <p class="text-sm text-gray-500">위치</p>
                                 <p class="text-lg font-semibold text-gray-800">${cityName}, ${countryName}</p>
@@ -668,8 +741,8 @@ function showEntryDetail(entryId) {
                                 <p class="text-gray-500 text-sm">📍 위치 정보를 확인할 수 없습니다</p>
                             </div>
                         </div>
+                        `}
                     </div>
-                    `}
                 </div>
 
                 <!-- 하단 버튼 -->

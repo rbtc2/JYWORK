@@ -16,6 +16,11 @@ function loadUserData() {
             entries = SafeJSON.parse(savedEntries, []);
         }
         
+        // 전역 변수 동기화
+        if (typeof window !== 'undefined') {
+            window.entries = entries;
+        }
+        
         // 기존 entries에 ID가 없는 경우 ID 추가 및 companions 구조 마이그레이션
         if (Array.isArray(entries)) {
             let needsUpdate = false;

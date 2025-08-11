@@ -7,6 +7,9 @@
 let entries = [];
 let currentDate = new Date();
 
+// 전역으로 노출 (다른 모듈에서 접근 가능하도록)
+window.entries = entries;
+
 // 사용자 관련 변수들
 let currentUser = {
     id: null,
@@ -23,6 +26,9 @@ let userResidence = {
     cityName: null,
     coordinates: null
 };
+
+// 전역으로 노출 (다른 모듈에서 접근 가능하도록)
+window.userResidence = userResidence;
 
 // 수정 모드 변수
 let isEditMode = false;
@@ -362,6 +368,7 @@ function initializeModal() {
         });
         document.getElementById('companion-type').value = '';
         document.getElementById('companion-detail-container').classList.add('hidden');
+        document.getElementById('companions').value = '';
         
         // 수정 모드 리셋
         isEditMode = false;
@@ -420,7 +427,7 @@ function initializeModal() {
         
         // 동행자 객체 생성
         let companions = '';
-        if (companionType === 'solo') {
+        if (companionType === 'solo' || !companionType || companionType === '') {
             companions = '';
         } else if (companionType && companionType !== 'solo') {
             // solo가 아닌 경우 detail이 비어있어도 저장
@@ -459,6 +466,12 @@ function initializeModal() {
             if (index !== -1) {
                 formData.id = editingEntryId; // 기존 ID 유지
                 entries[index] = formData;
+                
+                // 전역 변수 동기화
+                if (typeof window !== 'undefined') {
+                    window.entries = entries;
+                }
+                
                 saveUserData();
                 updateAllSections();
                 console.log('수정된 여행 데이터:', JSON.stringify(formData, null, 2));
@@ -469,6 +482,12 @@ function initializeModal() {
             // 추가 모드: 새 entry 추가
             formData.id = Date.now().toString(); // 고유 ID 추가
             entries.push(formData);
+            
+            // 전역 변수 동기화
+            if (typeof window !== 'undefined') {
+                window.entries = entries;
+            }
+            
             saveUserData();
             updateAllSections();
             console.log('여행 데이터:', JSON.stringify(formData, null, 2));
@@ -532,14 +551,34 @@ function initializeCompanionTypeSystem() {
     companionTypeBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             const selectedType = this.getAttribute('data-type');
+            const isCurrentlySelected = this.classList.contains('bg-blue-500');
             
-            // 모든 버튼 스타일 초기화
+            // 현재 선택된 버튼이면 선택 해제
+            if (isCurrentlySelected) {
+                // 선택 해제
+                this.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
+                this.classList.add('border-gray-300', 'text-gray-700');
+                
+                // 숨겨진 필드 값 제거
+                companionTypeInput.value = '';
+                
+                // 상세 입력창 숨김 및 값 초기화
+                companionDetailContainer.classList.add('hidden');
+                companionsInput.value = '';
+                
+                console.log('동행자 타입 선택 해제:', selectedType);
+                return;
+            }
+            
+            // 다른 버튼이 선택되어 있다면 선택 해제
             companionTypeBtns.forEach(b => {
-                b.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
-                b.classList.add('border-gray-300', 'text-gray-700');
+                if (b !== this) {
+                    b.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
+                    b.classList.add('border-gray-300', 'text-gray-700');
+                }
             });
             
-            // 선택된 버튼 스타일 적용
+            // 새로 선택된 버튼 스타일 적용
             this.classList.remove('border-gray-300', 'text-gray-700');
             this.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
             
@@ -555,6 +594,8 @@ function initializeCompanionTypeSystem() {
                 companionsInput.placeholder = placeholders[selectedType] || '동행자를 입력하세요';
                 companionsInput.focus();
             }
+            
+            console.log('동행자 타입 선택:', selectedType);
         });
     });
 }

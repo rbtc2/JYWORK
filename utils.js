@@ -1298,3 +1298,345 @@ if (typeof window !== 'undefined') {
     window.safeExecute = safeExecute;
     window.safeExecuteAsync = safeExecuteAsync;
 } 
+
+/**
+ * 여행 통계 및 컨텍스트 관련 유틸리티 함수들
+ */
+
+/**
+ * 특정 도시의 방문 통계 계산
+ * @param {string} cityName - 도시명
+ * @param {string} countryCode - 국가 코드
+ * @param {Array} entries - 전체 여행 기록 배열
+ * @returns {Object} 방문 통계 정보
+ */
+function getVisitStats(cityName, countryCode, entries) {
+    if (!entries || !Array.isArray(entries)) {
+        return {
+            visitCount: 0,
+            totalDays: 0,
+            previousVisit: null,
+            longestStay: 0,
+            highestRating: 0,
+            averageRating: 0
+        };
+    }
+
+    // 해당 도시의 모든 방문 기록 필터링
+    const cityEntries = entries.filter(entry => 
+        entry.city === cityName && entry.countryCode === countryCode
+    );
+
+    if (cityEntries.length === 0) {
+        return {
+            visitCount: 0,
+            totalDays: 0,
+            previousVisit: null,
+            longestStay: 0,
+            highestRating: 0,
+            averageRating: 0
+        };
+    }
+
+    // 방문 횟수
+    const visitCount = cityEntries.length;
+
+    // 총 체류일 계산
+    const totalDays = cityEntries.reduce((total, entry) => {
+        const days = calculateDays(entry.startDate, entry.endDate);
+        return total + days;
+    }, 0);
+
+    // 이전 방문일 찾기 (현재 방문 제외)
+    const sortedEntries = cityEntries
+        .sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+    
+    const previousVisit = sortedEntries.length > 1 ? sortedEntries[1] : null;
+
+    // 최장 체류일
+    const longestStay = Math.max(...cityEntries.map(entry => 
+        calculateDays(entry.startDate, entry.endDate)
+    ));
+
+    // 최고 별점
+    const ratings = cityEntries
+        .map(entry => entry.rating || 0)
+        .filter(rating => rating > 0);
+    
+    const highestRating = ratings.length > 0 ? Math.max(...ratings) : 0;
+    const averageRating = ratings.length > 0 ? 
+        Math.round((ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length) * 10) / 10 : 0;
+
+    return {
+        visitCount,
+        totalDays,
+        previousVisit,
+        longestStay,
+        highestRating,
+        averageRating
+    };
+}
+
+/**
+ * 특정 국가의 체류 통계 계산
+ * @param {string} countryCode - 국가 코드
+ * @param {Array} entries - 전체 여행 기록 배열
+ * @returns {Object} 국가 체류 통계 정보
+ */
+function getCountryStats(countryCode, entries) {
+    if (!entries || !Array.isArray(entries)) {
+        return {
+            totalDays: 0,
+            visitCount: 0,
+            cities: []
+        };
+    }
+
+    // 해당 국가의 모든 방문 기록 필터링
+    const countryEntries = entries.filter(entry => 
+        entry.countryCode === countryCode
+    );
+
+    if (countryEntries.length === 0) {
+        return {
+            totalDays: 0,
+            visitCount: 0,
+            cities: []
+        };
+    }
+
+    // 총 체류일 계산
+    const totalDays = countryEntries.reduce((total, entry) => {
+        const days = calculateDays(entry.startDate, entry.endDate);
+        return total + days;
+    }, 0);
+
+    // 방문 횟수
+    const visitCount = countryEntries.length;
+
+    // 방문한 도시 목록
+    const cities = [...new Set(countryEntries.map(entry => entry.city))];
+
+    return {
+        totalDays,
+        visitCount,
+        cities
+    };
+}
+
+/**
+ * 전체 해외 체류일 계산
+ * @param {Array} entries - 전체 여행 기록 배열
+ * @param {Object} userResidence - 사용자 거주지 정보
+ * @returns {number} 전체 해외 체류일
+ */
+function getTotalOverseasDays(entries, userResidence) {
+    if (!entries || !Array.isArray(entries)) return 0;
+
+    let totalDays = 0;
+
+    entries.forEach(entry => {
+        // 거주지 국가가 설정되어 있고, 해당 국가의 체류 기록인 경우 제외
+        if (userResidence && userResidence.countryCode && 
+            entry.countryCode === userResidence.countryCode) {
+            return; // 건너뛰기
+        }
+        
+        const days = calculateDays(entry.startDate, entry.endDate);
+        totalDays += days;
+    });
+
+    return totalDays;
+}
+
+/**
+ * 도시 방문 히스토리 정보 생성
+ * @param {Object} entry - 현재 여행 기록
+ * @param {Array} entries - 전체 여행 기록 배열
+ * @param {Object} userResidence - 사용자 거주지 정보
+ * @returns {Object} 도시 히스토리 정보
+ */
+/**
+ * 국가 코드를 한국어 국가 이름으로 변환
+ * @param {string} countryCode - 국가 코드 (예: 'US', 'JP')
+ * @returns {string} 한국어 국가 이름
+ */
+function getCountryName(countryCode) {
+    if (!countryCode) return '알 수 없음';
+    
+    const countryNames = {
+        'KR': '한국',
+        'JP': '일본',
+        'CN': '중국',
+        'US': '미국',
+        'GB': '영국',
+        'FR': '프랑스',
+        'DE': '독일',
+        'IT': '이탈리아',
+        'ES': '스페인',
+        'NL': '네덜란드',
+        'BE': '벨기에',
+        'CH': '스위스',
+        'AT': '오스트리아',
+        'SE': '스웨덴',
+        'NO': '노르웨이',
+        'DK': '덴마크',
+        'AU': '호주',
+        'CA': '캐나다',
+        'NZ': '뉴질랜드',
+        'SG': '싱가포르',
+        'TH': '태국',
+        'MY': '말레이시아',
+        'VN': '베트남',
+        'IN': '인도',
+        'BR': '브라질',
+        'MX': '멕시코',
+        'RU': '러시아',
+        'TR': '터키',
+        'PL': '폴란드',
+        'CZ': '체코',
+        'HU': '헝가리',
+        'FI': '핀란드',
+        'IE': '아일랜드',
+        'PT': '포르투갈'
+    };
+    
+    return countryNames[countryCode] || countryCode;
+}
+
+function getCityHistory(entry, entries, userResidence) {
+    const cityStats = getVisitStats(entry.city, entry.countryCode, entries);
+    const countryStats = getCountryStats(entry.countryCode, entries);
+    const totalOverseasDays = getTotalOverseasDays(entries, userResidence);
+    const countryName = getCountryName(entry.countryCode);
+
+    // 이전 방문일 포맷팅
+    let previousVisitText = null;
+    if (cityStats.previousVisit) {
+        const prevDate = new Date(cityStats.previousVisit.startDate);
+        const year = prevDate.getFullYear();
+        const month = prevDate.getMonth() + 1;
+        previousVisitText = `${year}년 ${month}월`;
+    }
+
+    // 국가 체류일 비율 계산
+    const overseasPercentage = totalOverseasDays > 0 ? 
+        Math.round((countryStats.totalDays / totalOverseasDays) * 100) : 0;
+
+    return {
+        cityStats,
+        countryStats,
+        totalOverseasDays,
+        previousVisitText,
+        overseasPercentage,
+        countryName
+    };
+}
+
+/**
+ * 날짜 차이 계산 (체류일 수) - 기존 함수가 없을 경우를 대비
+ * @param {string} startDate - 시작일
+ * @param {string} endDate - 종료일
+ * @returns {number} 체류일 수
+ */
+function calculateDays(startDate, endDate) {
+    if (!startDate || !endDate) return 0;
+    
+    try {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays + 1; // 시작일 포함
+    } catch (error) {
+        console.error('날짜 계산 오류:', error);
+        return 0;
+    }
+}
+
+/**
+ * 동행자 텍스트 생성 (기존 함수가 없을 경우를 대비)
+ * @param {Object} entry - 여행 기록
+ * @returns {string} 동행자 텍스트
+ */
+function getCompanionText(entry) {
+    if (!entry) return '없음';
+    
+    // companionType이 없거나 빈 문자열인 경우
+    if (!entry.companionType || entry.companionType === '') {
+        return '없음';
+    }
+    
+    // 동행자 정보가 문자열인 경우 (기존 구조)
+    if (typeof entry.companions === 'string') {
+        return entry.companions.trim() || '없음';
+    }
+    
+    // 동행자 정보가 객체인 경우 (새로운 구조)
+    if (entry.companions && typeof entry.companions === 'object') {
+        if (entry.companions.type === 'none') return '없음';
+        if (entry.companions.type === 'alone') return '혼자';
+        if (entry.companions.type === 'family') return '가족';
+        if (entry.companions.type === 'friends') return '친구';
+        if (entry.companions.type === 'colleagues') return '동료';
+        if (entry.companions.type === 'custom' && entry.companions.value) {
+            return entry.companions.value;
+        }
+        return '없음';
+    }
+    
+    return '없음';
+}
+
+/**
+ * 목적 텍스트 생성 (기존 함수가 없을 경우를 대비)
+ * @param {string} purpose - 목적 코드
+ * @returns {string} 목적 텍스트
+ */
+function getPurposeText(purpose) {
+    if (!purpose) return '기타';
+    
+    const purposeMap = {
+        'tourism': '관광',
+        'business': '업무',
+        'study': '유학',
+        'work': '근무',
+        'family': '가족 방문',
+        'medical': '의료',
+        'other': '기타'
+    };
+    
+    return purposeMap[purpose] || purpose;
+}
+
+/**
+ * 별점 생성 함수 (기존 함수가 없을 경우를 대비)
+ * @param {number} rating - 별점 (1-5)
+ * @returns {string} 별점 HTML
+ */
+function generateStarRating(rating) {
+    if (!rating || rating < 1) rating = 0;
+    
+    let stars = '';
+    for (let i = 1; i <= 5; i++) {
+        if (i <= rating) {
+            stars += '<span class="text-yellow-400">⭐</span>';
+        } else {
+            stars += '<span class="text-gray-300">⭐</span>';
+        }
+    }
+    return stars;
+}
+
+// 전역으로 노출
+if (typeof window !== 'undefined') {
+    window.getVisitStats = getVisitStats;
+    window.getCountryStats = getCountryStats;
+    window.getTotalOverseasDays = getTotalOverseasDays;
+    window.getCityHistory = getCityHistory;
+    window.getCountryName = getCountryName;
+    window.calculateDays = calculateDays;
+    window.getCompanionText = getCompanionText;
+    window.getPurposeText = getPurposeText;
+    window.generateStarRating = generateStarRating;
+} 
