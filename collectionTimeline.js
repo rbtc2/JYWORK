@@ -392,14 +392,14 @@ function modifyEntry(entryId) {
     const companionTypeBtns = document.querySelectorAll('.companion-type-btn');
     companionTypeBtns.forEach(btn => {
         btn.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
-        btn.classList.add('border-gray-300', 'text-gray-700');
+        btn.classList.add('bg-gray-100', 'text-gray-700', 'border-gray-300');
     });
     
     // companionType이 있는 경우에만 해당 버튼 선택
     if (companionType && companionType !== '') {
         const selectedBtn = document.querySelector(`[data-type="${companionType}"]`);
         if (selectedBtn) {
-            selectedBtn.classList.remove('border-gray-300', 'text-gray-700');
+            selectedBtn.classList.remove('bg-gray-100', 'text-gray-700', 'border-gray-300');
             selectedBtn.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
         }
     }
