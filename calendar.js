@@ -117,15 +117,15 @@ function getPurposeText(purpose) {
     return textMap[purpose] || purpose;
 }
 
-// 동행자 텍스트 변환 함수
+// 여행 스타일 텍스트 변환 함수
 function getCompanionText(entry) {
     // 기존 string companions와 새 객체 구조 모두 지원
     const companions = entry.companions || '';
     const companionType = entry.companionType || '';
     
-    // companionType이 없거나 빈 문자열인 경우 → 동행자 정보 미입력
+    // companionType이 없거나 빈 문자열인 경우 → 여행 스타일 정보 미입력
     if (!companionType || companionType === '') {
-        return '동행자 정보 없음';
+        return '정보 없음';
     }
     
     // companionType이 'solo'인 경우 → "혼자" 명시적 선택
@@ -138,10 +138,10 @@ function getCompanionText(entry) {
         'couple': '연인',
         'friends': '친구',
         'colleagues': '동료',
-        'custom': '동행자'
+        'custom': '여행 스타일'
     };
     
-    const typeText = typeTexts[companionType] || '동행자';
+    const typeText = typeTexts[companionType] || '여행 스타일';
     
     // 상세 정보가 있는 경우에만 추가
     if (companions && companions.trim() !== '') {
@@ -310,7 +310,7 @@ function renderCalendar() {
                     try {
                         const purposeText = safeExecute(() => getPurposeText(event.purpose), { purpose: event.purpose });
                         
-                        // 동행자 정보 가져오기
+                        // 여행 스타일 정보 가져오기
                         const companionText = safeExecute(() => getCompanionText(event), { entryId: event.id });
                         
                         // 툴팁 내용을 안전하게 생성

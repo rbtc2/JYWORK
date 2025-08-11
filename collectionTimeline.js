@@ -114,7 +114,7 @@ function sanitizeMemo(memo) {
     return memo.replace(/[<>]/g, ''); // XSS 방지를 위한 기본적인 이스케이프
 }
 
-// 동행자 텍스트를 안전하게 처리하는 함수
+// 여행 스타일 텍스트를 안전하게 처리하는 함수
 function sanitizeCompanions(companions) {
     if (!companions || typeof companions !== 'string') return '';
     return companions.replace(/[<>]/g, ''); // XSS 방지를 위한 기본적인 이스케이프
@@ -373,12 +373,12 @@ function modifyEntry(entryId) {
     document.getElementById('start-date').value = entry.startDate;
     document.getElementById('end-date').value = entry.endDate;
     document.getElementById('purpose').value = entry.purpose;
-    // 동행자 정보 설정 (기존 string과 새 객체 구조 모두 지원)
+    // 여행 스타일 정보 설정 (기존 string과 새 객체 구조 모두 지원)
     const companionsValue = entry.companions || '';
     const companionType = entry.companionType || '';
     
     // 디버깅을 위한 로그
-    console.log('modifyEntry 동행자 정보:', {
+    console.log('modifyEntry 여행 스타일 정보:', {
         entryId: entryId,
         companions: companionsValue,
         companionType: companionType,
@@ -388,7 +388,7 @@ function modifyEntry(entryId) {
     document.getElementById('companions').value = companionsValue;
     document.getElementById('companion-type').value = companionType;
     
-    // 동행자 타입 버튼 상태 설정 - 모든 버튼 초기화
+    // 여행 스타일 타입 버튼 상태 설정 - 모든 버튼 초기화
     const companionTypeBtns = document.querySelectorAll('.companion-type-btn');
     companionTypeBtns.forEach(btn => {
         btn.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
@@ -413,16 +413,16 @@ function modifyEntry(entryId) {
     } else {
         companionDetailContainer.classList.remove('hidden');
         
-        // 동행 타입별 placeholder 설정
+        // 여행 스타일 타입별 placeholder 설정
         const placeholders = {
             'family': '가족 구성원을 입력하세요 (예: 부모님, 형제, 자녀)',
             'couple': '연인/배우자 이름을 입력하세요',
             'friends': '친구 이름들을 입력하세요 (예: 김철수, 이영희)',
             'colleagues': '동료 이름들을 입력하세요 (예: 팀원들, 사장님)',
-            'custom': '동행자를 입력하세요'
+            'custom': '여행 스타일을 입력하세요'
         };
         
-        companionsInput.placeholder = placeholders[companionType] || '동행자를 입력하세요';
+        companionsInput.placeholder = placeholders[companionType] || '여행 스타일을 입력하세요';
     }
     document.getElementById('memo').value = entry.memo || '';
 
@@ -479,7 +479,7 @@ function getPurposeText(purpose) {
     return textMap[purpose] || purpose;
 }
 
-// 동행자 텍스트 변환 함수
+// 여행 스타일 텍스트 변환 함수
 function getCompanionText(entry) {
     // 기존 string companions와 새 객체 구조 모두 지원
     const companions = entry.companions || '';
@@ -493,9 +493,9 @@ function getCompanionText(entry) {
         companionsType: typeof companions
     });
     
-    // companionType이 없거나 빈 문자열인 경우 → 동행자 정보 미입력
+    // companionType이 없거나 빈 문자열인 경우 → 여행 스타일 정보 미입력
     if (!companionType || companionType === '') {
-        return '동행자 정보 없음';
+        return '정보 없음';
     }
     
     // companionType이 'solo'인 경우 → "혼자" 명시적 선택
@@ -508,10 +508,10 @@ function getCompanionText(entry) {
         'couple': '연인',
         'friends': '친구',
         'colleagues': '동료',
-        'custom': '동행자'
+        'custom': '여행 스타일'
     };
     
-    const typeText = typeTexts[companionType] || '동행자';
+    const typeText = typeTexts[companionType] || '여행 스타일';
     
     // 상세 정보가 있는 경우에만 추가
     if (companions && companions.trim() !== '') {
@@ -560,12 +560,12 @@ function showEntryDetail(entryId) {
 
     // 스마트 컨텍스트 정보 계산
     const cityHistory = getCityHistory(entry, entries, window.userResidence);
-    // 동행자 정보가 있는 경우: companionType이 존재하고 'solo'가 아닌 경우
-    const hasCompanions = entry.companionType && entry.companionType !== '' && entry.companionType !== 'solo';
+    // 여행 스타일 정보가 있는 경우: companionType이 존재하는 경우 (혼자 포함)
+    const hasCompanions = entry.companionType && entry.companionType !== '';
     const hasMemo = entry.memo && entry.memo.trim();
     
     // 디버깅을 위한 로그
-    console.log('showEntryDetail 동행자 정보:', {
+    console.log('showEntryDetail 여행 스타일 정보:', {
         entryId: entry.id,
         companionType: entry.companionType,
         companions: entry.companions,
@@ -700,7 +700,7 @@ function showEntryDetail(entryId) {
                         <div class="flex items-start space-x-3">
                             <span class="text-2xl mt-1">👥</span>
                             <div class="flex-1">
-                                <p class="text-sm text-gray-500">동행자</p>
+                                <p class="text-sm text-gray-500">여행 스타일</p>
                                 <p class="text-lg font-semibold text-gray-800">${getCompanionText(entry)}</p>
                             </div>
                         </div>

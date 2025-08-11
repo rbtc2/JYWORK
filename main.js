@@ -360,7 +360,7 @@ function initializeModal() {
             window.resetRating();
         }
         
-        // 동행자 타입 초기화
+        // 여행 스타일 타입 초기화
         const companionTypeBtns = document.querySelectorAll('.companion-type-btn');
         companionTypeBtns.forEach(btn => {
             btn.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
@@ -413,19 +413,19 @@ function initializeModal() {
             return;
         }
         
-        // 동행자 정보 처리
+        // 여행 스타일 정보 처리
         const companionType = document.getElementById('companion-type').value;
         const companionsDetail = document.getElementById('companions').value;
         
         // 디버깅을 위한 로그
-        console.log('폼 제출 시 동행자 정보:', {
+        console.log('폼 제출 시 여행 스타일 정보:', {
             companionType: companionType,
             companionsDetail: companionsDetail,
             hasCompanionType: !!companionType,
             hasCompanionsDetail: !!companionsDetail
         });
         
-        // 동행자 객체 생성 - 개념적 구분 적용
+        // 여행 스타일 객체 생성 - 개념적 구분 적용
         let companions = '';
         let finalCompanionType = '';
         
@@ -443,7 +443,7 @@ function initializeModal() {
             finalCompanionType = companionType;
         }
         
-        console.log('최종 동행자 데이터:', {
+        console.log('최종 여행 스타일 데이터:', {
             companions: companions,
             companionType: finalCompanionType
         });
@@ -544,20 +544,20 @@ function initializeDateValidation() {
     });
 }
 
-// 동행자 타입 선택 시스템 초기화
+// 여행 스타일 타입 선택 시스템 초기화
 function initializeCompanionTypeSystem() {
     const companionTypeBtns = document.querySelectorAll('.companion-type-btn');
     const companionTypeInput = document.getElementById('companion-type');
     const companionDetailContainer = document.getElementById('companion-detail-container');
     const companionsInput = document.getElementById('companions');
     
-    // 동행 타입별 placeholder 설정
+    // 여행 스타일 타입별 placeholder 설정
     const placeholders = {
         'family': '가족 구성원을 입력하세요 (예: 부모님, 형제, 자녀)',
         'couple': '연인/배우자 이름을 입력하세요',
         'friends': '친구 이름들을 입력하세요 (예: 김철수, 이영희)',
         'colleagues': '동료 이름들을 입력하세요 (예: 팀원들, 사장님)',
-        'custom': '동행자를 입력하세요'
+        'custom': '여행 스타일을 입력하세요'
     };
     
     companionTypeBtns.forEach(btn => {
@@ -578,7 +578,7 @@ function initializeCompanionTypeSystem() {
                 companionDetailContainer.classList.add('hidden');
                 companionsInput.value = '';
                 
-                console.log('동행자 타입 선택 해제:', selectedType);
+                console.log('여행 스타일 타입 선택 해제:', selectedType);
                 return;
             }
             
@@ -603,11 +603,11 @@ function initializeCompanionTypeSystem() {
                 companionsInput.value = '';
             } else {
                 companionDetailContainer.classList.remove('hidden');
-                companionsInput.placeholder = placeholders[selectedType] || '동행자를 입력하세요';
+                companionsInput.placeholder = placeholders[selectedType] || '여행 스타일을 입력하세요';
                 companionsInput.focus();
             }
             
-            console.log('동행자 타입 선택:', selectedType);
+            console.log('여행 스타일 타입 선택:', selectedType);
         });
     });
 }

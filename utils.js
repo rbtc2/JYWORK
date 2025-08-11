@@ -632,7 +632,7 @@ function sanitizeUserInput(input, options = {}) {
 }
 
 /**
- * 동행자 입력 처리 함수 - 향후 사용자 ID 연동 대비
+ * 여행 스타일 입력 처리 함수 - 향후 사용자 ID 연동 대비
  */
 function sanitizeCompanions(companionsString) {
     if (!companionsString) return '';
@@ -670,16 +670,16 @@ function validateTravelForm(formData) {
         errors.push('메모는 1000자를 초과할 수 없습니다.');
     }
     
-    // 동행자 길이 체크 (기존 string과 새 객체 구조 모두 지원)
+    // 여행 스타일 길이 체크 (기존 string과 새 객체 구조 모두 지원)
     if (formData.companions && typeof formData.companions === 'string' && formData.companions.length > 200) {
-        errors.push('동행자 정보는 200자를 초과할 수 없습니다.');
+        errors.push('여행 스타일 정보는 200자를 초과할 수 없습니다.');
     }
     
     return { isValid: errors.length === 0, errors };
 }
 
 /**
- * 향후 동행자 기능 확장을 위한 데이터 구조 설계
+ * 향후 여행 스타일 기능 확장을 위한 데이터 구조 설계
  */
 const companionDataStructure = {
     // 현재: 단순 문자열
@@ -1555,16 +1555,16 @@ function calculateDays(startDate, endDate) {
 }
 
 /**
- * 동행자 텍스트 생성 (기존 함수가 없을 경우를 대비)
+ * 여행 스타일 텍스트 생성 (기존 함수가 없을 경우를 대비)
  * @param {Object} entry - 여행 기록
- * @returns {string} 동행자 텍스트
+ * @returns {string} 여행 스타일 텍스트
  */
 function getCompanionText(entry) {
-    if (!entry) return '동행자 정보 없음';
+    if (!entry) return '정보 없음';
     
-    // companionType이 없거나 빈 문자열인 경우 → 동행자 정보 미입력
+    // companionType이 없거나 빈 문자열인 경우 → 여행 스타일 정보 미입력
     if (!entry.companionType || entry.companionType === '') {
-        return '동행자 정보 없음';
+        return '정보 없음';
     }
     
     // companionType이 'solo'인 경우 → "혼자" 명시적 선택
@@ -1572,14 +1572,14 @@ function getCompanionText(entry) {
         return '혼자';
     }
     
-    // 동행자 정보가 문자열인 경우 (기존 구조)
+    // 여행 스타일 정보가 문자열인 경우 (기존 구조)
     if (typeof entry.companions === 'string') {
-        return entry.companions.trim() || '동행자 정보 없음';
+        return entry.companions.trim() || '정보 없음';
     }
     
-    // 동행자 정보가 객체인 경우 (새로운 구조)
+    // 여행 스타일 정보가 객체인 경우 (새로운 구조)
     if (entry.companions && typeof entry.companions === 'object') {
-        if (entry.companions.type === 'none') return '동행자 정보 없음';
+        if (entry.companions.type === 'none') return '정보 없음';
         if (entry.companions.type === 'alone') return '혼자';
         if (entry.companions.type === 'family') return '가족';
         if (entry.companions.type === 'friends') return '친구';
@@ -1587,10 +1587,10 @@ function getCompanionText(entry) {
         if (entry.companions.type === 'custom' && entry.companions.value) {
             return entry.companions.value;
         }
-        return '동행자 정보 없음';
+        return '정보 없음';
     }
     
-    return '동행자 정보 없음';
+    return '정보 없음';
 }
 
 /**
