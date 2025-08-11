@@ -483,7 +483,7 @@ function getPurposeText(purpose) {
 function getCompanionText(entry) {
     // 기존 string companions와 새 객체 구조 모두 지원
     const companions = entry.companions || '';
-    const companionType = entry.companionType || 'solo';
+    const companionType = entry.companionType || '';
     
     // 디버깅을 위한 로그
     console.log('getCompanionText 호출:', {
@@ -493,6 +493,12 @@ function getCompanionText(entry) {
         companionsType: typeof companions
     });
     
+    // companionType이 없거나 빈 문자열인 경우 → 동행자 정보 미입력
+    if (!companionType || companionType === '') {
+        return '동행자 정보 없음';
+    }
+    
+    // companionType이 'solo'인 경우 → "혼자" 명시적 선택
     if (companionType === 'solo') {
         return '혼자';
     }
@@ -554,11 +560,18 @@ function showEntryDetail(entryId) {
 
     // 스마트 컨텍스트 정보 계산
     const cityHistory = getCityHistory(entry, entries, window.userResidence);
-    const hasCompanions = entry.companionType && entry.companionType !== '' && entry.companions && (
-        (typeof entry.companions === 'string' && entry.companions.trim()) ||
-        (typeof entry.companions === 'object' && entry.companions.type !== 'none')
-    );
+    // 동행자 정보가 있는 경우: companionType이 존재하고 'solo'가 아닌 경우
+    const hasCompanions = entry.companionType && entry.companionType !== '' && entry.companionType !== 'solo';
     const hasMemo = entry.memo && entry.memo.trim();
+    
+    // 디버깅을 위한 로그
+    console.log('showEntryDetail 동행자 정보:', {
+        entryId: entry.id,
+        companionType: entry.companionType,
+        companions: entry.companions,
+        hasCompanions: hasCompanions,
+        hasMemo: hasMemo
+    });
 
     // 모달 HTML 생성
     const modalHTML = `

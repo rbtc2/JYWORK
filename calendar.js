@@ -121,8 +121,14 @@ function getPurposeText(purpose) {
 function getCompanionText(entry) {
     // 기존 string companions와 새 객체 구조 모두 지원
     const companions = entry.companions || '';
-    const companionType = entry.companionType || 'solo';
+    const companionType = entry.companionType || '';
     
+    // companionType이 없거나 빈 문자열인 경우 → 동행자 정보 미입력
+    if (!companionType || companionType === '') {
+        return '동행자 정보 없음';
+    }
+    
+    // companionType이 'solo'인 경우 → "혼자" 명시적 선택
     if (companionType === 'solo') {
         return '혼자';
     }
@@ -139,7 +145,7 @@ function getCompanionText(entry) {
     
     // 상세 정보가 있는 경우에만 추가
     if (companions && companions.trim() !== '') {
-        return `${typeText}: ${companions}`;
+        return `${companions}`;
     } else {
         return typeText;
     }

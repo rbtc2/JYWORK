@@ -1560,21 +1560,26 @@ function calculateDays(startDate, endDate) {
  * @returns {string} 동행자 텍스트
  */
 function getCompanionText(entry) {
-    if (!entry) return '없음';
+    if (!entry) return '동행자 정보 없음';
     
-    // companionType이 없거나 빈 문자열인 경우
+    // companionType이 없거나 빈 문자열인 경우 → 동행자 정보 미입력
     if (!entry.companionType || entry.companionType === '') {
-        return '없음';
+        return '동행자 정보 없음';
+    }
+    
+    // companionType이 'solo'인 경우 → "혼자" 명시적 선택
+    if (entry.companionType === 'solo') {
+        return '혼자';
     }
     
     // 동행자 정보가 문자열인 경우 (기존 구조)
     if (typeof entry.companions === 'string') {
-        return entry.companions.trim() || '없음';
+        return entry.companions.trim() || '동행자 정보 없음';
     }
     
     // 동행자 정보가 객체인 경우 (새로운 구조)
     if (entry.companions && typeof entry.companions === 'object') {
-        if (entry.companions.type === 'none') return '없음';
+        if (entry.companions.type === 'none') return '동행자 정보 없음';
         if (entry.companions.type === 'alone') return '혼자';
         if (entry.companions.type === 'family') return '가족';
         if (entry.companions.type === 'friends') return '친구';
@@ -1582,10 +1587,10 @@ function getCompanionText(entry) {
         if (entry.companions.type === 'custom' && entry.companions.value) {
             return entry.companions.value;
         }
-        return '없음';
+        return '동행자 정보 없음';
     }
     
-    return '없음';
+    return '동행자 정보 없음';
 }
 
 /**

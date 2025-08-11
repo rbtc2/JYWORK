@@ -425,16 +425,28 @@ function initializeModal() {
             hasCompanionsDetail: !!companionsDetail
         });
         
-        // 동행자 객체 생성
+        // 동행자 객체 생성 - 개념적 구분 적용
         let companions = '';
-        if (companionType === 'solo' || !companionType || companionType === '') {
+        let finalCompanionType = '';
+        
+        if (!companionType || companionType === '') {
+            // 아무것도 선택하지 않음 → null/"" 저장
             companions = '';
-        } else if (companionType && companionType !== 'solo') {
-            // solo가 아닌 경우 detail이 비어있어도 저장
+            finalCompanionType = '';
+        } else if (companionType === 'solo') {
+            // "혼자" 명시적 선택 → "혼자" 저장
+            companions = '';
+            finalCompanionType = 'solo';
+        } else {
+            // 다른 타입 선택 → 해당 타입과 상세 정보 저장
             companions = companionsDetail || '';
+            finalCompanionType = companionType;
         }
         
-        console.log('최종 companions 값:', companions);
+        console.log('최종 동행자 데이터:', {
+            companions: companions,
+            companionType: finalCompanionType
+        });
         
         // 보안 검증 - 입력 길이 및 내용 검증
         const memo = document.getElementById('memo').value;
@@ -456,7 +468,7 @@ function initializeModal() {
             purpose: document.getElementById('purpose').value,
             rating: document.getElementById('rating').value,
             companions: companions,
-            companionType: companionType,
+            companionType: finalCompanionType,
             memo: document.getElementById('memo').value
         };
 
