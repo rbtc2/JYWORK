@@ -1645,3 +1645,389 @@ if (typeof window !== 'undefined') {
     window.getPurposeText = getPurposeText;
     window.generateStarRating = generateStarRating;
 } 
+
+/**
+ * 검색 기능 관련 함수들
+ */
+
+/**
+ * 여행 기록 검색 함수
+ * @param {string} query - 검색어
+ * @param {Array} entries - 검색할 여행 기록 배열
+ * @returns {Array} 검색 결과 배열
+ */
+function searchEntries(query, entries = []) {
+    if (!query || !query.trim() || !entries || !Array.isArray(entries)) {
+        return [];
+    }
+
+    const searchTerm = query.toLowerCase().trim();
+    const results = [];
+
+    entries.forEach(entry => {
+        let matchScore = 0;
+        let matchedFields = [];
+
+        // 국가명 검색
+        if (entry.country && entry.country.toLowerCase().includes(searchTerm)) {
+            matchScore += 10;
+            matchedFields.push('country');
+        }
+        if (entry.countryCode && entry.countryCode.toLowerCase().includes(searchTerm)) {
+            matchScore += 8;
+            matchedFields.push('countryCode');
+        }
+
+        // 도시명 검색
+        if (entry.city && entry.city.toLowerCase().includes(searchTerm)) {
+            matchScore += 10;
+            matchedFields.push('city');
+        }
+
+        // 동행자/여행 스타일 검색
+        if (entry.companions) {
+            if (typeof entry.companions === 'string' && entry.companions.toLowerCase().includes(searchTerm)) {
+                matchScore += 6;
+                matchedFields.push('companions');
+            } else if (typeof entry.companions === 'object' && entry.companions.value && 
+                      entry.companions.value.toLowerCase().includes(searchTerm)) {
+                matchScore += 6;
+                matchedFields.push('companions');
+            }
+        }
+        if (entry.companionType && entry.companionType.toLowerCase().includes(searchTerm)) {
+            matchScore += 5;
+            matchedFields.push('companionType');
+        }
+
+        // 목적 검색
+        if (entry.purpose && entry.purpose.toLowerCase().includes(searchTerm)) {
+            matchScore += 7;
+            matchedFields.push('purpose');
+        }
+
+        // 메모 검색
+        if (entry.memo && entry.memo.toLowerCase().includes(searchTerm)) {
+            matchScore += 4;
+            matchedFields.push('memo');
+        }
+
+        // 날짜 검색 (YYYY-MM-DD 형식)
+        if (entry.startDate && entry.startDate.includes(searchTerm)) {
+            matchScore += 3;
+            matchedFields.push('startDate');
+        }
+        if (entry.endDate && entry.endDate.includes(searchTerm)) {
+            matchScore += 3;
+            matchedFields.push('endDate');
+        }
+
+        // 별점 검색
+        if (entry.rating && entry.rating.toString().includes(searchTerm)) {
+            matchScore += 2;
+            matchedFields.push('rating');
+        }
+
+        // 검색어가 포함된 경우 결과에 추가
+        if (matchScore > 0) {
+            results.push({
+                entry,
+                matchScore,
+                matchedFields,
+                highlightText: generateHighlightText(entry, searchTerm, matchedFields)
+            });
+        }
+    });
+
+    // 점수순으로 정렬 (높은 점수 우선)
+    return results.sort((a, b) => b.matchScore - a.matchScore);
+}
+
+/**
+ * 검색 결과 하이라이트 텍스트 생성
+ * @param {Object} entry - 여행 기록
+ * @param {string} searchTerm - 검색어
+ * @param {Array} matchedFields - 일치한 필드들
+ * @returns {Object} 하이라이트 정보
+ */
+function generateHighlightText(entry, searchTerm, matchedFields) {
+    const highlights = {};
+
+    matchedFields.forEach(field => {
+        let value = entry[field];
+        if (typeof value === 'string') {
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            highlights[field] = value.replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
+        } else if (typeof value === 'object' && value && value.value) {
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            highlights[field] = value.value.replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
+        }
+    });
+
+    return highlights;
+}
+
+/**
+ * 검색 결과 렌더링
+ * @param {Array} searchResults - 검색 결과 배열
+ * @param {string} containerId - 결과를 표시할 컨테이너 ID
+ */
+function renderSearchResults(searchResults, containerId = 'search-results') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (searchResults.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <div class="text-4xl mb-4">🔍</div>
+                <p class="text-lg">검색 결과가 없습니다.</p>
+                <p class="text-sm mt-2">다른 검색어를 시도해보세요.</p>
+            </div>
+        `;
+        return;
+    }
+
+    const resultsHTML = searchResults.map(result => {
+        const { entry, matchedFields, highlightText } = result;
+        const days = calculateDays(entry.startDate, entry.endDate);
+        const purposeText = getPurposeText(entry.purpose);
+        const companionText = getCompanionText(entry);
+        const flag = window.countryFlags ? window.countryFlags[entry.countryCode] || '🏳️' : '🏳️';
+        
+        // 국가명과 도시명을 정확한 한글명으로 변환
+        const countryName = getCountryName ? getCountryName(entry.countryCode) || entry.country : entry.country;
+        const cityName = entry.city;
+
+        // 일치한 필드 표시
+        const matchedFieldsText = matchedFields.map(field => {
+            const fieldNames = {
+                country: '국가',
+                countryCode: '국가코드',
+                city: '도시',
+                companions: '동행자',
+                companionType: '여행스타일',
+                purpose: '목적',
+                memo: '메모',
+                startDate: '시작일',
+                endDate: '종료일',
+                rating: '별점'
+            };
+            return fieldNames[field] || field;
+        }).join(', ');
+
+        return `
+            <div class="search-result-card bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-blue-500"
+                 onclick="showEntryDetail('${entry.id}')">
+                <div class="p-4">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-2xl" aria-label="${countryName} 국기">${flag}</span>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">${cityName}, ${countryName}</h3>
+                                <p class="text-sm text-gray-600">${entry.startDate} ~ ${entry.endDate} (${days}일)</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-gray-500">일치한 필드</div>
+                            <div class="text-xs text-blue-600 font-medium">${matchedFieldsText}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                        <div>
+                            <span class="text-gray-500">목적:</span>
+                            <span class="ml-2 font-medium">${purposeText}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">동행자:</span>
+                            <span class="ml-2 font-medium">${companionText}</span>
+                        </div>
+                    </div>
+                    
+                    ${entry.memo ? `
+                        <div class="mt-3 p-3 bg-gray-50 rounded">
+                            <div class="text-xs text-gray-500 mb-1">메모</div>
+                            <div class="text-sm text-gray-700">${highlightText.memo || entry.memo}</div>
+                        </div>
+                    ` : ''}
+                    
+                    ${entry.rating ? `
+                        <div class="mt-3 flex items-center">
+                            <span class="text-gray-500 text-sm mr-2">평점:</span>
+                            <div class="flex space-x-1">
+                                ${generateStarRating ? generateStarRating(entry.rating) : '⭐'.repeat(entry.rating)}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = `
+        <div class="mb-4">
+            <div class="text-lg font-semibold text-gray-800 mb-2">
+                검색 결과 (${searchResults.length}건)
+            </div>
+            <div class="text-sm text-gray-600">
+                검색 결과를 클릭하면 상세 정보를 볼 수 있습니다.
+            </div>
+        </div>
+        <div class="space-y-4">
+            ${resultsHTML}
+        </div>
+    `;
+}
+
+/**
+ * 검색 이벤트 처리 초기화
+ * @param {string} searchInputId - 검색 입력 필드 ID
+ * @param {string} searchButtonId - 검색 버튼 ID
+ * @param {string} resultsContainerId - 결과 컨테이너 ID
+ */
+function initializeSearchEventListeners(searchInputId = 'search-input', 
+                                     searchButtonId = 'search-button', 
+                                     resultsContainerId = 'search-results') {
+    
+    const searchInput = document.getElementById(searchInputId);
+    const searchButton = document.getElementById(searchButtonId);
+    
+    if (!searchInput) return;
+
+    // 엔터키로 검색
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            performSearch();
+        }
+    });
+
+    // 검색 버튼 클릭으로 검색
+    if (searchButton) {
+        searchButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            performSearch();
+        });
+    }
+
+    // 실시간 검색 (디바운싱 적용)
+    const debouncedSearch = debounce(function() {
+        const query = searchInput.value.trim();
+        if (query.length >= 2) {
+            performSearch();
+        } else if (query.length === 0) {
+            clearSearchResults();
+        }
+    }, 500);
+
+    searchInput.addEventListener('input', debouncedSearch);
+
+    // 검색 실행 함수
+    function performSearch() {
+        const query = searchInput.value.trim();
+        if (!query) {
+            clearSearchResults();
+            return;
+        }
+
+        // 전역 entries 배열 사용
+        const entries = window.entries || [];
+        const searchResults = searchEntries(query, entries);
+        renderSearchResults(searchResults, resultsContainerId);
+    }
+
+    // 검색 결과 초기화 함수
+    function clearSearchResults() {
+        const container = document.getElementById(resultsContainerId);
+        if (container) {
+            container.innerHTML = '';
+        }
+    }
+}
+
+/**
+ * 검색 결과 필터링 (고급 검색)
+ * @param {Array} searchResults - 기본 검색 결과
+ * @param {Object} filters - 필터 옵션
+ * @returns {Array} 필터링된 결과
+ */
+function filterSearchResults(searchResults, filters = {}) {
+    if (!searchResults || !Array.isArray(searchResults)) return [];
+
+    let filtered = [...searchResults];
+
+    // 국가별 필터링
+    if (filters.countryCode) {
+        filtered = filtered.filter(result => 
+            result.entry.countryCode === filters.countryCode
+        );
+    }
+
+    // 기간별 필터링
+    if (filters.startDate) {
+        filtered = filtered.filter(result => 
+            new Date(result.entry.startDate) >= new Date(filters.startDate)
+        );
+    }
+    if (filters.endDate) {
+        filtered = filtered.filter(result => 
+            new Date(result.entry.endDate) <= new Date(filters.endDate)
+        );
+    }
+
+    // 목적별 필터링
+    if (filters.purpose) {
+        filtered = filtered.filter(result => 
+            result.entry.purpose === filters.purpose
+        );
+    }
+
+    // 동행자별 필터링
+    if (filters.companionType) {
+        filtered = filtered.filter(result => 
+            result.entry.companionType === filters.companionType
+        );
+    }
+
+    // 별점별 필터링
+    if (filters.minRating) {
+        filtered = filtered.filter(result => 
+            result.entry.rating && result.entry.rating >= filters.minRating
+        );
+    }
+
+    return filtered;
+}
+
+/**
+ * 빠른 검색 태그 이벤트 리스너 초기화
+ */
+function initializeQuickSearchTags() {
+    // 빠른 검색 태그 클릭 이벤트
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.quick-search-tag')) {
+            const tag = e.target.closest('.quick-search-tag');
+            const searchTerm = tag.dataset.search;
+            
+            if (searchTerm) {
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) {
+                    searchInput.value = searchTerm;
+                    // 검색 실행
+                    const entries = window.entries || [];
+                    const searchResults = searchEntries(searchTerm, entries);
+                    renderSearchResults(searchResults, 'search-results');
+                }
+            }
+        }
+    });
+}
+
+// 전역으로 노출
+if (typeof window !== 'undefined') {
+    window.searchEntries = searchEntries;
+    window.renderSearchResults = renderSearchResults;
+    window.initializeSearchEventListeners = initializeSearchEventListeners;
+    window.filterSearchResults = filterSearchResults;
+    window.initializeQuickSearchTags = initializeQuickSearchTags;
+} 

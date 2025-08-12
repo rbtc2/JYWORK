@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>여행 기록 검색 기능 테스트</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .search-result-card:hover {
+            transform: translateY(-2px);
+        }
+        .search-result-card {
+            transition: all 0.2s ease-in-out;
+        }
+        mark {
+            background-color: #fef3c7;
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- 헤더 -->
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">🔍 여행 기록 검색</h1>
+                <p class="text-gray-600">국가, 도시, 동행자, 목적 등으로 여행 기록을 검색해보세요</p>
+            </div>
+
+            <!-- 검색 폼 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="flex-1">
+                        <label for="search-input" class="block text-sm font-medium text-gray-700 mb-2">
+                            검색어 입력
+                        </label>
+                        <input type="text" 
+                               id="search-input" 
+                               placeholder="예: 일본, 도쿄, 혼자, 관광, 2024..."
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div class="flex items-end">
+                        <button id="search-button" 
+                                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+                            검색
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 검색 팁 -->
+                <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+                    <h3 class="text-sm font-medium text-blue-800 mb-2">💡 검색 팁</h3>
+                    <div class="text-sm text-blue-700 space-y-1">
+                        <p>• <strong>국가/도시:</strong> "일본", "도쿄", "JP" 등</p>
+                        <p>• <strong>동행자:</strong> "혼자", "가족", "친구" 등</p>
+                        <p>• <strong>목적:</strong> "관광", "업무", "유학" 등</p>
+                        <p>• <strong>날짜:</strong> "2024", "2024-03" 등</p>
+                        <p>• <strong>메모:</strong> 메모 내용에 포함된 단어</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 검색 결과 -->
+            <div id="search-results"></div>
+
+            <!-- 샘플 데이터 표시 -->
+            <div class="mt-12 bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">📊 현재 등록된 여행 기록</h2>
+                <div id="sample-entries" class="space-y-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 스크립트 로드 -->
+    <script src="data.js"></script>
+    <script src="utils.js"></script>
+    <script src="main.js"></script>
+    
+    <script>
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            // 샘플 데이터 생성 (테스트용)
+            const sampleEntries = [
+                {
+                    id: '1',
+                    country: '일본',
+                    countryCode: 'JP',
+                    city: '도쿄',
+                    startDate: '2024-03-15',
+                    endDate: '2024-03-20',
+                    purpose: 'tourism',
+                    companionType: 'solo',
+                    companions: '혼자',
+                    rating: 5,
+                    memo: '도쿄 타워와 시부야를 방문했습니다. 맛있는 라멘을 먹었어요!'
+                },
+                {
+                    id: '2',
+                    country: '미국',
+                    countryCode: 'US',
+                    city: '뉴욕',
+                    startDate: '2024-02-10',
+                    endDate: '2024-02-15',
+                    purpose: 'business',
+                    companionType: 'colleagues',
+                    companions: '동료',
+                    rating: 4,
+                    memo: '비즈니스 미팅과 자유의 여신상을 구경했습니다.'
+                },
+                {
+                    id: '3',
+                    country: '프랑스',
+                    countryCode: 'FR',
+                    city: '파리',
+                    startDate: '2024-01-20',
+                    endDate: '2024-01-25',
+                    purpose: 'tourism',
+                    companionType: 'family',
+                    companions: '가족',
+                    rating: 5,
+                    memo: '에펠탑과 루브르 박물관을 방문했습니다. 와인도 맛있었어요!'
+                },
+                {
+                    id: '4',
+                    country: '대한민국',
+                    countryCode: 'KR',
+                    city: '부산',
+                    startDate: '2024-04-01',
+                    endDate: '2024-04-03',
+                    purpose: 'family',
+                    companionType: 'friends',
+                    companions: '친구',
+                    rating: 4,
+                    memo: '해운대 해수욕장과 광안대교 야경을 보았습니다.'
+                },
+                {
+                    id: '5',
+                    country: '영국',
+                    countryCode: 'GB',
+                    city: '런던',
+                    startDate: '2023-12-20',
+                    endDate: '2023-12-25',
+                    purpose: 'study',
+                    companionType: 'solo',
+                    companions: '혼자',
+                    rating: 5,
+                    memo: '영어 공부를 위해 런던에 갔습니다. 빅벤과 타워브리지를 보았어요.'
+                }
+            ];
+
+            // 전역 entries 배열에 샘플 데이터 설정
+            window.entries = sampleEntries;
+
+            // 샘플 데이터 표시
+            displaySampleEntries(sampleEntries);
+
+            // 검색 이벤트 리스너 초기화
+            initializeSearchEventListeners();
+
+            // 국가 플래그 설정 (테스트용)
+            window.countryFlags = {
+                'JP': '🇯🇵',
+                'US': '🇺🇸',
+                'FR': '🇫🇷',
+                'KR': '🇰🇷',
+                'GB': '🇬🇧'
+            };
+        });
+
+        // 샘플 데이터 표시 함수
+        function displaySampleEntries(entries) {
+            const container = document.getElementById('sample-entries');
+            if (!container) return;
+
+            const entriesHTML = entries.map(entry => {
+                const days = calculateDays(entry.startDate, entry.endDate);
+                const purposeText = getPurposeText(entry.purpose);
+                const companionText = getCompanionText(entry);
+                const flag = window.countryFlags[entry.countryCode] || '🏳️';
+
+                return `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-2xl">${flag}</span>
+                            <div>
+                                <div class="font-medium text-gray-800">${entry.city}, ${entry.country}</div>
+                                <div class="text-sm text-gray-600">${entry.startDate} ~ ${entry.endDate} (${days}일)</div>
+                            </div>
+                        </div>
+                        <div class="text-right text-sm text-gray-600">
+                            <div>${purposeText}</div>
+                            <div>${companionText}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = entriesHTML;
+        }
+
+        // 전역 함수들 (테스트용)
+        function calculateDays(startDate, endDate) {
+            if (!startDate || !endDate) return 0;
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays + 1;
+        }
+
+        function getPurposeText(purpose) {
+            const purposeMap = {
+                'tourism': '관광',
+                'business': '업무',
+                'study': '유학',
+                'work': '근무',
+                'family': '가족 방문',
+                'medical': '의료',
+                'other': '기타'
+            };
+            return purposeMap[purpose] || purpose;
+        }
+
+        function getCompanionText(entry) {
+            if (!entry.companionType || entry.companionType === '') {
+                return '정보 없음';
+            }
+            if (entry.companionType === 'solo') {
+                return '혼자';
+            }
+            if (typeof entry.companions === 'string') {
+                return entry.companions.trim() || '정보 없음';
+            }
+            if (entry.companions && typeof entry.companions === 'object') {
+                if (entry.companions.type === 'none') return '정보 없음';
+                if (entry.companions.type === 'alone') return '혼자';
+                if (entry.companions.type === 'family') return '가족';
+                if (entry.companions.type === 'friends') return '친구';
+                if (entry.companions.type === 'colleagues') return '동료';
+                if (entry.companions.type === 'custom' && entry.companions.value) {
+                    return entry.companions.value;
+                }
+                return '정보 없음';
+            }
+            return '정보 없음';
+        }
+
+        function generateStarRating(rating) {
+            if (!rating || rating < 1) rating = 0;
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<span class="text-yellow-400">⭐</span>';
+                } else {
+                    stars += '<span class="text-gray-300">⭐</span>';
+                }
+            }
+            return stars;
+        }
+
+        // showEntryDetail 함수 (테스트용)
+        function showEntryDetail(entryId) {
+            const entry = window.entries.find(e => e.id === entryId);
+            if (!entry) return;
+
+            alert(`여행 기록 상세 정보:\n\n도시: ${entry.city}, ${entry.country}\n기간: ${entry.startDate} ~ ${entry.endDate}\n목적: ${getPurposeText(entry.purpose)}\n동행자: ${getCompanionText(entry)}\n메모: ${entry.memo || '없음'}`);
+        }
+    </script>
+</body>
+</html>

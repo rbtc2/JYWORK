@@ -910,6 +910,16 @@ function initializeApp() {
         safeExecute(() => initializeMemoCounter(), { function: 'initializeMemoCounter' });
         safeExecute(() => initializeSettingsButton(), { function: 'initializeSettingsButton' });
         
+        // 검색 기능 초기화
+        if (typeof initializeSearchEventListeners === 'function') {
+            safeExecute(() => initializeSearchEventListeners(), { function: 'initializeSearchEventListeners' });
+        }
+        
+        // 빠른 검색 태그 초기화
+        if (typeof initializeQuickSearchTags === 'function') {
+            safeExecute(() => initializeQuickSearchTags(), { function: 'initializeQuickSearchTags' });
+        }
+        
         // 페이지네이션 초기화
         if (typeof initializePaginationButtons === 'function') {
             safeExecute(() => initializePaginationButtons(), { function: 'initializePaginationButtons' });

@@ -258,43 +258,55 @@
                         <input 
                             type="text" 
                             id="search-input" 
-                            placeholder="도시, 국가 검색..." 
+                            placeholder="국가, 도시, 동행자, 목적, 메모 등으로 검색..." 
                             class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm sm:text-base"
                         >
                         <button 
-                            id="search-btn" 
+                            id="search-button" 
                             class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm sm:text-base font-medium min-h-[48px] flex items-center justify-center"
                         >
                             검색
                         </button>
                     </div>
+                    
+                    <!-- 검색 팁 -->
+                    <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+                        <h3 class="text-sm font-medium text-blue-800 mb-2">💡 검색 팁</h3>
+                        <div class="text-sm text-blue-700 space-y-1">
+                            <p>• <strong>국가/도시:</strong> "일본", "도쿄", "JP" 등</p>
+                            <p>• <strong>동행자:</strong> "혼자", "가족", "친구" 등</p>
+                            <p>• <strong>목적:</strong> "관광", "업무", "유학" 등</p>
+                            <p>• <strong>날짜:</strong> "2024", "2024-03" 등</p>
+                            <p>• <strong>메모:</strong> 메모 내용에 포함된 단어</p>
+                        </div>
+                    </div>
                 </div>
                 
-                <!-- 2. 중단: 최근 검색어 태그들 -->
+                <!-- 2. 중단: 빠른 검색 태그들 -->
                 <div class="mb-6 sm:mb-8">
-                    <h3 class="text-sm sm:text-base font-semibold text-gray-700 mb-3 sm:mb-4">최근 검색어</h3>
+                    <h3 class="text-sm sm:text-base font-semibold text-gray-700 mb-3 sm:mb-4">빠른 검색</h3>
                     <div class="overflow-x-auto">
                         <div class="flex gap-2 sm:gap-3 whitespace-nowrap pb-2">
-                            <button class="search-tag px-3 py-2 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0">
-                                #다낭
+                            <button class="quick-search-tag px-3 py-2 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0" data-search="일본">
+                                🇯🇵 일본
                             </button>
-                            <button class="search-tag px-3 py-2 bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0">
-                                #부산
+                            <button class="quick-search-tag px-3 py-2 bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0" data-search="혼자">
+                                🚶 혼자
                             </button>
-                            <button class="search-tag px-3 py-2 bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0">
-                                #도쿄
+                            <button class="quick-search-tag px-3 py-2 bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0" data-search="관광">
+                                🎯 관광
                             </button>
-                            <button class="search-tag px-3 py-2 bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0">
-                                #파리
+                            <button class="quick-search-tag px-3 py-2 bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0" data-search="2024">
+                                📅 2024
                             </button>
-                            <button class="search-tag px-3 py-2 bg-red-100 text-red-700 rounded-full hover:bg-red-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0">
-                                #뉴욕
+                            <button class="quick-search-tag px-3 py-2 bg-red-100 text-red-700 rounded-full hover:bg-red-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0" data-search="도쿄">
+                                🗼 도쿄
                             </button>
-                            <button class="search-tag px-3 py-2 bg-indigo-100 text-indigo-700 rounded-full hover:bg-indigo-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0">
-                                #런던
+                            <button class="quick-search-tag px-3 py-2 bg-indigo-100 text-indigo-700 rounded-full hover:bg-indigo-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0" data-search="가족">
+                                👨‍👩‍👧‍👦 가족
                             </button>
-                            <button class="search-tag px-3 py-2 bg-pink-100 text-pink-700 rounded-full hover:bg-pink-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0">
-                                #시드니
+                            <button class="quick-search-tag px-3 py-2 bg-pink-100 text-pink-700 rounded-full hover:bg-pink-200 transition-colors text-xs sm:text-sm font-medium flex-shrink-0" data-search="업무">
+                                💼 업무
                             </button>
                         </div>
                     </div>
@@ -306,7 +318,7 @@
                     <div id="search-results" class="text-center py-8 sm:py-12">
                         <div class="text-3xl sm:text-4xl mb-4">🔍</div>
                         <p class="text-gray-500 text-base sm:text-lg">검색어를 입력하세요</p>
-                        <p class="text-gray-400 text-sm mt-2">도시명, 국가명, 또는 여행 키워드를 검색해보세요</p>
+                        <p class="text-gray-400 text-sm mt-2">국가명, 도시명, 동행자, 목적 등으로 여행 기록을 검색해보세요</p>
                     </div>
                 </div>
             </div>
