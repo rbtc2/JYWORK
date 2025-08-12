@@ -363,8 +363,7 @@ function initializeModal() {
         // 여행 스타일 타입 초기화
         const companionTypeBtns = document.querySelectorAll('.companion-type-btn');
         companionTypeBtns.forEach(btn => {
-            btn.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
-            btn.classList.add('bg-gray-100', 'text-gray-700', 'border-gray-300');
+            btn.classList.remove('selected');
         });
         document.getElementById('companion-type').value = '';
         document.getElementById('companion-detail-container').classList.add('hidden');
@@ -563,13 +562,12 @@ function initializeCompanionTypeSystem() {
     companionTypeBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             const selectedType = this.getAttribute('data-type');
-            const isCurrentlySelected = this.classList.contains('bg-blue-500');
+            const isCurrentlySelected = this.classList.contains('selected');
             
             // 현재 선택된 버튼이면 선택 해제
             if (isCurrentlySelected) {
                 // 선택 해제 - 기본 스타일로 복원
-                this.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
-                this.classList.add('bg-gray-100', 'text-gray-700', 'border-gray-300');
+                this.classList.remove('selected');
                 
                 // 숨겨진 필드 값 제거
                 companionTypeInput.value = '';
@@ -585,14 +583,12 @@ function initializeCompanionTypeSystem() {
             // 다른 버튼이 선택되어 있다면 선택 해제
             companionTypeBtns.forEach(b => {
                 if (b !== this) {
-                    b.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
-                    b.classList.add('bg-gray-100', 'text-gray-700', 'border-gray-300');
+                    b.classList.remove('selected');
                 }
             });
             
             // 새로 선택된 버튼 스타일 적용
-            this.classList.remove('bg-gray-100', 'text-gray-700', 'border-gray-300');
-            this.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
+            this.classList.add('selected');
             
             // 숨겨진 필드에 값 설정
             companionTypeInput.value = selectedType;

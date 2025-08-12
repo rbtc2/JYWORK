@@ -1067,4 +1067,57 @@ nav {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* 여행 스타일 버튼 명시적 스타일 - 모바일 호환성 강화 */
+.companion-type-btn {
+    transition: all 0.2s ease;
+    min-height: 40px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 선택된 상태 - 높은 우선순위로 설정 */
+.companion-type-btn.selected {
+    background-color: #3b82f6 !important;
+    color: white !important;
+    border-color: #3b82f6 !important;
+}
+
+/* 선택되지 않은 상태 */
+.companion-type-btn:not(.selected) {
+    background-color: #f3f4f6 !important;
+    color: #374151 !important;
+    border-color: #d1d5db !important;
+}
+
+/* hover 효과 */
+.companion-type-btn:not(.selected):hover {
+    background-color: #e5e7eb !important;
+    border-color: #9ca3af !important;
+}
+
+/* 모바일 특정 스타일 */
+@media (max-width: 768px) {
+    .companion-type-btn {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* 모바일에서 선택된 상태 강제 적용 */
+    .companion-type-btn.selected {
+        background-color: #3b82f6 !important;
+        color: white !important;
+        border-color: #3b82f6 !important;
+        box-shadow: 0 1px 3px 0 rgba(59, 130, 246, 0.3) !important;
+    }
+    
+    /* 모바일에서 선택되지 않은 상태 강제 적용 */
+    .companion-type-btn:not(.selected) {
+        background-color: #f3f4f6 !important;
+        color: #374151 !important;
+        border-color: #d1d5db !important;
+    }
 } 

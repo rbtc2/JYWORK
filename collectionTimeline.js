@@ -391,16 +391,14 @@ function modifyEntry(entryId) {
     // 여행 스타일 타입 버튼 상태 설정 - 모든 버튼 초기화
     const companionTypeBtns = document.querySelectorAll('.companion-type-btn');
     companionTypeBtns.forEach(btn => {
-        btn.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
-        btn.classList.add('bg-gray-100', 'text-gray-700', 'border-gray-300');
+        btn.classList.remove('selected');
     });
     
     // companionType이 있는 경우에만 해당 버튼 선택
     if (companionType && companionType !== '') {
         const selectedBtn = document.querySelector(`[data-type="${companionType}"]`);
         if (selectedBtn) {
-            selectedBtn.classList.remove('bg-gray-100', 'text-gray-700', 'border-gray-300');
-            selectedBtn.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
+            selectedBtn.classList.add('selected');
         }
     }
     
