@@ -150,6 +150,7 @@ function updateAllSections() {
     renderCollectionTimeline();
     renderCalendar();
     updateMap();
+    updateSettingsDataStats();
     
     // Countries 컬렉션 업데이트 (모달이 열려있는 경우)
     if (typeof renderCountriesCollection === 'function') {
@@ -859,6 +860,59 @@ function initializeSettingsButton() {
     }
 }
 
+// 설정 서브탭 기능 초기화
+function initializeSettingsSubtabs() {
+    const subtabs = document.querySelectorAll('.subtab');
+    const personalSettings = document.getElementById('personal-settings');
+    const appSettings = document.getElementById('app-settings');
+    
+    if (!subtabs.length || !personalSettings || !appSettings) return;
+    
+    // 기본적으로 개인 설정 탭 활성화
+    personalSettings.classList.remove('hidden');
+    appSettings.classList.add('hidden');
+    
+    subtabs.forEach(subtab => {
+        globalEventManager.addEventListener(subtab, 'click', function() {
+            const targetTab = this.getAttribute('data-subtab');
+            
+            // 모든 서브탭에서 active 클래스 제거
+            subtabs.forEach(tab => {
+                tab.classList.remove('active', 'bg-blue-500', 'text-white');
+                tab.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            // 클릭된 서브탭에 active 클래스 추가
+            this.classList.remove('bg-gray-200', 'text-gray-700');
+            this.classList.add('active', 'bg-blue-500', 'text-white');
+            
+            // 해당 탭 내용 표시
+            if (targetTab === 'personal') {
+                personalSettings.classList.remove('hidden');
+                appSettings.classList.add('hidden');
+            } else if (targetTab === 'app') {
+                personalSettings.classList.add('hidden');
+                appSettings.classList.remove('hidden');
+            }
+        });
+    });
+}
+
+// 설정 탭의 데이터 통계 업데이트
+function updateSettingsDataStats() {
+    const travelCountElement = document.getElementById('travel-count');
+    const countryCountElement = document.getElementById('country-count');
+    
+    if (travelCountElement && countryCountElement) {
+        // 여행 기록 수
+        travelCountElement.textContent = entries.length;
+        
+        // 방문 국가 수 (중복 제거)
+        const uniqueCountries = [...new Set(entries.map(entry => entry.country))];
+        countryCountElement.textContent = uniqueCountries.length;
+    }
+}
+
 // 애플리케이션 초기화
 function initializeApp() {
     try {
@@ -909,6 +963,7 @@ function initializeApp() {
         safeExecute(() => initializeAutocompleteEventListeners(), { function: 'initializeAutocompleteEventListeners' });
         safeExecute(() => initializeMemoCounter(), { function: 'initializeMemoCounter' });
         safeExecute(() => initializeSettingsButton(), { function: 'initializeSettingsButton' });
+        safeExecute(() => initializeSettingsSubtabs(), { function: 'initializeSettingsSubtabs' });
         
         // 검색 기능 초기화
         if (typeof initializeSearchEventListeners === 'function') {

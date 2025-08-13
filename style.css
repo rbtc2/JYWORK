@@ -100,6 +100,36 @@ body {
     color: white;
 }
 
+/* 설정 서브탭 스타일 */
+.settings-subtabs {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.subtab {
+    transition: all 0.3s ease;
+    min-height: 44px;
+    border: 1px solid transparent;
+}
+
+.subtab:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.subtab.active {
+    border-color: #3b82f6;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.settings-content {
+    transition: opacity 0.3s ease;
+}
+
+.settings-content.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
 @media (max-width: 640px) {
     .nav-container {
         padding: 0.5rem;
