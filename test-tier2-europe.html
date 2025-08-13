@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tier 2 유럽 도시 데이터 테스트</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .search-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .country-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .country-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+        }
+        .country-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .country-flag {
+            font-size: 2em;
+            margin-right: 15px;
+        }
+        .country-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+        .city-list {
+            list-style: none;
+            padding: 0;
+        }
+        .city-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .city-item:last-child {
+            border-bottom: none;
+        }
+        .city-name {
+            color: #555;
+        }
+        .city-en {
+            color: #888;
+            font-size: 0.9em;
+        }
+        .performance-test {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s;
+        }
+        .test-button:hover {
+            background: #5a6fd8;
+        }
+        .test-result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌍 Tier 2 유럽 도시 데이터 테스트</h1>
+        <p>유럽 20개국의 주요 도시 데이터와 좌표 정보를 확인합니다</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-number" id="countryCount">-</div>
+            <div>로드된 국가</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="cityCount">-</div>
+            <div>로드된 도시</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="coordinateCount">-</div>
+            <div>좌표 데이터</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="totalCities">-</div>
+            <div>총 도시 수</div>
+        </div>
+    </div>
+
+    <div class="search-section">
+        <h2>🔍 도시 검색</h2>
+        <input type="text" class="search-input" id="searchInput" placeholder="도시명, 영문명, 또는 별칭으로 검색...">
+        <div class="country-grid" id="countryGrid"></div>
+    </div>
+
+    <div class="performance-test">
+        <h2>⚡ 성능 테스트</h2>
+        <button class="test-button" onclick="testSearchPerformance()">검색 성능 테스트</button>
+        <button class="test-button" onclick="testDataAccess()">데이터 접근 테스트</button>
+        <button class="test-button" onclick="testCoordinateLookup()">좌표 조회 테스트</button>
+        <div class="test-result" id="testResult"></div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="cityData.js"></script>
+    <script src="major-cities-tier1.js"></script>
+    <script src="major-cities-tier1-part2.js"></script>
+    <script src="major-cities-tier2-europe.js"></script>
+    <script src="major-cities-tier2-europe-part2.js"></script>
+    <script src="major-cities-tier2-europe-part3.js"></script>
+    <script src="major-cities-tier2-europe-part4.js"></script>
+    <script src="utils.js"></script>
+    
+    <script>
+        // 페이지 로드 후 통계 업데이트
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(updateStats, 100);
+            setTimeout(displayCountries, 200);
+        });
+
+        function updateStats() {
+            const countryCount = Object.keys(cities).length;
+            const cityCount = Object.values(cities).reduce((total, cityList) => total + cityList.length, 0);
+            const coordinateCount = Object.keys(cityCoordinates).length;
+            
+            document.getElementById('countryCount').textContent = countryCount;
+            document.getElementById('cityCount').textContent = cityCount;
+            document.getElementById('coordinateCount').textContent = coordinateCount;
+            document.getElementById('totalCities').textContent = cityCount;
+        }
+
+        function displayCountries() {
+            const grid = document.getElementById('countryGrid');
+            const tier2EuropeCountries = [
+                'GR', 'PT', 'PL', 'HU', 'CZ', 'SK', 'SI', 'HR', 'RS', 'BG',
+                'RO', 'UA', 'BY', 'LT', 'LV', 'EE', 'IS', 'LU', 'MT', 'CY'
+            ];
+
+            grid.innerHTML = '';
+
+            tier2EuropeCountries.forEach(countryCode => {
+                if (cities[countryCode]) {
+                    const country = countries.find(c => c.code === countryCode);
+                    const countryCard = document.createElement('div');
+                    countryCard.className = 'country-card';
+                    
+                    const flag = countryFlags[countryCode] || '🏳️';
+                    const name = country ? country.name : countryCode;
+                    
+                    countryCard.innerHTML = `
+                        <div class="country-header">
+                            <div class="country-flag">${flag}</div>
+                            <div class="country-name">${name} (${countryCode})</div>
+                        </div>
+                        <ul class="city-list">
+                            ${cities[countryCode].map(city => `
+                                <li class="city-item">
+                                    <div>
+                                        <div class="city-name">${city.name}</div>
+                                        <div class="city-en">${city.enName}</div>
+                                    </div>
+                                    <div style="color: #667eea;">
+                                        ${cityCoordinates[city.name] ? '📍' : '❌'}
+                                    </div>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    `;
+                    
+                    grid.appendChild(countryCard);
+                }
+            });
+        }
+
+        // 검색 기능
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            if (query.length < 2) {
+                displayCountries();
+                return;
+            }
+
+            const filteredCountries = {};
+            Object.keys(cities).forEach(countryCode => {
+                const filteredCities = cities[countryCode].filter(city => 
+                    city.name.toLowerCase().includes(query) ||
+                    city.enName.toLowerCase().includes(query) ||
+                    city.aliases.some(alias => alias.toLowerCase().includes(query))
+                );
+                
+                if (filteredCities.length > 0) {
+                    filteredCountries[countryCode] = filteredCities;
+                }
+            });
+
+            displayFilteredCountries(filteredCountries);
+        });
+
+        function displayFilteredCountries(filteredCities) {
+            const grid = document.getElementById('countryGrid');
+            grid.innerHTML = '';
+
+            Object.keys(filteredCities).forEach(countryCode => {
+                const country = countries.find(c => c.code === countryCode);
+                const countryCard = document.createElement('div');
+                countryCard.className = 'country-card';
+                
+                const flag = countryFlags[countryCode] || '🏳️';
+                const name = country ? country.name : countryCode;
+                
+                countryCard.innerHTML = `
+                    <div class="country-header">
+                        <div class="country-flag">${flag}</div>
+                        <div class="country-name">${name} (${countryCode})</div>
+                    </div>
+                    <ul class="city-list">
+                        ${filteredCities[countryCode].map(city => `
+                            <li class="city-item">
+                                <div>
+                                    <div class="city-name">${city.name}</div>
+                                    <div class="city-en">${city.enName}</div>
+                                </div>
+                                <div style="color: #667eea;">
+                                    ${cityCoordinates[city.name] ? '📍' : '❌'}
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                
+                grid.appendChild(countryCard);
+            });
+        }
+
+        // 성능 테스트 함수들
+        function testSearchPerformance() {
+            const startTime = performance.now();
+            let searchCount = 0;
+            
+            // 1000번의 검색 시뮬레이션
+            for (let i = 0; i < 1000; i++) {
+                const randomQuery = Math.random().toString(36).substring(7);
+                Object.keys(cities).forEach(countryCode => {
+                    cities[countryCode].filter(city => 
+                        city.name.toLowerCase().includes(randomQuery) ||
+                        city.enName.toLowerCase().includes(randomQuery)
+                    );
+                    searchCount++;
+                });
+            }
+            
+            const endTime = performance.now();
+            const duration = endTime - startTime;
+            
+            document.getElementById('testResult').innerHTML = `
+                <strong>검색 성능 테스트 결과:</strong><br>
+                • 총 검색 횟수: ${searchCount.toLocaleString()}회<br>
+                • 소요 시간: ${duration.toFixed(2)}ms<br>
+                • 평균 검색 시간: ${(duration / searchCount).toFixed(4)}ms
+            `;
+        }
+
+        function testDataAccess() {
+            const startTime = performance.now();
+            let accessCount = 0;
+            
+            // 10000번의 데이터 접근 시뮬레이션
+            for (let i = 0; i < 10000; i++) {
+                Object.keys(cities).forEach(countryCode => {
+                    cities[countryCode].forEach(city => {
+                        const name = city.name;
+                        const enName = city.enName;
+                        const aliases = city.aliases;
+                        accessCount++;
+                    });
+                });
+            }
+            
+            const endTime = performance.now();
+            const duration = endTime - startTime;
+            
+            document.getElementById('testResult').innerHTML = `
+                <strong>데이터 접근 테스트 결과:</strong><br>
+                • 총 접근 횟수: ${accessCount.toLocaleString()}회<br>
+                • 소요 시간: ${duration.toFixed(2)}ms<br>
+                • 평균 접근 시간: ${(duration / accessCount).toFixed(4)}ms
+            `;
+        }
+
+        function testCoordinateLookup() {
+            const startTime = performance.now();
+            let lookupCount = 0;
+            let foundCount = 0;
+            
+            // 10000번의 좌표 조회 시뮬레이션
+            for (let i = 0; i < 10000; i++) {
+                Object.keys(cities).forEach(countryCode => {
+                    cities[countryCode].forEach(city => {
+                        const coords = cityCoordinates[city.name];
+                        if (coords) {
+                            foundCount++;
+                        }
+                        lookupCount++;
+                    });
+                });
+            }
+            
+            const endTime = performance.now();
+            const duration = endTime - startTime;
+            
+            document.getElementById('testResult').innerHTML = `
+                <strong>좌표 조회 테스트 결과:</strong><br>
+                • 총 조회 횟수: ${lookupCount.toLocaleString()}회<br>
+                • 찾은 좌표: ${foundCount.toLocaleString()}개<br>
+                • 소요 시간: ${duration.toFixed(2)}ms<br>
+                • 평균 조회 시간: ${(duration / lookupCount).toFixed(4)}ms
+            `;
+        }
+    </script>
+</body>
+</html>

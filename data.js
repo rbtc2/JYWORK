@@ -386,11 +386,31 @@ function initializeCityCoordinates() {
             cityCoordinates = { ...cityCoordinates, ...window.tier1CityCoordinatesPart2 };
             console.log('Tier 1 Part 2 도시 좌표 데이터 로드 완료 (8개 국가 추가)');
         }
-    } else if (window.expandedCityCoordinates) {
+    }
+    
+    // Tier 2 유럽 도시 좌표 데이터 로드
+    if (window.tier2EuropeCityCoordinates) {
+        cityCoordinates = { ...cityCoordinates, ...window.tier2EuropeCityCoordinates };
+        console.log('Tier 2 유럽 Part 1 도시 좌표 데이터 로드 완료 (5개 국가)');
+    }
+    if (window.tier2EuropeCityCoordinatesPart2) {
+        cityCoordinates = { ...cityCoordinates, ...window.tier2EuropeCityCoordinatesPart2 };
+        console.log('Tier 2 유럽 Part 2 도시 좌표 데이터 로드 완료 (5개 국가)');
+    }
+    if (window.tier2EuropeCityCoordinatesPart3) {
+        cityCoordinates = { ...cityCoordinates, ...window.tier2EuropeCityCoordinatesPart3 };
+        console.log('Tier 2 유럽 Part 3 도시 좌표 데이터 로드 완료 (10개 국가)');
+    }
+    if (window.tier2EuropeCityCoordinatesPart4) {
+        cityCoordinates = { ...cityCoordinates, ...window.tier2EuropeCityCoordinatesPart4 };
+        console.log('Tier 2 유럽 Part 4 도시 좌표 데이터 로드 완료 (5개 국가)');
+    }
+    
+    if (window.expandedCityCoordinates && Object.keys(cityCoordinates).length === 0) {
         // 기존 확장된 도시 좌표 데이터가 있으면 사용
         cityCoordinates = { ...window.expandedCityCoordinates };
         console.log('확장된 도시 좌표 데이터 로드 완료');
-    } else {
+    } else if (Object.keys(cityCoordinates).length === 0) {
         // 기본 도시 좌표 데이터 (하위 호환성)
         cityCoordinates = {
             // 한국 도시들
@@ -462,11 +482,31 @@ function initializeCityData() {
             cities = { ...cities, ...window.tier1CitiesPart2 };
             console.log('Tier 1 Part 2 도시 데이터 로드 완료 (8개 국가 추가)');
         }
-    } else if (window.expandedCities) {
+    }
+    
+    // Tier 2 유럽 도시 데이터 로드
+    if (window.tier2EuropeCities) {
+        cities = { ...cities, ...window.tier2EuropeCities };
+        console.log('Tier 2 유럽 Part 1 도시 데이터 로드 완료 (5개 국가)');
+    }
+    if (window.tier2EuropeCitiesPart2) {
+        cities = { ...cities, ...window.tier2EuropeCitiesPart2 };
+        console.log('Tier 2 유럽 Part 2 도시 데이터 로드 완료 (5개 국가)');
+    }
+    if (window.tier2EuropeCitiesPart3) {
+        cities = { ...cities, ...window.tier2EuropeCitiesPart3 };
+        console.log('Tier 2 유럽 Part 3 도시 데이터 로드 완료 (10개 국가)');
+    }
+    if (window.tier2EuropeCitiesPart4) {
+        cities = { ...cities, ...window.tier2EuropeCitiesPart4 };
+        console.log('Tier 2 유럽 Part 4 도시 데이터 로드 완료 (5개 국가)');
+    }
+    
+    if (window.expandedCities && Object.keys(cities).length === 0) {
         // 기존 확장된 도시 데이터가 있으면 사용
         cities = { ...window.expandedCities };
         console.log('확장된 도시 데이터 로드 완료');
-    } else {
+    } else if (Object.keys(cities).length === 0) {
         // 기본 도시 데이터 (하위 호환성)
         cities = {
             'KR': [
