@@ -380,6 +380,12 @@ function initializeCityCoordinates() {
     if (window.tier1CityCoordinates) {
         cityCoordinates = { ...window.tier1CityCoordinates };
         console.log('Tier 1 도시 좌표 데이터 로드 완료');
+        
+        // Part 2 좌표 데이터가 있으면 추가
+        if (window.tier1CityCoordinatesPart2) {
+            cityCoordinates = { ...cityCoordinates, ...window.tier1CityCoordinatesPart2 };
+            console.log('Tier 1 Part 2 도시 좌표 데이터 로드 완료 (8개 국가 추가)');
+        }
     } else if (window.expandedCityCoordinates) {
         // 기존 확장된 도시 좌표 데이터가 있으면 사용
         cityCoordinates = { ...window.expandedCityCoordinates };
