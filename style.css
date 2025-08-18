@@ -949,13 +949,13 @@ body {
 /* 미니맵 반응형 */
 @media (max-width: 768px) {
     .mini-map-container {
-        height: 40px;
+        height: 200px; /* 모바일에서도 충분한 높이 제공 */
     }
 }
 
 @media (max-width: 480px) {
     .mini-map-container {
-        height: 36px;
+        height: 180px; /* 작은 모바일에서도 적절한 높이 */
     }
 } 
 
