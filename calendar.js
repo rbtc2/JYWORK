@@ -220,13 +220,13 @@ function getEventDisplayText(entry) {
         return flag;
     }
     
-    // 국기 이모지가 없는 경우 2글자 국가 코드 사용
+    // 국기 이모지가 없는 경우 2-3글자 축약 국가명 사용
     if (entry.countryCode) {
         return entry.countryCode.toUpperCase();
     }
     
-    // 국가 코드도 없는 경우 텍스트 축약
-    return truncateText(entry.country, 6);
+    // 국가 코드도 없는 경우 텍스트 축약 (2-3글자)
+    return truncateText(entry.country, 3);
 }
 
 // 캘린더 렌더링
@@ -526,5 +526,35 @@ function initializeCalendarEventListeners() {
         document.getElementById('month-select'),
         'change',
         updateCalendarFromDropdowns
+    );
+    
+    // 대륙별 색상 범례 아코디언 토글
+    globalEventManager.addEventListener(
+        document.getElementById('legend-toggle'),
+        'click',
+        function() {
+            const legendContent = document.getElementById('legend-content');
+            const legendArrow = document.getElementById('legend-arrow');
+            
+            if (legendContent.classList.contains('hidden')) {
+                // 펼치기
+                legendContent.classList.remove('hidden');
+                legendArrow.style.transform = 'rotate(180deg)';
+                // 부드러운 애니메이션을 위한 약간의 지연
+                setTimeout(() => {
+                    legendContent.style.maxHeight = '200px';
+                    legendContent.style.opacity = '1';
+                }, 10);
+            } else {
+                // 접기
+                legendContent.style.maxHeight = '0';
+                legendContent.style.opacity = '0';
+                legendArrow.style.transform = 'rotate(0deg)';
+                // 애니메이션 완료 후 hidden 클래스 추가
+                setTimeout(() => {
+                    legendContent.classList.add('hidden');
+                }, 300);
+            }
+        }
     );
 } 

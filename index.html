@@ -333,70 +333,86 @@
                 </div>
                 
                 <!-- 캘린더 네비게이션 -->
-                <div class="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6 gap-3 sm:gap-4">
-                    <!-- 연도/월 선택 드롭다운 -->
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        <select id="year-select" class="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm min-h-[40px]">
-                            <!-- 연도 옵션들이 동적으로 생성됩니다 -->
-                        </select>
-                        <span class="text-gray-600 font-medium text-sm">년</span>
-                        <select id="month-select" class="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm min-h-[40px]">
-                            <option value="0">1월</option>
-                            <option value="1">2월</option>
-                            <option value="2">3월</option>
-                            <option value="3">4월</option>
-                            <option value="4">5월</option>
-                            <option value="5">6월</option>
-                            <option value="6">7월</option>
-                            <option value="7">8월</option>
-                            <option value="8">9월</option>
-                            <option value="9">10월</option>
-                            <option value="10">11월</option>
-                            <option value="11">12월</option>
-                        </select>
+                <div class="flex flex-col gap-4 mb-4 sm:mb-6">
+                    <!-- 연도/월 선택 및 현재 월 표시 -->
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-3">
+                        <!-- 연도/월 선택 드롭다운 -->
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <select id="year-select" class="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm min-h-[40px]">
+                                <!-- 연도 옵션들이 동적으로 생성됩니다 -->
+                            </select>
+                            <span class="text-gray-600 font-medium text-sm">년</span>
+                            <select id="month-select" class="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm min-h-[40px]">
+                                <option value="0">1월</option>
+                                <option value="1">2월</option>
+                                <option value="2">3월</option>
+                                <option value="3">4월</option>
+                                <option value="4">5월</option>
+                                <option value="5">6월</option>
+                                <option value="6">7월</option>
+                                <option value="7">8월</option>
+                                <option value="8">9월</option>
+                                <option value="9">10월</option>
+                                <option value="10">11월</option>
+                                <option value="11">12월</option>
+                            </select>
+                        </div>
+                        
+                        <!-- 현재 월 표시 -->
+                        <h2 id="current-month" class="text-lg sm:text-xl font-semibold text-gray-800">2024년 1월</h2>
                     </div>
                     
-                    <!-- 현재 월 표시 -->
-                    <h2 id="current-month" class="text-lg sm:text-xl font-semibold text-gray-800">2024년 1월</h2>
-                    
-                    <!-- 이전/다음 버튼 -->
-                    <div class="flex items-center gap-2">
-                        <button id="prev-month" class="px-3 sm:px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm min-h-[40px]">
-                            ← 이전
-                        </button>
-                        <button id="next-month" class="px-3 sm:px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm min-h-[40px]">
-                            다음 →
-                        </button>
+                    <!-- 월 전환 버튼 -->
+                    <div class="flex justify-center">
+                        <div class="flex items-center gap-3 bg-gray-50 rounded-lg px-4 py-2">
+                            <button id="prev-month" class="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-white transition-all rounded-md text-sm min-h-[40px] flex items-center gap-1">
+                                <span class="text-lg">◀</span>
+                                <span class="hidden sm:inline">이전</span>
+                            </button>
+                            <div class="w-px h-6 bg-gray-300"></div>
+                            <button id="next-month" class="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-white transition-all rounded-md text-sm min-h-[40px] flex items-center gap-1">
+                                <span class="hidden sm:inline">다음</span>
+                                <span class="text-lg">▶</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- 대륙별 색상 범례 -->
-                <div class="mb-4 sm:mb-6 bg-gray-50 rounded-lg p-3 sm:p-4">
-                    <h3 class="text-sm sm:text-base font-semibold text-gray-800 mb-3">🌍 대륙별 색상 범례</h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-4 h-4 rounded-sm bg-blue-500 border-l-2 border-blue-700"></div>
-                            <span class="text-xs sm:text-sm text-gray-700">아시아</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-4 h-4 rounded-sm bg-orange-500 border-l-2 border-orange-700"></div>
-                            <span class="text-xs sm:text-sm text-gray-700">유럽</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-4 h-4 rounded-sm bg-red-500 border-l-2 border-red-700"></div>
-                            <span class="text-xs sm:text-sm text-gray-700">북아메리카</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-4 h-4 rounded-sm bg-green-500 border-l-2 border-green-700"></div>
-                            <span class="text-xs sm:text-sm text-gray-700">남아메리카</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-4 h-4 rounded-sm bg-purple-500 border-l-2 border-purple-700"></div>
-                            <span class="text-xs sm:text-sm text-gray-700">아프리카</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-4 h-4 rounded-sm bg-yellow-500 border-l-2 border-yellow-700"></div>
-                            <span class="text-xs sm:text-sm text-gray-700">오세아니아</span>
+                <!-- 대륙별 색상 범례 (아코디언) -->
+                <div class="mb-4 sm:mb-6 bg-gray-50 rounded-lg border border-gray-200">
+                    <button id="legend-toggle" class="w-full p-3 sm:p-4 text-left flex items-center justify-between hover:bg-gray-100 transition-colors rounded-lg">
+                        <h3 class="text-sm sm:text-base font-semibold text-gray-800 flex items-center gap-2">
+                            <span>🌍</span>
+                            <span>대륙별 색상 범례</span>
+                        </h3>
+                        <span id="legend-arrow" class="text-gray-500 transform transition-transform duration-200">▼</span>
+                    </button>
+                    <div id="legend-content" class="px-3 sm:px-4 pb-3 sm:pb-4 hidden">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 rounded-sm bg-blue-500 border-l-2 border-blue-700"></div>
+                                <span class="text-xs sm:text-sm text-gray-700">아시아</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 rounded-sm bg-orange-500 border-l-2 border-orange-700"></div>
+                                <span class="text-xs sm:text-sm text-gray-700">유럽</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 rounded-sm bg-red-500 border-l-2 border-red-700"></div>
+                                <span class="text-xs sm:text-sm text-gray-700">북아메리카</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 rounded-sm bg-green-500 border-l-2 border-green-700"></div>
+                                <span class="text-xs sm:text-sm text-gray-700">남아메리카</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 rounded-sm bg-purple-500 border-l-2 border-purple-700"></div>
+                                <span class="text-xs sm:text-sm text-gray-700">아프리카</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 rounded-sm bg-yellow-500 border-l-2 border-yellow-700"></div>
+                                <span class="text-xs sm:text-sm text-gray-700">오세아니아</span>
+                            </div>
                         </div>
                     </div>
                 </div>

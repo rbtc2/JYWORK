@@ -1548,4 +1548,61 @@ nav {
 
 .dark .text-stone-700 {
     color: #e7e5e4;
+}
+
+/* 캘린더 관련 스타일 */
+.calendar-event {
+    transition: all 0.2s ease-in-out;
+    border-radius: 4px;
+    border-left: 3px solid;
+    padding: 2px 4px;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    cursor: pointer;
+    user-select: none;
+}
+
+.calendar-event:hover {
+    transform: scale(1.02);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 아코디언 애니메이션 */
+#legend-content {
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+}
+
+#legend-content.hidden {
+    max-height: 0;
+    opacity: 0;
+}
+
+#legend-content:not(.hidden) {
+    max-height: 200px;
+    opacity: 1;
+}
+
+/* 월 전환 버튼 스타일 */
+#prev-month, #next-month {
+    transition: all 0.2s ease-in-out;
+}
+
+#prev-month:hover, #next-month:hover {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 모바일 최적화 */
+@media (max-width: 640px) {
+    .calendar-event {
+        font-size: 0.7rem;
+        padding: 1px 3px;
+    }
+    
+    #legend-content:not(.hidden) {
+        max-height: 150px;
+    }
 } 
