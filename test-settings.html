@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>설정 기능 테스트</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 다크 모드 스타일 */
+        .dark {
+            color-scheme: dark;
+        }
+        
+        .dark body {
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+        
+        .dark .bg-white {
+            background-color: #374151;
+        }
+        
+        .dark .bg-gray-50 {
+            background-color: #1f2937;
+        }
+        
+        .dark .text-gray-800 {
+            color: #f9fafb;
+        }
+        
+        .dark .border-gray-200 {
+            border-color: #4b5563;
+        }
+        
+        /* 애니메이션 비활성화 */
+        .no-animations *,
+        .no-animations *::before,
+        .no-animations *::after {
+            animation: none !important;
+            transition: none !important;
+        }
+        
+        .no-animations .hover\:scale-110:hover {
+            transform: none !important;
+        }
+        
+        .no-animations .hover\:bg-blue-600:hover {
+            background-color: inherit !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-2xl mx-auto p-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">⚙️ 설정 기능 테스트</h1>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-6">
+            <!-- 다크 모드 토글 -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                    <p class="font-medium text-gray-700 text-base">다크 모드</p>
+                    <p class="text-sm text-gray-500">어두운 테마로 변경</p>
+                </div>
+                <button id="dark-mode-toggle" class="toggle-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm min-h-[40px] w-full sm:w-auto">
+                    ☀️ 라이트모드
+                </button>
+            </div>
+            
+            <!-- 푸시 알림 토글 -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                    <p class="font-medium text-gray-700 text-base">푸시 알림</p>
+                    <p class="text-sm text-gray-500">여행 일정 알림 받기</p>
+                </div>
+                <button id="push-notification-toggle" class="toggle-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm min-h-[40px] w-full sm:w-auto">
+                    🔕 Off
+                </button>
+            </div>
+            
+            <!-- 효과음 토글 -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                    <p class="font-medium text-gray-700 text-base">효과음</p>
+                    <p class="text-sm text-gray-500">버튼 클릭, 여행 추가 등</p>
+                </div>
+                <button id="sound-effects-toggle" class="toggle-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm min-h-[40px] w-full sm:w-auto">
+                    🔇 Off
+                </button>
+            </div>
+            
+            <!-- 애니메이션 효과 토글 -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                    <p class="font-medium text-gray-700 text-base">애니메이션 효과</p>
+                    <p class="text-sm text-gray-500">호버, 배지 언락 등</p>
+                </div>
+                <button id="animation-effects-toggle" class="toggle-btn px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm min-h-[40px] w-full sm:w-auto">
+                    ✨ On
+                </button>
+            </div>
+        </div>
+        
+        <!-- 테스트 결과 -->
+        <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 class="font-semibold text-blue-800 mb-2">현재 설정 상태:</h3>
+            <div id="settings-status" class="text-sm text-blue-700">
+                로딩 중...
+            </div>
+        </div>
+        
+        <!-- 애니메이션 테스트 -->
+        <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
+            <h3 class="font-semibold text-green-800 mb-2">애니메이션 테스트:</h3>
+            <button class="test-animation-btn px-4 py-2 bg-green-500 text-white rounded-lg hover:scale-110 hover:bg-green-600 transition-all duration-300">
+                호버 효과 테스트 (애니메이션 On일 때만 작동)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 앱 설정 객체
+        let appSettings = {
+            darkMode: false,
+            pushNotifications: false,
+            soundEffects: false,
+            animations: true
+        };
+
+        // 앱 설정 초기화
+        function initializeAppSettings() {
+            const savedSettings = localStorage.getItem('appSettings');
+            if (savedSettings) {
+                try {
+                    appSettings = { ...appSettings, ...JSON.parse(savedSettings) };
+                } catch (e) {
+                    console.error('앱 설정 로드 실패:', e);
+                }
+            }
+            
+            // 설정 적용
+            applyAppSettings();
+            updateAppSettingsUI();
+            updateSettingsStatus();
+        }
+
+        // 앱 설정 적용
+        function applyAppSettings() {
+            // 다크 모드 적용
+            if (appSettings.darkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            
+            // 애니메이션 효과 적용
+            if (appSettings.animations) {
+                document.body.classList.remove('no-animations');
+            } else {
+                document.body.classList.add('no-animations');
+            }
+        }
+
+        // 앱 설정 UI 업데이트
+        function updateAppSettingsUI() {
+            // 다크 모드 토글
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            if (darkModeToggle) {
+                if (appSettings.darkMode) {
+                    darkModeToggle.textContent = '🌙 다크모드';
+                    darkModeToggle.className = 'toggle-btn px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm min-h-[40px] w-full sm:w-auto';
+                } else {
+                    darkModeToggle.textContent = '☀️ 라이트모드';
+                    darkModeToggle.className = 'toggle-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm min-h-[40px] w-full sm:w-auto';
+                }
+            }
+            
+            // 푸시 알림 토글
+            const pushNotificationToggle = document.getElementById('push-notification-toggle');
+            if (pushNotificationToggle) {
+                if (appSettings.pushNotifications) {
+                    pushNotificationToggle.textContent = '🔔 On';
+                    pushNotificationToggle.className = 'toggle-btn px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm min-h-[40px] w-full sm:w-auto';
+                } else {
+                    pushNotificationToggle.textContent = '🔕 Off';
+                    pushNotificationToggle.className = 'toggle-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm min-h-[40px] w-full sm:w-auto';
+                }
+            }
+            
+            // 효과음 토글
+            const soundEffectsToggle = document.getElementById('sound-effects-toggle');
+            if (soundEffectsToggle) {
+                if (appSettings.soundEffects) {
+                    soundEffectsToggle.textContent = '🔊 On';
+                    soundEffectsToggle.className = 'toggle-btn px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm min-h-[40px] w-full sm:w-auto';
+                } else {
+                    soundEffectsToggle.textContent = '🔇 Off';
+                    soundEffectsToggle.className = 'toggle-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm min-h-[40px] w-full sm:w-auto';
+                }
+            }
+            
+            // 애니메이션 효과 토글
+            const animationEffectsToggle = document.getElementById('animation-effects-toggle');
+            if (animationEffectsToggle) {
+                if (appSettings.animations) {
+                    animationEffectsToggle.textContent = '✨ On';
+                    animationEffectsToggle.className = 'toggle-btn px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm min-h-[40px] w-full sm:w-auto';
+                } else {
+                    animationEffectsToggle.textContent = '⏸️ Off';
+                    animationEffectsToggle.className = 'toggle-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm min-h-[40px] w-full sm:w-auto';
+                }
+            }
+        }
+
+        // 설정 상태 표시
+        function updateSettingsStatus() {
+            const statusElement = document.getElementById('settings-status');
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <strong>다크 모드:</strong> ${appSettings.darkMode ? '🌙 On' : '☀️ Off'}<br>
+                    <strong>푸시 알림:</strong> ${appSettings.pushNotifications ? '🔔 On' : '🔕 Off'}<br>
+                    <strong>효과음:</strong> ${appSettings.soundEffects ? '🔊 On' : '🔇 Off'}<br>
+                    <strong>애니메이션:</strong> ${appSettings.animations ? '✨ On' : '⏸️ Off'}
+                `;
+            }
+        }
+
+        // 앱 설정 저장
+        function saveAppSettings() {
+            try {
+                localStorage.setItem('appSettings', JSON.stringify(appSettings));
+                console.log('설정이 저장되었습니다:', appSettings);
+            } catch (e) {
+                console.error('앱 설정 저장 실패:', e);
+            }
+        }
+
+        // 다크 모드 토글
+        function toggleDarkMode() {
+            appSettings.darkMode = !appSettings.darkMode;
+            applyAppSettings();
+            updateAppSettingsUI();
+            updateSettingsStatus();
+            saveAppSettings();
+            
+            // 효과음 재생
+            if (appSettings.soundEffects) {
+                playToggleSound();
+            }
+        }
+
+        // 푸시 알림 토글
+        function togglePushNotifications() {
+            if (!appSettings.pushNotifications) {
+                // 알림 권한 요청
+                if ('Notification' in window) {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            appSettings.pushNotifications = true;
+                            updateAppSettingsUI();
+                            updateSettingsStatus();
+                            saveAppSettings();
+                            
+                            // 테스트 알림
+                            new Notification('알림 설정 완료', {
+                                body: '여행 일정 알림을 받을 수 있습니다.',
+                                icon: '🌍'
+                            });
+                        } else {
+                            alert('알림 권한이 거부되었습니다. 브라우저 설정에서 권한을 허용해주세요.');
+                        }
+                    });
+                } else {
+                    alert('이 브라우저는 알림을 지원하지 않습니다.');
+                }
+            } else {
+                appSettings.pushNotifications = false;
+                updateAppSettingsUI();
+                updateSettingsStatus();
+                saveAppSettings();
+            }
+            
+            // 효과음 재생
+            if (appSettings.soundEffects) {
+                playToggleSound();
+            }
+        }
+
+        // 효과음 토글
+        function toggleSoundEffects() {
+            appSettings.soundEffects = !appSettings.soundEffects;
+            updateAppSettingsUI();
+            updateSettingsStatus();
+            saveAppSettings();
+            
+            // 효과음 재생 (끄는 중에도 재생)
+            playToggleSound();
+        }
+
+        // 애니메이션 효과 토글
+        function toggleAnimations() {
+            appSettings.animations = !appSettings.animations;
+            applyAppSettings();
+            updateAppSettingsUI();
+            updateSettingsStatus();
+            saveAppSettings();
+            
+            // 효과음 재생
+            if (appSettings.soundEffects) {
+                playToggleSound();
+            }
+        }
+
+        // 토글 효과음 재생
+        function playToggleSound() {
+            try {
+                // 간단한 오디오 컨텍스트 생성
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+            } catch (e) {
+                console.log('효과음 재생 실패:', e);
+            }
+        }
+
+        // 이벤트 리스너 설정
+        document.addEventListener('DOMContentLoaded', function() {
+            // 앱 설정 초기화
+            initializeAppSettings();
+            
+            // 토글 버튼 이벤트 리스너
+            document.getElementById('dark-mode-toggle').addEventListener('click', toggleDarkMode);
+            document.getElementById('push-notification-toggle').addEventListener('click', togglePushNotifications);
+            document.getElementById('sound-effects-toggle').addEventListener('click', toggleSoundEffects);
+            document.getElementById('animation-effects-toggle').addEventListener('click', toggleAnimations);
+            
+            console.log('✅ 설정 테스트 페이지가 초기화되었습니다.');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>설정 탭 전환 테스트</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hidden {
+            display: none !important;
+        }
+        
+        .settings-content {
+            min-height: 200px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-4xl mx-auto p-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">⚙️ 설정 탭 전환 테스트</h1>
+        
+        <!-- 설정 탭 -->
+        <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">설정</h2>
+            
+            <!-- 서브탭 네비게이션 -->
+            <div class="settings-subtabs flex space-x-2 mb-6 justify-center">
+                <button class="subtab active px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium" data-subtab="personal">
+                    👤 개인 설정
+                </button>
+                <button class="subtab px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium" data-subtab="app">
+                    ⚙️ 앱 설정
+                </button>
+            </div>
+            
+            <!-- 개인 설정 탭 -->
+            <div id="personal-settings" class="settings-content">
+                <div class="space-y-4">
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">👤 개인 설정</h3>
+                        <p class="text-gray-600">이것은 개인 설정 탭입니다.</p>
+                        <div class="mt-4 p-3 bg-blue-100 rounded">
+                            <p class="text-sm text-blue-800">✅ 개인 설정 탭이 정상적으로 표시됩니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 앱 설정 탭 -->
+            <div id="app-settings" class="settings-content hidden">
+                <div class="space-y-4">
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">⚙️ 앱 설정</h3>
+                        
+                        <!-- 다크 모드 토글 -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                            <div>
+                                <p class="font-medium text-gray-700 text-base">다크 모드</p>
+                                <p class="text-sm text-gray-500">어두운 테마로 변경</p>
+                            </div>
+                            <button id="dark-mode-toggle" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm">
+                                ☀️ 라이트모드
+                            </button>
+                        </div>
+                        
+                        <!-- 푸시 알림 토글 -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                            <div>
+                                <p class="font-medium text-gray-700 text-base">푸시 알림</p>
+                                <p class="text-sm text-gray-500">여행 일정 알림 받기</p>
+                            </div>
+                            <button id="push-notification-toggle" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm">
+                                🔕 Off
+                            </button>
+                        </div>
+                        
+                        <!-- 효과음 토글 -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                            <div>
+                                <p class="font-medium text-gray-700 text-base">효과음</p>
+                                <p class="text-sm text-gray-500">버튼 클릭, 여행 추가 등</p>
+                            </div>
+                            <button id="sound-effects-toggle" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm">
+                                🔇 Off
+                            </button>
+                        </div>
+                        
+                        <!-- 애니메이션 효과 토글 -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                            <div>
+                                <p class="font-medium text-gray-700 text-base">애니메이션 효과</p>
+                                <p class="text-sm text-gray-500">호버, 배지 언락 등</p>
+                            </div>
+                            <button id="animation-effects-toggle" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">
+                                ✨ On
+                            </button>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-green-100 rounded">
+                            <p class="text-sm text-green-800">✅ 앱 설정 탭이 정상적으로 표시됩니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 디버그 정보 -->
+        <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h3 class="font-semibold text-yellow-800 mb-2">디버그 정보:</h3>
+            <div id="debug-info" class="text-sm text-yellow-700">
+                로딩 중...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 설정 서브탭 기능 초기화
+        function initializeSettingsSubtabs() {
+            console.log('🔧 설정 서브탭 초기화 시작...');
+            
+            const subtabs = document.querySelectorAll('.subtab');
+            const personalSettings = document.getElementById('personal-settings');
+            const appSettings = document.getElementById('app-settings');
+            
+            console.log('📋 찾은 요소들:', {
+                subtabs: subtabs.length,
+                personalSettings: !!personalSettings,
+                appSettings: !!appSettings
+            });
+            
+            if (!subtabs.length || !personalSettings || !appSettings) {
+                console.error('❌ 필요한 요소를 찾을 수 없습니다.');
+                return;
+            }
+            
+            // 기본적으로 개인 설정 탭 활성화
+            personalSettings.classList.remove('hidden');
+            appSettings.classList.add('hidden');
+            
+            console.log('✅ 기본 탭 설정 완료');
+            
+            subtabs.forEach(subtab => {
+                subtab.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-subtab');
+                    console.log('🖱️ 클릭된 탭:', targetTab);
+                    
+                    // 모든 서브탭에서 active 클래스 제거
+                    subtabs.forEach(tab => {
+                        tab.classList.remove('active', 'bg-blue-500', 'text-white');
+                        tab.classList.add('bg-gray-200', 'text-gray-700');
+                    });
+                    
+                    // 클릭된 서브탭에 active 클래스 추가
+                    this.classList.remove('bg-gray-200', 'text-gray-700');
+                    this.classList.add('active', 'bg-blue-500', 'text-white');
+                    
+                    // 해당 탭 내용 표시
+                    if (targetTab === 'personal') {
+                        console.log('👤 개인 설정 탭 표시');
+                        personalSettings.classList.remove('hidden');
+                        appSettings.classList.add('hidden');
+                    } else if (targetTab === 'app') {
+                        console.log('⚙️ 앱 설정 탭 표시');
+                        personalSettings.classList.add('hidden');
+                        appSettings.classList.remove('hidden');
+                    }
+                    
+                    updateDebugInfo();
+                });
+            });
+            
+            console.log('✅ 설정 서브탭 초기화 완료');
+        }
+        
+        // 디버그 정보 업데이트
+        function updateDebugInfo() {
+            const debugElement = document.getElementById('debug-info');
+            if (debugElement) {
+                const personalSettings = document.getElementById('personal-settings');
+                const appSettings = document.getElementById('app-settings');
+                
+                const personalHidden = personalSettings.classList.contains('hidden');
+                const appHidden = appSettings.classList.contains('hidden');
+                
+                debugElement.innerHTML = `
+                    <strong>현재 상태:</strong><br>
+                    👤 개인 설정: ${personalHidden ? '숨김' : '표시'} (hidden: ${personalHidden})<br>
+                    ⚙️ 앱 설정: ${appHidden ? '숨김' : '표시'} (hidden: ${appHidden})<br>
+                    <br>
+                    <strong>CSS 클래스:</strong><br>
+                    personal-settings: "${personalSettings.className}"<br>
+                    app-settings: "${appSettings.className}"
+                `;
+            }
+        }
+        
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 페이지 로드 완료');
+            
+            // 설정 서브탭 초기화
+            initializeSettingsSubtabs();
+            
+            // 초기 디버그 정보 업데이트
+            updateDebugInfo();
+            
+            console.log('✅ 모든 초기화 완료');
+        });
+    </script>
+</body>
+</html>

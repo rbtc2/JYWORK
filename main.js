@@ -862,19 +862,53 @@ function initializeSettingsButton() {
 
 // 설정 서브탭 기능 초기화
 function initializeSettingsSubtabs() {
+    console.log('🔧 설정 서브탭 초기화 시작...');
+    
     const subtabs = document.querySelectorAll('.subtab');
     const personalSettings = document.getElementById('personal-settings');
     const appSettings = document.getElementById('app-settings');
     
-    if (!subtabs.length || !personalSettings || !appSettings) return;
+    console.log('📋 찾은 요소들:', {
+        subtabs: subtabs.length,
+        personalSettings: !!personalSettings,
+        appSettings: !!appSettings
+    });
+    
+    if (!subtabs.length || !personalSettings || !appSettings) {
+        console.error('❌ 필요한 요소를 찾을 수 없습니다.');
+        return;
+    }
     
     // 기본적으로 개인 설정 탭 활성화
     personalSettings.classList.remove('hidden');
     appSettings.classList.add('hidden');
     
+    console.log('✅ 기본 탭 설정 완료');
+    console.log('🔍 초기 상태:', {
+        personalSettings: {
+            className: personalSettings.className,
+            hidden: personalSettings.classList.contains('hidden'),
+            display: window.getComputedStyle(personalSettings).display
+        },
+        appSettings: {
+            className: appSettings.className,
+            hidden: appSettings.classList.contains('hidden'),
+            display: window.getComputedStyle(appSettings).display
+        }
+    });
+    
+    // 앱 설정 초기화 (DOM이 준비된 후)
+    if (typeof initializeAppSettings === 'function') {
+        console.log('🔧 앱 설정 초기화 호출...');
+        initializeAppSettings();
+    } else {
+        console.error('❌ initializeAppSettings 함수를 찾을 수 없습니다');
+    }
+    
     subtabs.forEach(subtab => {
         globalEventManager.addEventListener(subtab, 'click', function() {
             const targetTab = this.getAttribute('data-subtab');
+            console.log('🖱️ 클릭된 탭:', targetTab);
             
             // 모든 서브탭에서 active 클래스 제거
             subtabs.forEach(tab => {
@@ -888,14 +922,44 @@ function initializeSettingsSubtabs() {
             
             // 해당 탭 내용 표시
             if (targetTab === 'personal') {
+                console.log('👤 개인 설정 탭 표시');
                 personalSettings.classList.remove('hidden');
                 appSettings.classList.add('hidden');
+                
+                console.log('🔍 개인 설정 탭 전환 후 상태:', {
+                    personalSettings: {
+                        className: personalSettings.className,
+                        hidden: personalSettings.classList.contains('hidden'),
+                        display: window.getComputedStyle(personalSettings).display
+                    },
+                    appSettings: {
+                        className: appSettings.className,
+                        hidden: appSettings.classList.contains('hidden'),
+                        display: window.getComputedStyle(appSettings).display
+                    }
+                });
             } else if (targetTab === 'app') {
+                console.log('⚙️ 앱 설정 탭 표시');
                 personalSettings.classList.add('hidden');
                 appSettings.classList.remove('hidden');
+                
+                console.log('🔍 앱 설정 탭 전환 후 상태:', {
+                    personalSettings: {
+                        className: personalSettings.className,
+                        hidden: personalSettings.classList.contains('hidden'),
+                        display: window.getComputedStyle(personalSettings).display
+                    },
+                    appSettings: {
+                        className: appSettings.className,
+                        hidden: appSettings.classList.contains('hidden'),
+                        display: window.getComputedStyle(appSettings).display
+                    }
+                });
             }
         });
     });
+    
+    console.log('✅ 설정 서브탭 초기화 완료');
 }
 
 // 설정 탭의 데이터 통계 업데이트
@@ -964,6 +1028,8 @@ function initializeApp() {
         safeExecute(() => initializeMemoCounter(), { function: 'initializeMemoCounter' });
         safeExecute(() => initializeSettingsButton(), { function: 'initializeSettingsButton' });
         safeExecute(() => initializeSettingsSubtabs(), { function: 'initializeSettingsSubtabs' });
+        
+        // 앱 설정 초기화는 initializeSettingsSubtabs 내에서 처리됨
         
         // 검색 기능 초기화
         if (typeof initializeSearchEventListeners === 'function') {
