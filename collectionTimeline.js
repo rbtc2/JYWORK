@@ -878,7 +878,7 @@ function showExpandedMapModal(entryId, countryCode, cityCoordinates) {
 
     // 확장 지도 모달 HTML 생성 (상세 모달과 동일한 디자인)
     const expandedModalHTML = `
-        <div id="expanded-map-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 opacity-0">
+        <div id="expanded-map-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[1100] flex items-center justify-center p-4 opacity-0">
             <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto transform translate-y-4">
                 <!-- 헤더 -->
                 <div class="flex justify-between items-start sm:items-center p-4 sm:p-6 border-b border-gray-100 relative">

@@ -962,6 +962,7 @@ body {
 /* 확장 지도 모달 스타일 */
 #expanded-map-modal {
     animation: fadeIn 0.3s ease-in;
+    z-index: 1100 !important; /* 상단 메뉴(nav: 1000)보다 높게 설정 */
 }
 
 #expanded-map-modal .bg-white {
