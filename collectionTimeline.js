@@ -738,7 +738,23 @@ function showEntryDetail(entryId) {
                                 <p class="text-lg font-semibold text-gray-800">${cityName}, ${countryName}</p>
                             </div>
                         </div>
-                        <div id="mini-map-${entry.id}" class="mini-map-container rounded-lg overflow-hidden h-48"></div>
+                        <div id="mini-map-${entry.id}" class="mini-map-container rounded-lg overflow-hidden h-48 cursor-pointer hover:shadow-lg transition-all duration-200 relative" 
+                             onclick="openExpandedMap('${entry.id}', '${entry.countryCode}', {lat: ${cityCoord.lat}, lng: ${cityCoord.lng}})"
+                             onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openExpandedMap('${entry.id}', '${entry.countryCode}', {lat: ${cityCoord.lat}, lng: ${cityCoord.lng}}); }"
+                             tabindex="0"
+                             role="button"
+                             title="클릭하여 국가 전체 보기"
+                             aria-label="${cityName}의 국가 전체 지도 보기">
+                            <!-- 확대 아이콘 오버레이 -->
+                            <div class="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full p-2 shadow-sm z-10 transition-all duration-200 hover:bg-opacity-100 hover:scale-110">
+                                <span class="text-sm text-gray-600">🔍</span>
+                            </div>
+                            <!-- 툴팁 -->
+                            <div class="absolute bottom-2 left-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded opacity-0 transition-opacity duration-200 pointer-events-none" 
+                                 style="white-space: nowrap;">
+                                클릭하여 국가 전체 보기
+                            </div>
+                        </div>
                         ` : `
                         <div class="flex items-center space-x-3 mb-4">
                             <span class="text-2xl">📍</span>
@@ -813,6 +829,429 @@ function showEntryDetail(entryId) {
         globalEventManager.setTimeout(() => {
             initializeMiniMap(entry.id, cityCoord.lat, cityCoord.lng, entry.city);
         }, 100, 'mini-map-init-delay');
+    }
+}
+
+// 확장 지도 모달 열기 (모달 교체 방식)
+function openExpandedMap(entryId, countryCode, cityCoordinates) {
+    const entry = entries.find(e => e.id === entryId);
+    if (!entry || !cityCoordinates || !cityCoordinates.lat || !cityCoordinates.lng) {
+        console.warn('Invalid entry or coordinates for expanded map');
+        return;
+    }
+
+    // 기존 확장 지도 모달이 있다면 정리하고 제거
+    const existingExpandedModal = document.getElementById('expanded-map-modal');
+    if (existingExpandedModal) {
+        closeExpandedMap();
+        existingExpandedModal.remove();
+    }
+
+    // 상세 모달을 먼저 닫기 (모달 교체 방식)
+    const detailModal = document.getElementById('entry-detail-modal');
+    if (detailModal) {
+        // 부드러운 fade-out 애니메이션
+        detailModal.style.transition = 'opacity 0.2s ease-out';
+        detailModal.style.opacity = '0';
+        
+        setTimeout(() => {
+            if (detailModal.parentNode) {
+                detailModal.remove();
+            }
+            // 지도 모달 열기
+            showExpandedMapModal(entryId, countryCode, cityCoordinates);
+        }, 200);
+    } else {
+        // 상세 모달이 없는 경우 바로 지도 모달 열기
+        showExpandedMapModal(entryId, countryCode, cityCoordinates);
+    }
+}
+
+// 확장 지도 모달 표시 (내부 함수)
+function showExpandedMapModal(entryId, countryCode, cityCoordinates) {
+    const entry = entries.find(e => e.id === entryId);
+    if (!entry) return;
+
+    const countryName = getCountryNameByCode(countryCode) || countryCode;
+    const cityName = getCityNameByCode(countryCode, entry.city) || entry.city;
+    const flag = countryFlags[countryCode] || '🏳️';
+
+    // 확장 지도 모달 HTML 생성 (상세 모달과 동일한 디자인)
+    const expandedModalHTML = `
+        <div id="expanded-map-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 opacity-0">
+            <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto transform translate-y-4">
+                <!-- 헤더 -->
+                <div class="flex justify-between items-start sm:items-center p-4 sm:p-6 border-b border-gray-100 relative">
+                    <div class="flex items-start sm:items-center space-x-3 sm:space-x-4 flex-1 min-w-0 pr-12">
+                        <button onclick="closeExpandedMapAndReturnToDetail('${entryId}')" 
+                                class="text-blue-600 hover:text-blue-700 text-lg font-medium flex items-center space-x-2 transition-colors">
+                            <span>←</span>
+                            <span>상세 정보</span>
+                        </button>
+                    </div>
+                    <button onclick="closeExpandedMapCompletely()" 
+                            class="absolute top-4 right-4 sm:relative sm:top-auto sm:right-auto text-gray-400 hover:text-gray-600 text-xl sm:text-2xl font-bold flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+                            aria-label="모달 닫기">
+                        ×
+                    </button>
+                </div>
+
+                <!-- 제목 -->
+                <div class="px-6 pt-4 pb-2">
+                    <div class="flex items-center space-x-4">
+                        <span class="text-3xl sm:text-4xl" aria-label="${countryName} 국기">${flag}</span>
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-bold text-gray-800">🗺️ ${countryName} 전체 지도</h2>
+                            <p class="text-sm sm:text-lg text-gray-600 mt-1">${cityName} 위치 중심</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 지도 컨테이너 -->
+                <div class="px-6 pb-4">
+                    <div id="expanded-map-${entryId}" class="w-full h-96 rounded-lg overflow-hidden border border-gray-200 relative">
+                        <!-- 로딩 상태 -->
+                        <div id="expanded-map-loading-${entryId}" class="absolute inset-0 bg-gray-100 flex items-center justify-center">
+                            <div class="text-center">
+                                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                                <p class="text-gray-600">지도를 불러오는 중...</p>
+                            </div>
+                        </div>
+                        <!-- 에러 상태 (기본적으로 숨김) -->
+                        <div id="expanded-map-error-${entryId}" class="absolute inset-0 bg-red-50 flex items-center justify-center hidden">
+                            <div class="text-center">
+                                <span class="text-4xl mb-4">⚠️</span>
+                                <p class="text-red-600 font-medium">지도를 불러올 수 없습니다</p>
+                                <p class="text-red-500 text-sm mt-2">잠시 후 다시 시도해주세요</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 하단 정보 -->
+                <div class="px-6 pb-6">
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="text-sm text-gray-600">
+                            <span>📍 ${cityName} (${cityCoordinates.lat.toFixed(4)}, ${cityCoordinates.lng.toFixed(4)})</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 하단 버튼 -->
+                <div class="p-6 border-t border-gray-100">
+                    <div class="flex justify-center space-x-2">
+                        <button onclick="closeExpandedMapAndReturnToDetail('${entryId}')" 
+                                class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors font-medium">
+                            ← 상세 정보로
+                        </button>
+                        <button onclick="closeExpandedMapCompletely()" 
+                                class="px-6 py-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors font-medium">
+                            완전 닫기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // 새 모달 추가
+    document.body.insertAdjacentHTML('beforeend', expandedModalHTML);
+
+    // 부드러운 fade-in 애니메이션
+    setTimeout(() => {
+        const modal = document.getElementById('expanded-map-modal');
+        if (modal) {
+            modal.style.transition = 'opacity 0.3s ease-in';
+            modal.style.opacity = '1';
+            
+            const content = modal.querySelector('.bg-white');
+            if (content) {
+                content.style.transition = 'transform 0.3s ease-out';
+                content.style.transform = 'translateY(0)';
+            }
+        }
+    }, 50);
+
+    // 안전한 이벤트 등록
+    const escKeyListener = globalEventManager.addEventListener(
+        document,
+        'keydown',
+        function(e) {
+            if (e.key === 'Escape') {
+                closeExpandedMapAndReturnToDetail(entryId);
+            }
+        }
+    );
+
+    // 모달 외부 클릭 이벤트
+    const outsideClickListener = globalEventManager.addEventListener(
+        document.getElementById('expanded-map-modal'),
+        'click',
+        function(e) {
+            if (e.target.id === 'expanded-map-modal') {
+                closeExpandedMapAndReturnToDetail(entryId);
+            }
+        }
+    );
+
+    // 모달에 정리 함수 정보 저장
+    const modal = document.getElementById('expanded-map-modal');
+    modal._cleanupListeners = [escKeyListener, outsideClickListener];
+
+    // 확장 지도 초기화
+    globalEventManager.setTimeout(() => {
+        initializeExpandedMap(entryId, cityCoordinates.lat, cityCoordinates.lng, cityName);
+    }, 100, 'expanded-map-init-delay');
+}
+
+// 확장 지도 모달 닫고 상세 모달로 복귀
+function closeExpandedMapAndReturnToDetail(entryId) {
+    const modal = document.getElementById('expanded-map-modal');
+    if (!modal) return;
+
+    // 부드러운 fade-out 애니메이션
+    modal.style.transition = 'opacity 0.2s ease-out';
+    modal.style.opacity = '0';
+    
+    const content = modal.querySelector('.bg-white');
+    if (content) {
+        content.style.transition = 'transform 0.2s ease-in';
+        content.style.transform = 'translateY(4px)';
+    }
+
+    setTimeout(() => {
+        // 이벤트 리스너 정리
+        if (modal._cleanupListeners) {
+            modal._cleanupListeners.forEach(cleanup => {
+                if (typeof cleanup === 'function') {
+                    cleanup();
+                }
+            });
+        }
+
+        // 지도 인스턴스 정리
+        const entryIdFromModal = modal.querySelector('[id^="expanded-map-"]')?.id?.replace('expanded-map-', '');
+        if (entryIdFromModal) {
+            cleanupExpandedMap(entryIdFromModal);
+        }
+
+        // 모달 제거
+        modal.remove();
+
+        // 상세 모달 다시 열기
+        showEntryDetail(entryId);
+    }, 200);
+}
+
+// 확장 지도 모달 완전 닫기
+function closeExpandedMapCompletely() {
+    const modal = document.getElementById('expanded-map-modal');
+    if (!modal) return;
+
+    // 부드러운 fade-out 애니메이션
+    modal.style.transition = 'opacity 0.2s ease-out';
+    modal.style.opacity = '0';
+    
+    const content = modal.querySelector('.bg-white');
+    if (content) {
+        content.style.transition = 'transform 0.2s ease-in';
+        content.style.transform = 'translateY(4px)';
+    }
+
+    setTimeout(() => {
+        // 이벤트 리스너 정리
+        if (modal._cleanupListeners) {
+            modal._cleanupListeners.forEach(cleanup => {
+                if (typeof cleanup === 'function') {
+                    cleanup();
+                }
+            });
+        }
+
+        // 지도 인스턴스 정리
+        const entryId = modal.querySelector('[id^="expanded-map-"]')?.id?.replace('expanded-map-', '');
+        if (entryId) {
+            cleanupExpandedMap(entryId);
+        }
+
+        // 모달 제거
+        modal.remove();
+    }, 200);
+}
+
+// 기존 closeExpandedMap 함수는 호환성을 위해 유지 (closeExpandedMapCompletely와 동일)
+function closeExpandedMap() {
+    closeExpandedMapCompletely();
+}
+
+// 확장 지도 초기화 함수
+function initializeExpandedMap(entryId, lat, lng, cityName) {
+    try {
+        const mapContainer = document.getElementById(`expanded-map-${entryId}`);
+        const loadingElement = document.getElementById(`expanded-map-loading-${entryId}`);
+        const errorElement = document.getElementById(`expanded-map-error-${entryId}`);
+        
+        if (!mapContainer) {
+            console.warn(`ExpandedMap container not found for entry ${entryId}`);
+            return;
+        }
+
+        // 로딩 상태 표시
+        if (loadingElement) {
+            loadingElement.style.display = 'flex';
+        }
+        if (errorElement) {
+            errorElement.style.display = 'none';
+        }
+
+        // Leaflet 라이브러리 확인
+        if (typeof L === 'undefined' || !L.map) {
+            console.error('Leaflet library is not loaded');
+            showExpandedMapError(entryId, 'Leaflet 라이브러리를 불러올 수 없습니다');
+            return;
+        }
+
+        // 좌표 유효성 검증
+        if (typeof lat !== 'number' || typeof lng !== 'number' || 
+            isNaN(lat) || isNaN(lng)) {
+            console.warn(`Invalid coordinates for entry ${entryId}: lat=${lat}, lng=${lng}`);
+            showExpandedMapError(entryId, '유효하지 않은 좌표입니다');
+            return;
+        }
+
+        // Leaflet 지도 생성 (국가 전체가 보이도록 줌 레벨 조정)
+        const expandedMap = L.map(mapContainer, {
+            center: [lat, lng],
+            zoom: 5, // 국가 전체가 보이도록 줌 레벨 조정
+            interactive: false,
+            dragging: false,
+            zoomControl: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            boxZoom: false,
+            keyboard: false,
+            tap: false,
+            touchZoom: false,
+            bounceAtZoomLimits: false,
+            zoomSnap: 0,
+            zoomDelta: 0,
+            wheelPxPerZoomLevel: 0,
+            maxZoom: 5, // 최대 줌 레벨 고정
+            minZoom: 5, // 최소 줌 레벨 고정
+            maxBounds: null,
+            maxBoundsViscosity: 0
+        });
+
+        // OpenStreetMap 타일 레이어 추가
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 5,
+            minZoom: 5,
+            updateWhenZooming: false,
+            updateWhenIdle: false,
+            keepBuffer: 0,
+            maxNativeZoom: 5
+        }).addTo(expandedMap);
+
+        // 마커 추가
+        const marker = L.marker([lat, lng], {
+            icon: L.divIcon({
+                className: 'expanded-custom-marker',
+                html: '<div style="background-color: #3B82F6; width: 20px; height: 20px; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.5);"></div>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            })
+        }).addTo(expandedMap);
+
+        // 지도 크기 조정 및 줌 레벨 강제 고정
+        setTimeout(() => {
+            try {
+                if (!expandedMap || typeof expandedMap.invalidateSize !== 'function') {
+                    console.warn('ExpandedMap initialization failed: map object is not valid');
+                    return;
+                }
+
+                expandedMap.invalidateSize();
+                expandedMap.setZoom(5, { animate: false });
+                
+                // 모든 줌 관련 이벤트 비활성화
+                expandedMap.off('zoomstart');
+                expandedMap.off('zoom');
+                expandedMap.off('zoomend');
+                expandedMap.off('viewreset');
+                
+                // 지도 완전 고정
+                if (expandedMap.dragging && typeof expandedMap.dragging.disable === 'function') {
+                    expandedMap.dragging.disable();
+                }
+                if (expandedMap.touchZoom && typeof expandedMap.touchZoom.disable === 'function') {
+                    expandedMap.touchZoom.disable();
+                }
+                if (expandedMap.doubleClickZoom && typeof expandedMap.doubleClickZoom.disable === 'function') {
+                    expandedMap.doubleClickZoom.disable();
+                }
+                if (expandedMap.scrollWheelZoom && typeof expandedMap.scrollWheelZoom.disable === 'function') {
+                    expandedMap.scrollWheelZoom.disable();
+                }
+                if (expandedMap.boxZoom && typeof expandedMap.boxZoom.disable === 'function') {
+                    expandedMap.boxZoom.disable();
+                }
+                if (expandedMap.keyboard && typeof expandedMap.keyboard.disable === 'function') {
+                    expandedMap.keyboard.disable();
+                }
+                if (expandedMap.tap && typeof expandedMap.tap.disable === 'function') {
+                    expandedMap.tap.disable();
+                }
+
+                // 지도 인스턴스를 컨테이너에 저장
+                mapContainer._expandedMap = expandedMap;
+                
+                // 로딩 완료 - 로딩 상태 숨기기
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
+                }
+            } catch (error) {
+                console.warn('Error during expandedMap initialization:', error);
+                showExpandedMapError(entryId, '지도 초기화 중 오류가 발생했습니다');
+            }
+        }, 200);
+    } catch (error) {
+        console.error('Error initializing expandedMap:', error);
+        showExpandedMapError(entryId, '지도를 불러올 수 없습니다');
+    }
+}
+
+// 확장 지도 에러 표시 함수
+function showExpandedMapError(entryId, message) {
+    const loadingElement = document.getElementById(`expanded-map-loading-${entryId}`);
+    const errorElement = document.getElementById(`expanded-map-error-${entryId}`);
+    
+    if (loadingElement) {
+        loadingElement.style.display = 'none';
+    }
+    
+    if (errorElement) {
+        const errorMessageElement = errorElement.querySelector('p:first-of-type');
+        if (errorMessageElement) {
+            errorMessageElement.textContent = message;
+        }
+        errorElement.style.display = 'flex';
+    }
+}
+
+// 확장 지도 정리 함수
+function cleanupExpandedMap(entryId) {
+    try {
+        const mapContainer = document.getElementById(`expanded-map-${entryId}`);
+        if (mapContainer && mapContainer._expandedMap) {
+            const map = mapContainer._expandedMap;
+            if (typeof map.remove === 'function') {
+                map.remove();
+            }
+            mapContainer._expandedMap = null;
+        }
+    } catch (error) {
+        console.warn('Error cleaning up expanded map:', error);
     }
 }
 
