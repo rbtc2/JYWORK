@@ -32,21 +32,7 @@
             border-color: #4b5563;
         }
         
-        /* 애니메이션 비활성화 */
-        .no-animations *,
-        .no-animations *::before,
-        .no-animations *::after {
-            animation: none !important;
-            transition: none !important;
-        }
-        
-        .no-animations .hover\:scale-110:hover {
-            transform: none !important;
-        }
-        
-        .no-animations .hover\:bg-blue-600:hover {
-            background-color: inherit !important;
-        }
+
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -87,16 +73,7 @@
                 </button>
             </div>
             
-            <!-- 애니메이션 효과 토글 -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div>
-                    <p class="font-medium text-gray-700 text-base">애니메이션 효과</p>
-                    <p class="text-sm text-gray-500">호버, 배지 언락 등</p>
-                </div>
-                <button id="animation-effects-toggle" class="toggle-btn px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm min-h-[40px] w-full sm:w-auto">
-                    ✨ On
-                </button>
-            </div>
+
         </div>
         
         <!-- 테스트 결과 -->
@@ -107,23 +84,16 @@
             </div>
         </div>
         
-        <!-- 애니메이션 테스트 -->
-        <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
-            <h3 class="font-semibold text-green-800 mb-2">애니메이션 테스트:</h3>
-            <button class="test-animation-btn px-4 py-2 bg-green-500 text-white rounded-lg hover:scale-110 hover:bg-green-600 transition-all duration-300">
-                호버 효과 테스트 (애니메이션 On일 때만 작동)
-            </button>
-        </div>
+
     </div>
 
     <script>
         // 앱 설정 객체
-        let appSettings = {
-            darkMode: false,
-            pushNotifications: false,
-            soundEffects: false,
-            animations: true
-        };
+let appSettings = {
+    darkMode: false,
+    pushNotifications: false,
+    soundEffects: false
+};
 
         // 앱 설정 초기화
         function initializeAppSettings() {
@@ -151,12 +121,7 @@
                 document.documentElement.classList.remove('dark');
             }
             
-            // 애니메이션 효과 적용
-            if (appSettings.animations) {
-                document.body.classList.remove('no-animations');
-            } else {
-                document.body.classList.add('no-animations');
-            }
+            
         }
 
         // 앱 설정 UI 업데이트
@@ -197,17 +162,7 @@
                 }
             }
             
-            // 애니메이션 효과 토글
-            const animationEffectsToggle = document.getElementById('animation-effects-toggle');
-            if (animationEffectsToggle) {
-                if (appSettings.animations) {
-                    animationEffectsToggle.textContent = '✨ On';
-                    animationEffectsToggle.className = 'toggle-btn px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm min-h-[40px] w-full sm:w-auto';
-                } else {
-                    animationEffectsToggle.textContent = '⏸️ Off';
-                    animationEffectsToggle.className = 'toggle-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm min-h-[40px] w-full sm:w-auto';
-                }
-            }
+            
         }
 
         // 설정 상태 표시
@@ -218,7 +173,7 @@
                     <strong>다크 모드:</strong> ${appSettings.darkMode ? '🌙 On' : '☀️ Off'}<br>
                     <strong>푸시 알림:</strong> ${appSettings.pushNotifications ? '🔔 On' : '🔕 Off'}<br>
                     <strong>효과음:</strong> ${appSettings.soundEffects ? '🔊 On' : '🔇 Off'}<br>
-                    <strong>애니메이션:</strong> ${appSettings.animations ? '✨ On' : '⏸️ Off'}
+    
                 `;
             }
         }
@@ -295,19 +250,7 @@
             playToggleSound();
         }
 
-        // 애니메이션 효과 토글
-        function toggleAnimations() {
-            appSettings.animations = !appSettings.animations;
-            applyAppSettings();
-            updateAppSettingsUI();
-            updateSettingsStatus();
-            saveAppSettings();
-            
-            // 효과음 재생
-            if (appSettings.soundEffects) {
-                playToggleSound();
-            }
-        }
+
 
         // 토글 효과음 재생
         function playToggleSound() {
@@ -342,7 +285,7 @@
             document.getElementById('dark-mode-toggle').addEventListener('click', toggleDarkMode);
             document.getElementById('push-notification-toggle').addEventListener('click', togglePushNotifications);
             document.getElementById('sound-effects-toggle').addEventListener('click', toggleSoundEffects);
-            document.getElementById('animation-effects-toggle').addEventListener('click', toggleAnimations);
+        
             
             console.log('✅ 설정 테스트 페이지가 초기화되었습니다.');
         });

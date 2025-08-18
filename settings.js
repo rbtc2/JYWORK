@@ -7,8 +7,7 @@
 let appSettings = {
     darkMode: false,
     pushNotifications: false,
-    soundEffects: false,
-    animations: true
+    soundEffects: false
 };
 
 // 앱 설정 초기화
@@ -41,13 +40,6 @@ function applyAppSettings() {
         document.documentElement.classList.add('dark');
     } else {
         document.documentElement.classList.remove('dark');
-    }
-    
-    // 애니메이션 효과 적용
-    if (appSettings.animations) {
-        document.body.classList.remove('no-animations');
-    } else {
-        document.body.classList.add('no-animations');
     }
 }
 
@@ -112,23 +104,7 @@ function updateAppSettingsUI() {
         }
     }
     
-    // 애니메이션 효과 토글
-    const animationEffectsToggle = document.getElementById('animation-effects-toggle');
-    console.log('🔍 애니메이션 효과 토글 버튼:', {
-        found: !!animationEffectsToggle,
-        id: 'animation-effects-toggle',
-        element: animationEffectsToggle
-    });
-    
-    if (animationEffectsToggle) {
-        if (appSettings.animations) {
-            animationEffectsToggle.textContent = '✨ On';
-            animationEffectsToggle.className = 'toggle-btn px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm min-h-[40px] w-full sm:w-auto';
-        } else {
-            animationEffectsToggle.textContent = '🚫 Off';
-            animationEffectsToggle.className = 'toggle-btn px-3 sm:px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm min-h-[40px] w-full sm:w-auto';
-        }
-    }
+
     
     console.log('🔍 앱 설정 div 상태:', {
         appSettingsDiv: document.getElementById('app-settings'),
@@ -205,18 +181,7 @@ function toggleSoundEffects() {
     playToggleSound();
 }
 
-// 애니메이션 효과 토글
-function toggleAnimations() {
-    appSettings.animations = !appSettings.animations;
-    applyAppSettings();
-    updateAppSettingsUI();
-    saveAppSettings();
-    
-    // 효과음 재생
-    if (appSettings.soundEffects) {
-        playToggleSound();
-    }
-}
+
 
 // 토글 효과음 재생
 function playToggleSound() {
@@ -375,7 +340,6 @@ function initializeSettingsEventListeners() {
     document.getElementById('dark-mode-toggle').addEventListener('click', toggleDarkMode);
     document.getElementById('push-notification-toggle').addEventListener('click', togglePushNotifications);
     document.getElementById('sound-effects-toggle').addEventListener('click', toggleSoundEffects);
-    document.getElementById('animation-effects-toggle').addEventListener('click', toggleAnimations);
     
     // 언어 설정 (향후 구현 예정)
     document.getElementById('language-toggle').addEventListener('click', function() {
