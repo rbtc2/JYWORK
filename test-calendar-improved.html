@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>개선된 캘린더 테스트</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .calendar-event {
+            border-left: 3px solid;
+            padding: 2px 4px;
+            margin: 1px 0;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            line-height: 1.2;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-event:hover {
+            transform: scale(1.02);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .calendar-tooltip {
+            position: fixed;
+            z-index: 1000;
+            background-color: #1f2937;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 300px;
+            pointer-events: none;
+            font-size: 14px;
+        }
+        
+        .calendar-tooltip div {
+            margin-bottom: 4px;
+        }
+        
+        .calendar-tooltip div:first-child {
+            font-weight: 600;
+        }
+        
+        .calendar-tooltip div:not(:first-child) {
+            color: #d1d5db;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">개선된 캘린더 테스트</h1>
+        
+        <!-- 캘린더 컨트롤 -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-semibold text-gray-800">캘린더</h2>
+                <div class="flex items-center space-x-4">
+                    <button id="prev-month" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                        ← 이전
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <select id="year-select" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="2023">2023년</option>
+                            <option value="2024">2024년</option>
+                            <option value="2025">2025년</option>
+                        </select>
+                        <select id="month-select" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="0">1월</option>
+                            <option value="1">2월</option>
+                            <option value="2">3월</option>
+                            <option value="3">4월</option>
+                            <option value="4">5월</option>
+                            <option value="5">6월</option>
+                            <option value="6">7월</option>
+                            <option value="7">8월</option>
+                            <option value="8">9월</option>
+                            <option value="9">10월</option>
+                            <option value="10">11월</option>
+                            <option value="11">12월</option>
+                        </select>
+                    </div>
+                    <button id="next-month" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                        다음 →
+                    </button>
+                </div>
+            </div>
+            
+            <div id="current-month" class="text-2xl font-bold text-center text-gray-800 mb-6">2024년 1월</div>
+            
+            <!-- 캘린더 테이블 -->
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="border border-gray-200 p-3 text-center text-sm font-medium text-gray-600 bg-gray-50">일</th>
+                            <th class="border border-gray-200 p-3 text-center text-sm font-medium text-gray-600 bg-gray-50">월</th>
+                            <th class="border border-gray-200 p-3 text-center text-sm font-medium text-gray-600 bg-gray-50">화</th>
+                            <th class="border border-gray-200 p-3 text-center text-sm font-medium text-gray-600 bg-gray-50">수</th>
+                            <th class="border border-gray-200 p-3 text-center text-sm font-medium text-gray-600 bg-gray-50">목</th>
+                            <th class="border border-gray-200 p-3 text-center text-sm font-medium text-gray-600 bg-gray-50">금</th>
+                            <th class="border border-gray-200 p-3 text-center text-sm font-medium text-gray-600 bg-gray-50">토</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calendar-body">
+                        <!-- 캘린더 내용이 여기에 렌더링됩니다 -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 빈 캘린더 메시지 -->
+            <div id="calendar-empty" class="hidden text-center py-12 text-gray-500">
+                <div class="text-6xl mb-4">📅</div>
+                <p class="text-xl">등록된 일정이 없습니다</p>
+                <p class="text-sm mt-2">새로운 여행 일정을 추가해보세요!</p>
+            </div>
+        </div>
+        
+        <!-- 테스트 데이터 추가 버튼 -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">테스트 데이터</h3>
+            <button id="add-test-data" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                테스트 일정 추가
+            </button>
+            <button id="clear-test-data" class="ml-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                테스트 일정 제거
+            </button>
+        </div>
+    </div>
+
+    <!-- 필요한 스크립트 파일들 -->
+    <script src="utils.js"></script>
+    <script src="data.js"></script>
+    <script src="collectionTimeline.js"></script>
+    <script src="calendar.js"></script>
+    
+    <script>
+        // 테스트 데이터 추가
+        document.getElementById('add-test-data').addEventListener('click', function() {
+            const testEntries = [
+                {
+                    id: 'test1',
+                    country: '일본',
+                    countryCode: 'JP',
+                    city: '도쿄',
+                    startDate: '2024-01-15',
+                    endDate: '2024-01-20',
+                    purpose: 'travel',
+                    companions: '친구들과',
+                    companionType: 'friends',
+                    memo: '도쿄 여행! 스시와 라멘을 먹으러 갑니다.'
+                },
+                {
+                    id: 'test2',
+                    country: '일본',
+                    countryCode: 'JP',
+                    city: '도쿄',
+                    startDate: '2024-01-15',
+                    endDate: '2024-01-18',
+                    purpose: 'business',
+                    companions: '',
+                    companionType: 'solo',
+                    memo: '비즈니스 미팅'
+                },
+                {
+                    id: 'test3',
+                    country: '대한민국',
+                    countryCode: 'KR',
+                    city: '서울',
+                    startDate: '2024-01-15',
+                    endDate: '2024-01-17',
+                    purpose: 'study',
+                    companions: '동료들과',
+                    companionType: 'colleagues',
+                    memo: '교육 프로그램 참석'
+                },
+                {
+                    id: 'test4',
+                    country: '미국',
+                    countryCode: 'US',
+                    city: '뉴욕',
+                    startDate: '2024-01-15',
+                    endDate: '2024-01-25',
+                    purpose: 'working-holiday',
+                    companions: '',
+                    companionType: 'solo',
+                    memo: '워킹 홀리데이로 뉴욕에서 생활'
+                },
+                {
+                    id: 'test5',
+                    country: '프랑스',
+                    countryCode: 'FR',
+                    city: '파리',
+                    startDate: '2024-01-15',
+                    endDate: '2024-01-22',
+                    purpose: 'travel',
+                    companions: '연인과',
+                    companionType: 'couple',
+                    memo: '로맨틱한 파리 여행'
+                }
+            ];
+            
+            // 기존 테스트 데이터가 있다면 제거
+            window.entries = window.entries.filter(entry => !entry.id.startsWith('test'));
+            
+            // 새 테스트 데이터 추가
+            window.entries.push(...testEntries);
+            
+            // 캘린더 다시 렌더링
+            renderCalendar();
+            
+            alert('테스트 일정이 추가되었습니다! 1월 15일에 5개의 일정이 있습니다.');
+        });
+        
+        // 테스트 데이터 제거
+        document.getElementById('clear-test-data').addEventListener('click', function() {
+            window.entries = window.entries.filter(entry => !entry.id.startsWith('test'));
+            renderCalendar();
+            alert('테스트 일정이 제거되었습니다.');
+        });
+        
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            // 캘린더 초기화
+            initializeCalendarEventListeners();
+            renderCalendar();
+        });
+    </script>
+</body>
+</html>

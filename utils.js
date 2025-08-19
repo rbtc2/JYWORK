@@ -1297,6 +1297,7 @@ if (typeof window !== 'undefined') {
     window.SafeDOM = SafeDOM;
     window.safeExecute = safeExecute;
     window.safeExecuteAsync = safeExecuteAsync;
+    window.sanitizeMemo = sanitizeMemo;
 } 
 
 /**

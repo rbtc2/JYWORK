@@ -1615,4 +1615,13 @@ function closeEntryDetail() {
     if (modal) {
         modal.remove();
     }
+}
+
+// 전역으로 노출
+if (typeof window !== 'undefined') {
+    window.showEntryDetail = showEntryDetail;
+    window.closeEntryDetail = closeEntryDetail;
+    window.modifyEntry = modifyEntry;
+    window.deleteEntry = deleteEntry;
+    window.toggleMemoDetail = toggleMemoDetail;
 } 

@@ -99,57 +99,7 @@ const continentColors = {
     'oceania': { bg: '#EAB308', border: '#CA8A04', text: 'white' }        // Yellow
 };
 
-// 목적 텍스트 변환 함수
-function getPurposeText(purpose) {
-    const textMap = {
-        'travel': '여행',
-        'business': '출장',
-        'study': '유학',
-        'working-holiday': '워킹 홀리데이',
-        'family-visit': '가족 방문',
-        'dispatch': '파견',
-        'exchange': '교환학생',
-        'volunteer': '봉사활동',
-        'medical': '의료',
-        'language': '어학 연수',
-        'transit': '비행 경유'
-    };
-    return textMap[purpose] || purpose;
-}
-
-// 여행 스타일 텍스트 변환 함수
-function getCompanionText(entry) {
-    // 기존 string companions와 새 객체 구조 모두 지원
-    const companions = entry.companions || '';
-    const companionType = entry.companionType || '';
-    
-    // companionType이 없거나 빈 문자열인 경우 → 여행 스타일 정보 미입력
-    if (!companionType || companionType === '') {
-        return '정보 없음';
-    }
-    
-    // companionType이 'solo'인 경우 → "혼자" 명시적 선택
-    if (companionType === 'solo') {
-        return '혼자';
-    }
-    
-    const typeTexts = {
-        'family': '가족',
-        'couple': '연인',
-        'friends': '친구',
-        'colleagues': '동료',
-        'custom': '여행 스타일'
-    };
-    
-    const typeText = typeTexts[companionType] || '여행 스타일';
-    
-    // 상세 정보가 있는 경우에만 추가
-    if (companions && companions.trim() !== '') {
-        return `${companions}`;
-    } else {
-        return typeText;
-    }
-}
+// getPurposeText와 getCompanionText 함수는 collectionTimeline.js에서 전역으로 노출됨
 
 // 국가 코드를 국기 이모지로 변환하는 함수
 function getCountryFlag(countryCode) {
@@ -229,6 +179,220 @@ function getEventDisplayText(entry) {
     return truncateText(entry.country, 3);
 }
 
+// 일정 콘텐츠 생성 함수 (최대 2개까지만 표시, 3개 이상일 때 3번째 줄에 축약)
+function generateEventContent(dayEvents, dateString) {
+    const MAX_VISIBLE_EVENTS = 2; // 2개만 정상 표시하고, 3개 이상일 때 3번째 줄에 축약 표시
+    let eventContent = '';
+    
+    if (dayEvents.length === 0) {
+        return eventContent;
+    }
+    
+    eventContent += `<div class="mt-1 space-y-0.5 sm:space-y-1">`;
+    
+    // 처음 2개 일정은 정상 표시
+    for (let i = 0; i < Math.min(dayEvents.length, MAX_VISIBLE_EVENTS); i++) {
+        const event = dayEvents[i];
+        
+        try {
+            const purposeText = safeExecute(() => getPurposeText(event.purpose), { purpose: event.purpose });
+            
+            // 여행 스타일 정보 가져오기 (툴팁에서만 사용)
+            const companionText = safeExecute(() => getCompanionText(event), { entryId: event.id });
+            
+            // 툴팁 내용을 안전하게 생성
+            const tooltipText = `${sanitizeMemo(event.country)} / ${sanitizeMemo(event.city)}\\n${purposeText}\\n👥 ${companionText}\\n📅 ${event.startDate} ~ ${event.endDate}${event.memo ? '\\n📝 ' + sanitizeMemo(event.memo) : ''}`;
+            
+            // 대륙별 색상 결정
+            const continent = safeExecute(() => getContinentFromCountryCode(event.countryCode), { countryCode: event.countryCode });
+            const continentColor = safeExecute(() => getContinentColor(continent), { continent });
+            
+            // 일정 표시 텍스트 생성
+            const displayText = safeExecute(() => getEventDisplayText(event), { entryId: event.id });
+            
+            if (continentColor && displayText) {
+                eventContent += `
+                    <div class="calendar-event text-xs overflow-hidden whitespace-nowrap"
+                         data-event-index="${i}"
+                         data-tooltip="${tooltipText.replace(/"/g, '&quot;')}"
+                         data-entry-id="${event.id}"
+                         data-continent="${continent}"
+                         onmouseenter="createTooltip(event, this.dataset.tooltip)"
+                         onmouseleave="removeTooltip()"
+                         onclick="showEntryDetail('${event.id}')"
+                         title="${sanitizeMemo(event.country)}"
+                         style="cursor: pointer; max-height: 1.2em; line-height: 1.2em; max-width: 100%; background-color: ${continentColor.bg}; border-left-color: ${continentColor.border}; color: ${continentColor.text};">
+                        <span class="truncate block w-full">${sanitizeMemo(displayText)}</span>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            errorHandler.handleError(error, { 
+                entryId: event.id,
+                index: i
+            }, ErrorSeverity.LOW);
+        }
+    }
+    
+    // 3개 이상일 때 3번째 줄에 축약 표시 추가
+    if (dayEvents.length > MAX_VISIBLE_EVENTS) {
+        const remainingCount = dayEvents.length - MAX_VISIBLE_EVENTS;
+        const thirdEvent = dayEvents[2]; // 3번째 일정 (0-based index)
+        
+        // 축약 표시에서 국기 이모지가 제대로 표시되도록 직접 매핑
+        let flagDisplay = '🌍';
+        if (thirdEvent.countryCode === 'JP') flagDisplay = '🇯🇵';
+        else if (thirdEvent.countryCode === 'KR') flagDisplay = '🇰🇷';
+        else if (thirdEvent.countryCode === 'US') flagDisplay = '🇺🇸';
+        else if (thirdEvent.countryCode === 'FR') flagDisplay = '🇫🇷';
+        else if (thirdEvent.countryCode === 'CN') flagDisplay = '🇨🇳';
+        else if (thirdEvent.countryCode === 'GB') flagDisplay = '🇬🇧';
+        else if (thirdEvent.countryCode === 'DE') flagDisplay = '🇩🇪';
+        else if (thirdEvent.countryCode === 'IT') flagDisplay = '🇮🇹';
+        else if (thirdEvent.countryCode === 'ES') flagDisplay = '🇪🇸';
+        else if (thirdEvent.countryCode === 'CA') flagDisplay = '🇨🇦';
+        else if (thirdEvent.countryCode === 'AU') flagDisplay = '🇦🇺';
+        else if (thirdEvent.countryCode === 'BR') flagDisplay = '🇧🇷';
+        else if (thirdEvent.countryCode === 'IN') flagDisplay = '🇮🇳';
+        else if (thirdEvent.countryCode === 'RU') flagDisplay = '🇷🇺';
+        else if (thirdEvent.countryCode) flagDisplay = thirdEvent.countryCode;
+        
+        eventContent += `
+            <div class="calendar-event text-xs overflow-hidden whitespace-nowrap cursor-pointer"
+                 onclick="showDayEventsModal('${dateString}', '${JSON.stringify(dayEvents).replace(/"/g, '&quot;')}')"
+                 title="이 날의 모든 일정 보기 (총 ${dayEvents.length}개)"
+                 style="max-height: 1.2em; line-height: 1.2em; max-width: 100%; background-color: #4B5563; border-left-color: #374151; color: white;">
+                <span class="truncate block w-full">${flagDisplay} +${remainingCount}</span>
+            </div>
+        `;
+    }
+    
+    eventContent += `</div>`;
+    return eventContent;
+}
+
+// 날짜별 일정 모달 표시 함수
+function showDayEventsModal(dateString, dayEventsJson) {
+    try {
+        // JSON 파싱
+        const dayEvents = JSON.parse(dayEventsJson);
+        
+        // 날짜 포맷팅
+        const date = new Date(dateString);
+        const formattedDate = `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+        
+        // 모달 HTML 생성
+        const modalHTML = `
+            <div id="day-events-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden">
+                    <!-- 헤더 -->
+                    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-semibold text-gray-900">${formattedDate}</h3>
+                            <button onclick="closeDayEventsModal()" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-1">총 ${dayEvents.length}개의 일정</p>
+                    </div>
+                    
+                    <!-- 본문 -->
+                    <div class="px-6 py-4 overflow-y-auto max-h-[60vh]">
+                        <div class="space-y-3">
+                            ${dayEvents.map((event, index) => {
+                                const purposeText = safeExecute(() => getPurposeText(event.purpose), { purpose: event.purpose });
+                                const companionText = safeExecute(() => getCompanionText(event), { entryId: event.id });
+                                const displayText = safeExecute(() => getEventDisplayText(event), { entryId: event.id });
+                                const continent = safeExecute(() => getContinentFromCountryCode(event.countryCode), { countryCode: event.countryCode });
+                                const continentColor = safeExecute(() => getContinentColor(continent), { continent });
+                                
+                                return `
+                                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                                         onclick="showEntryDetail('${event.id}'); closeDayEventsModal();">
+                                        <div class="flex items-start space-x-3">
+                                            <div class="flex-shrink-0">
+                                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium"
+                                                     style="background-color: ${continentColor.bg}; color: ${continentColor.text};">
+                                                    ${displayText}
+                                                </div>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-center space-x-2 mb-1">
+                                                    <span class="text-sm font-medium text-gray-900">${sanitizeMemo(event.country)}</span>
+                                                    <span class="text-gray-400">/</span>
+                                                    <span class="text-sm text-gray-700">${sanitizeMemo(event.city)}</span>
+                                                </div>
+                                                <div class="text-sm text-gray-600 mb-1">${purposeText}</div>
+                                                <div class="text-sm text-gray-500 mb-1">👥 ${companionText}</div>
+                                                <div class="text-sm text-gray-500">📅 ${event.startDate} ~ ${event.endDate}</div>
+                                                ${event.memo ? `<div class="text-sm text-gray-500 mt-1">📝 ${sanitizeMemo(event.memo)}</div>` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // 모달을 body에 추가
+        const modalContainer = document.createElement('div');
+        modalContainer.innerHTML = modalHTML;
+        const modalElement = modalContainer.firstElementChild;
+        
+        if (!modalElement) {
+            throw new Error('모달 요소 생성에 실패했습니다.');
+        }
+        
+        const bodyAppendSuccess = SafeDOM.appendChild(document.body, modalElement);
+        if (!bodyAppendSuccess) {
+            throw new Error('날짜별 일정 모달을 body에 추가하는데 실패했습니다.');
+        }
+        
+        // ESC 키 이벤트 리스너 추가
+        const handleEscKey = (event) => {
+            if (event.key === 'Escape') {
+                closeDayEventsModal();
+            }
+        };
+        
+        globalEventManager.addEventListener(document, 'keydown', handleEscKey);
+        
+        // 외부 클릭 이벤트 리스너 추가
+        const modal = document.getElementById('day-events-modal');
+        if (modal) {
+            globalEventManager.addEventListener(modal, 'click', (event) => {
+                if (event.target === modal) {
+                    closeDayEventsModal();
+                }
+            });
+        }
+        
+    } catch (error) {
+        errorHandler.handleError(error, { function: 'showDayEventsModal', dateString }, ErrorSeverity.MEDIUM);
+    }
+}
+
+// 날짜별 일정 모달 닫기 함수
+function closeDayEventsModal() {
+    try {
+        const modal = document.getElementById('day-events-modal');
+        if (modal) {
+            modal.remove();
+        }
+        
+        // ESC 키 이벤트 리스너 제거
+        globalEventManager.removeEventListener(document, 'keydown');
+        
+    } catch (error) {
+        errorHandler.handleError(error, { function: 'closeDayEventsModal' }, ErrorSeverity.LOW);
+    }
+}
+
 // 캘린더 렌더링
 function renderCalendar() {
     try {
@@ -305,48 +469,7 @@ function renderCalendar() {
             let dayContent = `<div class="text-xs sm:text-sm font-medium">${currentDate.getDate()}</div>`;
             
             if (dayEvents.length > 0) {
-                dayContent += `<div class="mt-1 space-y-0.5 sm:space-y-1">`;
-                dayEvents.forEach((event, index) => {
-                    try {
-                        const purposeText = safeExecute(() => getPurposeText(event.purpose), { purpose: event.purpose });
-                        
-                        // 여행 스타일 정보 가져오기
-                        const companionText = safeExecute(() => getCompanionText(event), { entryId: event.id });
-                        
-                        // 툴팁 내용을 안전하게 생성
-                        const tooltipText = `${sanitizeMemo(event.country)} / ${sanitizeMemo(event.city)}\\n${purposeText}\\n👥 ${companionText}\\n📅 ${event.startDate} ~ ${event.endDate}${event.memo ? '\\n📝 ' + sanitizeMemo(event.memo) : ''}`;
-                        
-                        // 대륙별 색상 결정
-                        const continent = safeExecute(() => getContinentFromCountryCode(event.countryCode), { countryCode: event.countryCode });
-                        const continentColor = safeExecute(() => getContinentColor(continent), { continent });
-                        
-                        // 일정 표시 텍스트 생성
-                        const displayText = safeExecute(() => getEventDisplayText(event), { entryId: event.id });
-                        
-                        if (continentColor && displayText) {
-                            dayContent += `
-                                <div class="calendar-event text-xs overflow-hidden whitespace-nowrap"
-                                     data-event-index="${index}"
-                                     data-tooltip="${tooltipText.replace(/"/g, '&quot;')}"
-                                     data-entry-id="${event.id}"
-                                     data-continent="${continent}"
-                                     onmouseenter="createTooltip(event, this.dataset.tooltip)"
-                                     onmouseleave="removeTooltip()"
-                                     onclick="showEntryDetail('${event.id}')"
-                                     title="${sanitizeMemo(event.country)}"
-                                     style="cursor: pointer; max-height: 1.2em; line-height: 1.2em; max-width: 100%; background-color: ${continentColor.bg}; border-left-color: ${continentColor.border}; color: ${continentColor.text};">
-                                    <span class="truncate block w-full">${sanitizeMemo(displayText)}</span>
-                                </div>
-                            `;
-                        }
-                    } catch (error) {
-                        errorHandler.handleError(error, { 
-                            entryId: event.id,
-                            index: index
-                        }, ErrorSeverity.LOW);
-                    }
-                });
-                dayContent += `</div>`;
+                dayContent += generateEventContent(dayEvents, currentDate.toISOString());
             }
 
             const cellClass = `

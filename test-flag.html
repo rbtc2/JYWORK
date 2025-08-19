@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>국기 이모지 테스트</title>
+</head>
+<body>
+    <h1>국기 이모지 테스트</h1>
+    <div id="test-results"></div>
+    
+    <script>
+        // getCountryFlag 함수 테스트
+        function getCountryFlag(countryCode) {
+            if (!countryCode) return null;
+            
+            const code = countryCode.toUpperCase();
+            
+            const flagMap = {
+                'KR': '🇰🇷', 'US': '🇺🇸', 'JP': '🇯🇵', 'CN': '🇨🇳', 'GB': '🇬🇧', 'DE': '🇩🇪', 'FR': '🇫🇷',
+                'IT': '🇮🇹', 'ES': '🇪🇸', 'CA': '🇨🇦', 'AU': '🇦🇺', 'BR': '🇧🇷', 'IN': '🇮🇳', 'RU': '🇷🇺'
+            };
+            
+            return flagMap[code] || null;
+        }
+        
+        // 테스트 실행
+        const testResults = document.getElementById('test-results');
+        const testCodes = ['JP', 'KR', 'US', 'FR', 'XX'];
+        
+        testCodes.forEach(code => {
+            const flag = getCountryFlag(code);
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>${code}:</strong> ${flag || 'null'} (${flag ? flag.length : 0} characters)`;
+            testResults.appendChild(div);
+        });
+        
+        // 직접 이모지 출력 테스트
+        const directDiv = document.createElement('div');
+        directDiv.innerHTML = '<h3>직접 이모지:</h3><p>🇯🇵 🇰🇷 🇺🇸 🇫🇷</p>';
+        testResults.appendChild(directDiv);
+    </script>
+</body>
+</html>
