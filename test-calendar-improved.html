@@ -61,25 +61,31 @@
                         ← 이전
                     </button>
                     <div class="flex items-center space-x-2">
-                        <select id="year-select" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="2023">2023년</option>
-                            <option value="2024">2024년</option>
-                            <option value="2025">2025년</option>
-                        </select>
-                        <select id="month-select" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="0">1월</option>
-                            <option value="1">2월</option>
-                            <option value="2">3월</option>
-                            <option value="3">4월</option>
-                            <option value="4">5월</option>
-                            <option value="5">6월</option>
-                            <option value="6">7월</option>
-                            <option value="7">8월</option>
-                            <option value="8">9월</option>
-                            <option value="9">10월</option>
-                            <option value="10">11월</option>
-                            <option value="11">12월</option>
-                        </select>
+                        <div class="flex flex-col">
+                            <label for="year-select" class="text-sm text-gray-600 mb-1">년도</label>
+                            <select id="year-select" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="2023">2023년</option>
+                                <option value="2024">2024년</option>
+                                <option value="2025">2025년</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col">
+                            <label for="month-select" class="text-sm text-gray-600 mb-1">월</label>
+                            <select id="month-select" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="0">1월</option>
+                                <option value="1">2월</option>
+                                <option value="2">3월</option>
+                                <option value="3">4월</option>
+                                <option value="4">5월</option>
+                                <option value="5">6월</option>
+                                <option value="6">7월</option>
+                                <option value="7">8월</option>
+                                <option value="8">9월</option>
+                                <option value="9">10월</option>
+                                <option value="10">11월</option>
+                                <option value="11">12월</option>
+                            </select>
+                        </div>
                     </div>
                     <button id="next-month" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
                         다음 →

@@ -483,13 +483,13 @@ function getCompanionText(entry) {
     const companions = entry.companions || '';
     const companionType = entry.companionType || '';
     
-    // 디버깅을 위한 로그
-    console.log('getCompanionText 호출:', {
-        entryId: entry.id,
-        companions: companions,
-        companionType: companionType,
-        companionsType: typeof companions
-    });
+    // 디버깅을 위한 로그 (프로덕션에서는 제거)
+    // console.log('getCompanionText 호출:', {
+    //     entryId: entry.id,
+    //     companions: companions,
+    //     companionType: companionType,
+    //     companionsType: typeof companions
+    // });
     
     // companionType이 없거나 빈 문자열인 경우 → 여행 스타일 정보 미입력
     if (!companionType || companionType === '') {
@@ -562,14 +562,14 @@ function showEntryDetail(entryId) {
     const hasCompanions = entry.companionType && entry.companionType !== '';
     const hasMemo = entry.memo && entry.memo.trim();
     
-    // 디버깅을 위한 로그
-    console.log('showEntryDetail 여행 스타일 정보:', {
-        entryId: entry.id,
-        companionType: entry.companionType,
-        companions: entry.companions,
-        hasCompanions: hasCompanions,
-        hasMemo: hasMemo
-    });
+    // 디버깅을 위한 로그 (프로덕션에서는 제거)
+    // console.log('showEntryDetail 여행 스타일 정보:', {
+    //     entryId: entry.id,
+    //     companionType: entry.companionType,
+    //     companions: entry.companions,
+    //     hasCompanions: hasCompanions,
+    //     hasMemo: hasMemo
+    // });
 
     // 모달 HTML 생성
     const modalHTML = `
