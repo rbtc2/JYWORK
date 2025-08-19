@@ -1865,8 +1865,28 @@ function renderSearchResults(searchResults, containerId = 'search-results') {
     const container = document.getElementById(containerId);
     if (!container) return;
 
+    // 별점 필터 상태 표시 (검색 결과가 없어도 표시)
+    let filterStatusHTML = '';
+    if (window.currentRatingFilter !== null) {
+        const filterText = `${window.currentRatingFilter}점`;
+        
+        filterStatusHTML = `
+            <div class="filter-status mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-blue-700 text-sm font-medium">⭐ ${filterText}</span>
+                    </div>
+                    <button onclick="clearRatingFilterSelection()" class="text-blue-500 hover:text-blue-700 text-sm underline">
+                        필터 제거
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
     if (searchResults.length === 0) {
         container.innerHTML = `
+            ${filterStatusHTML}
             <div class="text-center py-8 text-gray-500">
                 <div class="text-4xl mb-4">🔍</div>
                 <p class="text-lg">검색 결과가 없습니다.</p>
@@ -1876,24 +1896,7 @@ function renderSearchResults(searchResults, containerId = 'search-results') {
         return;
     }
 
-    // 별점 필터 상태 표시
-    let filterStatusHTML = '';
-    if (window.currentRatingFilter !== null) {
-        const filterText = `⭐ ${window.currentRatingFilter}점 항목만 표시`;
-        
-        filterStatusHTML = `
-            <div class="filter-status mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="text-blue-700 text-sm font-medium">${filterText}</span>
-                    </div>
-                    <button onclick="clearRatingFilterSelection()" class="text-blue-500 hover:text-blue-700 text-sm underline">
-                        필터 제거
-                    </button>
-                </div>
-            </div>
-        `;
-    }
+
 
     const resultsHTML = searchResults.map(result => {
         // result 자체가 유효한지 먼저 확인
@@ -2256,8 +2259,11 @@ function initializeRatingFilter() {
         window.currentRatingFilter = null;
         console.log('🧹 별점 필터 초기화 완료:', window.currentRatingFilter);
         
-        // 필터 제거 후 검색 결과 업데이트
-        applyRatingFilterToSearch();
+        // 필터 제거 후 최초 화면으로 복귀
+        const searchResultsContainer = document.getElementById('search-results');
+        if (searchResultsContainer) {
+            searchResultsContainer.innerHTML = '';
+        }
     }
     
     // 전역에서 접근 가능하도록 설정
