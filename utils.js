@@ -1701,6 +1701,38 @@ function searchEntries(query, entries = []) {
             matchedFields.push('companionType');
         }
 
+        // 여행 스타일 한글 텍스트 검색 (새로 추가)
+        const companionText = getCompanionText(entry);
+        if (companionText && companionText !== '정보 없음' && companionText.toLowerCase().includes(searchTerm)) {
+            matchScore += 7; // 높은 점수 부여
+            matchedFields.push('companionText');
+        }
+
+        // 여행 스타일 코드별 한글 매칭 검색 (새로 추가)
+        if (entry.companionType) {
+            const companionTypeMap = {
+                'solo': ['혼자', '솔로', '혼자서', '혼자 여행'],
+                'family': ['가족', '가족과', '가족과 함께'],
+                'couple': ['연인', '커플', '연인과', '커플과'],
+                'friends': ['친구', '친구와', '친구들과'],
+                'colleagues': ['동료', '동료와', '동료들과', '직장동료'],
+                'custom': ['커스텀', '직접입력', '기타']
+            };
+            
+            const type = entry.companionType;
+            if (companionTypeMap[type]) {
+                const matches = companionTypeMap[type].some(text => 
+                    text.toLowerCase().includes(searchTerm)
+                );
+                if (matches) {
+                    matchScore += 6;
+                    if (!matchedFields.includes('companionType')) {
+                        matchedFields.push('companionType');
+                    }
+                }
+            }
+        }
+
         // 목적 검색
         if (entry.purpose && entry.purpose.toLowerCase().includes(searchTerm)) {
             matchScore += 7;
@@ -1807,6 +1839,7 @@ function renderSearchResults(searchResults, containerId = 'search-results') {
                 city: '도시',
                 companions: '동행자',
                 companionType: '여행스타일',
+                companionText: '여행스타일',
                 purpose: '목적',
                 memo: '메모',
                 startDate: '시작일',
