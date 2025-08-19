@@ -22,19 +22,6 @@ let ratingSortType = 'rating-high'; // 'rating-high' 또는 'rating-low'
 //     'DE': '🇩🇪'
 // };
 
-// 국가 코드를 한글명으로 변환하는 함수
-function getCountryNameByCode(countryCode) {
-    const countryMap = {
-        'KR': '대한민국',
-        'JP': '일본',
-        'US': '미국',
-        'GB': '영국',
-        'FR': '프랑스',
-        'DE': '독일'
-    };
-    return countryMap[countryCode] || countryCode;
-}
-
 // 도시명을 정확한 한글명으로 변환하는 함수
 function getCityNameByCode(countryCode, cityName) {
     // 도시명이 이미 한글이거나 영어인 경우 그대로 반환
@@ -317,7 +304,7 @@ function renderCollectionTimeline() {
 
     collectionTimelineList.innerHTML = paginatedEntries.map(entry => {
         // 국가명과 도시명을 정확한 한글명으로 변환
-        const countryName = getCountryNameByCode(entry.countryCode) || entry.country;
+        const countryName = getKoreanName(entry.countryCode) || entry.country;
         const cityName = getCityNameByCode(entry.countryCode, entry.city) || entry.city;
         
         const days = calculateDays(entry.startDate, entry.endDate);
@@ -549,7 +536,7 @@ function showEntryDetail(entryId) {
     const flag = countryFlags[entry.countryCode] || '🏳️';
     
     // 국가명과 도시명을 정확한 한글명으로 변환
-    const countryName = getCountryNameByCode(entry.countryCode) || entry.country;
+    const countryName = getKoreanName(entry.countryCode) || entry.country;
     const cityName = getCityNameByCode(entry.countryCode, entry.city) || entry.city;
     
     // 도시 좌표 가져오기
@@ -872,7 +859,7 @@ function showExpandedMapModal(entryId, countryCode, cityCoordinates) {
     const entry = entries.find(e => e.id === entryId);
     if (!entry) return;
 
-    const countryName = getCountryNameByCode(countryCode) || countryCode;
+    const countryName = getKoreanName(countryCode) || countryCode;
     const cityName = getCityNameByCode(countryCode, entry.city) || entry.city;
     const flag = countryFlags[countryCode] || '🏳️';
 
@@ -1426,8 +1413,8 @@ function renderRatingTimeline() {
     const paginatedEntries = getPaginatedItems(sortedEntries, ratingCurrentPage, ITEMS_PER_PAGE);
 
     ratingTimelineList.innerHTML = paginatedEntries.map(entry => {
-        // 국가명과 도시명을 정확한 한글명으로 변환
-        const countryName = getCountryNameByCode(entry.countryCode) || entry.country;
+            // 국가명과 도시명을 정확한 한글명으로 변환
+    const countryName = getKoreanName(entry.countryCode) || entry.country;
         const cityName = getCityNameByCode(entry.countryCode, entry.city) || entry.city;
         
         const days = calculateDays(entry.startDate, entry.endDate);
