@@ -918,7 +918,7 @@ function showExpandedMapModal(entryId, countryCode, cityCoordinates) {
                             </div>
                         </div>
                         <!-- 에러 상태 (기본적으로 숨김) -->
-                        <div id="expanded-map-error-${entryId}" class="absolute inset-0 bg-red-50 flex items-center justify-center hidden">
+                        <div id="expanded-map-error-${entryId}" class="absolute inset-0 bg-red-50 items-center justify-center hidden">
                             <div class="text-center">
                                 <span class="text-4xl mb-4">⚠️</span>
                                 <p class="text-red-600 font-medium">지도를 불러올 수 없습니다</p>
@@ -1235,7 +1235,9 @@ function showExpandedMapError(entryId, message) {
         if (errorMessageElement) {
             errorMessageElement.textContent = message;
         }
-        errorElement.style.display = 'flex';
+        // hidden 클래스 제거하고 flex 클래스 추가
+        errorElement.classList.remove('hidden');
+        errorElement.classList.add('flex');
     }
 }
 
