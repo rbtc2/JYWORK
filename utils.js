@@ -1739,6 +1739,39 @@ function searchEntries(query, entries = []) {
             matchedFields.push('purpose');
         }
 
+        // 목적 한글 텍스트 검색 (새로 추가)
+        const purposeText = getPurposeText(entry.purpose);
+        if (purposeText && purposeText !== '기타' && purposeText.toLowerCase().includes(searchTerm)) {
+            matchScore += 8; // 높은 점수 부여
+            matchedFields.push('purposeText');
+        }
+
+        // 목적 코드별 한글 매칭 검색 (새로 추가)
+        if (entry.purpose) {
+            const purposeTypeMap = {
+                'tourism': ['여행', '관광', '관광여행', '여행관광'],
+                'business': ['출장', '업무', '비즈니스', '업무출장'],
+                'study': ['유학', '학업', '공부', '학습'],
+                'work': ['근무', '일', '업무', '직장'],
+                'family': ['가족', '가족방문', '가족과'],
+                'medical': ['의료', '병원', '치료', '건강'],
+                'other': ['기타', '기타목적', '기타사유']
+            };
+            
+            const purpose = entry.purpose;
+            if (purposeTypeMap[purpose]) {
+                const matches = purposeTypeMap[purpose].some(text => 
+                    text.toLowerCase().includes(searchTerm)
+                );
+                if (matches) {
+                    matchScore += 7;
+                    if (!matchedFields.includes('purpose')) {
+                        matchedFields.push('purpose');
+                    }
+                }
+            }
+        }
+
         // 메모 검색
         if (entry.memo && entry.memo.toLowerCase().includes(searchTerm)) {
             matchScore += 4;
@@ -1788,10 +1821,30 @@ function generateHighlightText(entry, searchTerm, matchedFields) {
 
     matchedFields.forEach(field => {
         let value = entry[field];
-        if (typeof value === 'string') {
+        
+        // purposeText 필드 특별 처리
+        if (field === 'purposeText') {
+            const purposeText = getPurposeText(entry.purpose);
+            if (purposeText && purposeText.toLowerCase().includes(searchTerm)) {
+                const regex = new RegExp(`(${searchTerm})`, 'gi');
+                highlights[field] = purposeText.replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
+            }
+        }
+        // companionText 필드 특별 처리
+        else if (field === 'companionText') {
+            const companionText = getCompanionText(entry);
+            if (companionText && companionText.toLowerCase().includes(searchTerm)) {
+                const regex = new RegExp(`(${searchTerm})`, 'gi');
+                highlights[field] = companionText.replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
+            }
+        }
+        // 일반 문자열 필드
+        else if (typeof value === 'string') {
             const regex = new RegExp(`(${searchTerm})`, 'gi');
             highlights[field] = value.replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
-        } else if (typeof value === 'object' && value && value.value) {
+        }
+        // 객체 필드 (value 속성이 있는 경우)
+        else if (typeof value === 'object' && value && value.value) {
             const regex = new RegExp(`(${searchTerm})`, 'gi');
             highlights[field] = value.value.replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
         }
@@ -1841,6 +1894,7 @@ function renderSearchResults(searchResults, containerId = 'search-results') {
                 companionType: '여행스타일',
                 companionText: '여행스타일',
                 purpose: '목적',
+                purposeText: '목적', // 추가
                 memo: '메모',
                 startDate: '시작일',
                 endDate: '종료일',
