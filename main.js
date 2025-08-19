@@ -1041,6 +1041,11 @@ function initializeApp() {
             safeExecute(() => initializeQuickSearchTags(), { function: 'initializeQuickSearchTags' });
         }
         
+        // 별점 필터 기능 초기화
+        if (typeof initializeRatingFilter === 'function') {
+            safeExecute(() => initializeRatingFilter(), { function: 'initializeRatingFilter' });
+        }
+        
         // 페이지네이션 초기화
         if (typeof initializePaginationButtons === 'function') {
             safeExecute(() => initializePaginationButtons(), { function: 'initializePaginationButtons' });

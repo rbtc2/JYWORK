@@ -1662,10 +1662,13 @@ function searchEntries(query, entries = []) {
         return [];
     }
 
+    // null이나 undefined 항목 제거
+    const validEntries = entries.filter(entry => entry && entry !== null && entry !== undefined);
+    
     const searchTerm = query.toLowerCase().trim();
     const results = [];
 
-    entries.forEach(entry => {
+    validEntries.forEach(entry => {
         let matchScore = 0;
         let matchedFields = [];
 
@@ -1873,8 +1876,40 @@ function renderSearchResults(searchResults, containerId = 'search-results') {
         return;
     }
 
+    // 별점 필터 상태 표시
+    let filterStatusHTML = '';
+    if (window.currentRatingFilter !== null) {
+        const filterText = `⭐ ${window.currentRatingFilter}점 항목만 표시`;
+        
+        filterStatusHTML = `
+            <div class="filter-status mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-blue-700 text-sm font-medium">${filterText}</span>
+                    </div>
+                    <button onclick="clearRatingFilterSelection()" class="text-blue-500 hover:text-blue-700 text-sm underline">
+                        필터 제거
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
     const resultsHTML = searchResults.map(result => {
+        // result 자체가 유효한지 먼저 확인
+        if (!result || typeof result !== 'object') {
+            console.warn('⚠️ 유효하지 않은 result 발견:', result);
+            return '';
+        }
+        
         const { entry, matchedFields, highlightText } = result;
+        
+        // entry가 유효하지 않으면 건너뛰기
+        if (!entry || entry === null || entry === undefined) {
+            console.warn('⚠️ 유효하지 않은 entry 발견:', result);
+            return '';
+        }
+        
         const days = calculateDays(entry.startDate, entry.endDate);
         const purposeText = getPurposeText(entry.purpose);
         const companionText = getCompanionText(entry);
@@ -1935,7 +1970,7 @@ function renderSearchResults(searchResults, containerId = 'search-results') {
                     ${entry.memo ? `
                         <div class="mt-3 p-3 bg-gray-50 rounded">
                             <div class="text-xs text-gray-500 mb-1">메모</div>
-                            <div class="text-sm text-gray-700">${highlightText.memo || entry.memo}</div>
+                            <div class="text-sm text-gray-700">${(highlightText && highlightText.memo) || entry.memo}</div>
                         </div>
                     ` : ''}
                     
@@ -1950,9 +1985,13 @@ function renderSearchResults(searchResults, containerId = 'search-results') {
                 </div>
             </div>
         `;
-    }).join('');
+    });
+
+    // 빈 문자열 필터링 및 HTML 생성
+    const filteredResultsHTML = resultsHTML.filter(html => html !== '').join('');
 
     container.innerHTML = `
+        ${filterStatusHTML}
         <div class="mb-4">
             <div class="text-lg font-semibold text-gray-800 mb-2">
                 검색 결과 (${searchResults.length}건)
@@ -1962,7 +2001,7 @@ function renderSearchResults(searchResults, containerId = 'search-results') {
             </div>
         </div>
         <div class="space-y-4">
-            ${resultsHTML}
+            ${filteredResultsHTML}
         </div>
     `;
 }
@@ -2111,6 +2150,196 @@ function initializeQuickSearchTags() {
     });
 }
 
+/**
+ * 별점 필터 기능 초기화
+ */
+function initializeRatingFilter() {
+    const advancedSearchButton = document.getElementById('advanced-search-button');
+    const ratingFilterSheet = document.getElementById('rating-filter-sheet');
+    const closeRatingFilter = document.getElementById('close-rating-filter');
+    const clearRatingFilter = document.getElementById('clear-rating-filter');
+    const applyRatingFilter = document.getElementById('apply-rating-filter');
+    
+    // 전역 변수로 별점 필터 상태 관리
+    window.currentRatingFilter = null;
+    
+    // 세부 검색 버튼 클릭 시 하단 시트 열기
+    if (advancedSearchButton) {
+        advancedSearchButton.addEventListener('click', function() {
+            openRatingFilterSheet();
+        });
+    }
+    
+    // 닫기 버튼 클릭 시 하단 시트 닫기
+    if (closeRatingFilter) {
+        closeRatingFilter.addEventListener('click', function() {
+            closeRatingFilterSheet();
+        });
+    }
+    
+    // 배경 클릭 시 하단 시트 닫기
+    if (ratingFilterSheet) {
+        ratingFilterSheet.addEventListener('click', function(e) {
+            if (e.target === ratingFilterSheet) {
+                closeRatingFilterSheet();
+            }
+        });
+    }
+    
+    // 초기화 버튼 클릭 시 필터 초기화
+    if (clearRatingFilter) {
+        clearRatingFilter.addEventListener('click', function() {
+            console.log('🧹 초기화 버튼 클릭됨');
+            clearRatingFilterSelection();
+        });
+    }
+    
+    // 적용 버튼 클릭 시 필터 적용
+    if (applyRatingFilter) {
+        applyRatingFilter.addEventListener('click', function() {
+            console.log('🔘 적용 버튼 클릭됨, currentRatingFilter:', window.currentRatingFilter);
+            applyRatingFilterToSearch();
+        });
+    }
+    
+    // 별점 라디오 버튼 변경 시 선택 상태만 업데이트 (즉시 적용하지 않음)
+    document.addEventListener('change', function(e) {
+        if (e.target.name === 'rating-filter') {
+            window.currentRatingFilter = parseInt(e.target.value);
+            console.log('⭐ 별점 필터 선택됨:', window.currentRatingFilter);
+        }
+    });
+    
+    /**
+     * 별점 필터 하단 시트 열기
+     */
+    function openRatingFilterSheet() {
+        if (ratingFilterSheet) {
+            ratingFilterSheet.classList.remove('hidden');
+            // 애니메이션을 위한 지연
+            setTimeout(() => {
+                const sheetContent = ratingFilterSheet.querySelector('.absolute');
+                if (sheetContent) {
+                    sheetContent.classList.remove('translate-y-full');
+                }
+            }, 10);
+        }
+    }
+    
+    /**
+     * 별점 필터 하단 시트 닫기
+     */
+    function closeRatingFilterSheet() {
+        if (ratingFilterSheet) {
+            const sheetContent = ratingFilterSheet.querySelector('.absolute');
+            if (sheetContent) {
+                sheetContent.classList.add('translate-y-full');
+            }
+            // 애니메이션 완료 후 숨김
+            setTimeout(() => {
+                ratingFilterSheet.classList.add('hidden');
+            }, 300);
+        }
+    }
+    
+    /**
+     * 별점 필터 선택 초기화
+     */
+    function clearRatingFilterSelection() {
+        console.log('🧹 별점 필터 초기화 시작');
+        
+        const ratingInputs = document.querySelectorAll('input[name="rating-filter"]');
+        ratingInputs.forEach(input => {
+            input.checked = false;
+        });
+        
+        window.currentRatingFilter = null;
+        console.log('🧹 별점 필터 초기화 완료:', window.currentRatingFilter);
+        
+        // 필터 제거 후 검색 결과 업데이트
+        applyRatingFilterToSearch();
+    }
+    
+    // 전역에서 접근 가능하도록 설정
+    window.clearRatingFilterSelection = clearRatingFilterSelection;
+    
+    /**
+     * 별점 필터를 검색 결과에 적용
+     */
+    function applyRatingFilterToSearch() {
+        const searchInput = document.getElementById('search-input');
+        const searchTerm = searchInput ? searchInput.value.trim() : '';
+        const entries = window.entries || [];
+        
+        console.log('🔍 applyRatingFilterToSearch 호출됨:', {
+            searchTerm: searchTerm,
+            entriesCount: entries.length,
+            currentRatingFilter: window.currentRatingFilter
+        });
+        
+        let searchResults = [];
+        
+        // 검색어가 있으면 검색 실행, 없으면 모든 항목 사용
+        if (searchTerm) {
+            searchResults = searchEntries(searchTerm, entries);
+        } else {
+            // 검색어가 없을 때는 모든 항목을 searchEntries 형식으로 변환
+            // null이나 undefined 항목은 제외
+            searchResults = entries
+                .filter(entry => entry && entry !== null && entry !== undefined)
+                .map(entry => ({
+                    entry: entry,
+                    matchScore: 0,
+                    matchedFields: [],
+                    highlightText: {} // highlightText 추가
+                }));
+        }
+        
+        // 디버깅을 위한 로그
+        console.log('🔍 별점 필터 적용 전:', {
+            totalEntries: entries.length,
+            searchTerm: searchTerm,
+            searchResultsCount: searchResults.length,
+            currentRatingFilter: window.currentRatingFilter
+        });
+        
+        // 별점 필터 적용
+        if (window.currentRatingFilter !== null) {
+            const beforeFilterCount = searchResults.length;
+            
+            // 선택한 별점과 정확히 일치하는 항목만 필터링
+            searchResults = searchResults.filter(result => {
+                const rating = result.entry.rating;
+                const ratingNum = parseInt(rating);
+                const isValidRating = rating && !isNaN(ratingNum) && ratingNum === window.currentRatingFilter;
+                
+                // 디버깅을 위한 개별 항목 로그 (모든 필터에 대해)
+                console.log(`🔍 항목 "${result.entry.city}, ${result.entry.country}":`, {
+                    rating: rating,
+                    ratingNum: ratingNum,
+                    isValidRating: isValidRating,
+                    filterThreshold: window.currentRatingFilter
+                });
+                
+                return isValidRating;
+            });
+            
+            console.log('⭐ 별점 필터 적용 후:', {
+                beforeFilterCount: beforeFilterCount,
+                afterFilterCount: searchResults.length,
+                filterType: `${window.currentRatingFilter}점`,
+                filteredOutCount: beforeFilterCount - searchResults.length
+            });
+        }
+        
+        // 검색 결과 렌더링
+        renderSearchResults(searchResults, 'search-results');
+        
+        // 하단 시트 닫기
+        closeRatingFilterSheet();
+    }
+}
+
 // 전역으로 노출
 if (typeof window !== 'undefined') {
     window.searchEntries = searchEntries;
@@ -2118,4 +2347,5 @@ if (typeof window !== 'undefined') {
     window.initializeSearchEventListeners = initializeSearchEventListeners;
     window.filterSearchResults = filterSearchResults;
     window.initializeQuickSearchTags = initializeQuickSearchTags;
+    window.initializeRatingFilter = initializeRatingFilter;
 } 
